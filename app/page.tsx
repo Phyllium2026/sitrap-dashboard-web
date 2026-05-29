@@ -330,22 +330,26 @@ export default function Home() {
 
         <section className="p-5 lg:p-8">
           <header className="mb-8 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-            <div>
-              <h1 className="text-3xl lg:text-4xl font-black uppercase text-[#14532d]">
-                Dashboard Ejecutivo SITRAP
-              </h1>
-              <p className="mt-2 text-slate-500">
-                Sistema de inventario, trazabilidad y monitoreo operativo de plantas
-              </p>
-              
-            <div className="rounded-xl bg-white px-5 py-4 shadow-sm flex items-center gap-3 text-[#1f6b3a]">
-              <CalendarClock />
-              <div>
-                <p className="text-xs text-slate-500">Última actualización</p>
-                <p className="font-bold">{new Date(kpis.fecha_actualizacion).toLocaleDateString('es-CL')}</p>
-              </div>
-            </div>
-          </header>
+  <div>
+    <h1 className="text-5xl font-black text-[#14532d]">
+      SITRAP
+    </h1>
+
+    <p className="mt-2 text-xl text-slate-600">
+      Sistema de Inventario y Trazabilidad de Plantas
+    </p>
+  </div>
+
+  <div className="rounded-xl bg-white px-5 py-4 shadow-sm flex items-center gap-3 text-[#1f6b3a]">
+    <CalendarClock />
+    <div>
+      <p className="text-xs text-slate-500">Última actualización</p>
+      <p className="font-bold">
+        {new Date(kpis.fecha_actualizacion).toLocaleDateString('es-CL')}
+      </p>
+    </div>
+  </div>
+</header>
 
           <SectionTitle>Stock</SectionTitle>
           <div className="grid gap-6 md:grid-cols-3 mb-8">
