@@ -278,39 +278,36 @@ export default function Home() {
       <div className="grid min-h-screen grid-cols-1 lg:grid-cols-[190px_1fr]">
         <aside className="bg-white p-4 border-r border-green-100">
        <Image
-  src="/sitrap-app-icon.png.png"
+  <Image
+  src="/sitrap-logo.png"
+  alt="SITRAP"
+  width={150}
+  height={150}
+  className="mx-auto mb-6 object-contain"
+/>
   alt="SITRAP"
   width={120}
   height={120}
   className="mx-auto mb-4 object-contain"
 />
 <div className="mb-6 space-y-2">
-  <button className="w-full rounded-xl bg-[#1f6b3a] px-3 py-3 text-sm font-bold text-white">
-    🏠 Inicio
+  <button className="w-full rounded-lg bg-[#14532d] px-3 py-2.5 text-left text-sm font-semibold text-white">
+    Inicio
   </button>
 
-  <button className="w-full rounded-xl border border-green-200 px-3 py-3 text-sm font-semibold text-[#14532d]">
-    📦 Inventario
+  <button className="w-full rounded-lg border border-green-100 bg-white px-3 py-2.5 text-left text-sm font-semibold text-[#14532d]">
+    Inventario
   </button>
 
-  <button className="w-full rounded-xl border border-green-200 px-3 py-3 text-sm font-semibold text-[#14532d]">
-    🔄 Movimientos
+  <button className="w-full rounded-lg border border-green-100 bg-white px-3 py-2.5 text-left text-sm font-semibold text-[#14532d]">
+    Movimientos
   </button>
 
-  <button className="w-full rounded-xl border border-green-200 px-3 py-3 text-sm font-semibold text-[#14532d]">
-    📊 Dashboard
+  <button className="w-full rounded-lg border border-green-100 bg-white px-3 py-2.5 text-left text-sm font-semibold text-[#14532d]">
+    Dashboard
   </button>
 </div>
-<div className="text-center mb-6">
-  <h2 className="text-lg font-black text-[#14532d]">
-    SITRAP
-  </h2>
 
-  <p className="text-[10px] text-slate-500 leading-tight">
-    Sistema de Inventario y
-    Trazabilidad de Plantas
-  </p>
-</div>   
 
           <div className="space-y-4">
             <SelectFilter label="Vivero" value={vivero} options={options.viveros} onChange={setVivero} />
