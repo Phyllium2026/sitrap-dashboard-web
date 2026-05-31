@@ -306,7 +306,7 @@ export default function Home() {
     <main className="h-screen overflow-hidden bg-[#f7f9f6] text-slate-900">
       <div className="grid h-[calc(100vh-2rem)] grid-cols-1 lg:grid-cols-[205px_1fr]">
         <aside className="flex h-[calc(100vh-2rem)] flex-col overflow-hidden border-r border-slate-200 bg-white px-2.5 py-1">
-          <div className="mb-1">
+          <div>
             <div className="mb-0.5 flex justify-center">
               <Image
                 src="/sitrap-logo.png"
@@ -350,36 +350,36 @@ export default function Home() {
                 </a>
               </div>
             </div>
-          </div>
 
-          <div className="mt-auto pb-1">
-            <SidebarTitle>
-              <span className="flex items-center gap-1.5">
-                <Filter size={9} />
-                Filtros rápidos
-              </span>
-            </SidebarTitle>
+            <div className="mt-1">
+              <SidebarTitle>
+                <span className="flex items-center gap-1.5">
+                  <Filter size={9} />
+                  Filtros rápidos
+                </span>
+              </SidebarTitle>
 
-            <div className="space-y-0.5">
-              <SelectFilter label="Vivero" value={vivero} options={options.viveros} onChange={setVivero} />
-              <SelectFilter label="Especie" value={especie} options={options.especies} onChange={setEspecie} />
-              <SelectFilter label="Contrato" value={contrato} options={options.contratos} onChange={setContrato} />
-              <SelectFilter label="Empresa / EECC" value={empresa} options={options.empresas} onChange={setEmpresa} />
-              <SelectFilter label="Fecha" value={fecha} options={options.fechas} onChange={setFecha} />
+              <div className="space-y-0.5">
+                <SelectFilter label="Vivero" value={vivero} options={options.viveros} onChange={setVivero} />
+                <SelectFilter label="Especie" value={especie} options={options.especies} onChange={setEspecie} />
+                <SelectFilter label="Contrato" value={contrato} options={options.contratos} onChange={setContrato} />
+                <SelectFilter label="Empresa / EECC" value={empresa} options={options.empresas} onChange={setEmpresa} />
+                <SelectFilter label="Fecha" value={fecha} options={options.fechas} onChange={setFecha} />
 
-              <button
-                onClick={() => {
-                  setVivero('');
-                  setEspecie('');
-                  setContrato('');
-                  setEmpresa('');
-                  setFecha('');
-                }}
-                className="flex w-full items-center justify-center gap-1 rounded-md border border-green-200 px-2 py-0.5 text-[9px] font-bold text-[#14532d] hover:bg-green-50"
-              >
-                <RotateCcw size={9} />
-                Limpiar filtros
-              </button>
+                <button
+                  onClick={() => {
+                    setVivero('');
+                    setEspecie('');
+                    setContrato('');
+                    setEmpresa('');
+                    setFecha('');
+                  }}
+                  className="flex w-full items-center justify-center gap-1 rounded-md border border-green-200 px-2 py-0.5 text-[9px] font-bold text-[#14532d] hover:bg-green-50"
+                >
+                  <RotateCcw size={9} />
+                  Limpiar filtros
+                </button>
+              </div>
             </div>
           </div>
         </aside>
@@ -412,14 +412,14 @@ export default function Home() {
                 <ResponsiveContainer width="100%" height="100%">
                   <ReBarChart
                     data={stockPorVivero}
-                    margin={{ top: 8, right: 2, bottom: 26, left: -12 }}
+                    margin={{ top: 8, right: 2, bottom: 26, left: 18 }}
                     barCategoryGap="4%"
                     barGap={2}
                   >
                     <XAxis dataKey="name" tick={{ fontSize: 8 }} interval={0} height={34} tickLine={false} angle={0} textAnchor="middle" />
                     <YAxis width={42} tick={{ fontSize: 8 }} tickLine={false} axisLine={false} tickMargin={4} />
                     <Tooltip formatter={(v: any) => fmt(v)} labelFormatter={(_, payload: any) => payload?.[0]?.payload?.fullName || ''} />
-                    <Bar dataKey="value" fill={GREEN} radius={[7, 7, 0, 0]} maxBarSize={78} />
+                    <Bar dataKey="value" fill={GREEN} radius={[7, 7, 0, 0]} maxBarSize={72} />
                   </ReBarChart>
                 </ResponsiveContainer>
               </div>
@@ -556,7 +556,7 @@ export default function Home() {
 
       <footer className="flex h-8 w-full items-center justify-center bg-[#14532d] px-4 text-[11px] font-semibold text-white">
         <span>SITRAP · Sistema de Inventario y Trazabilidad de Plantas</span>
-        <span className="absolute right-4">Versión 3.17</span>
+        <span className="absolute right-4">Versión 3.18</span>
       </footer>
     </main>
   );
