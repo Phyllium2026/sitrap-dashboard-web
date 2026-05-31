@@ -1,0 +1,22 @@
+{
+  "name": "SITRAP",
+  "short_name": "SITRAP",
+  "description": "Sistema de Inventario y Trazabilidad de Plantas",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f7f9f6",
+  "theme_color": "#14532d",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/sitrap-app-icon.png.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/sitrap-app-icon.png.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
