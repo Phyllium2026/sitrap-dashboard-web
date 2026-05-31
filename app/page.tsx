@@ -6,7 +6,9 @@ import {
   BarChart as ReBarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
 } from 'recharts';
 import {
-  Home, Boxes, PackageCheck, PackagePlus, PackageMinus, Truck, Warehouse,
+  Home as HomeIcon,
+  Boxes,
+  PackageCheck, PackagePlus, PackageMinus, Truck, Warehouse,
   CalendarClock, RefreshCw, ClipboardList, ArrowLeftRight, BarChart3,
   Filter, AlertTriangle, ExternalLink, RotateCcw, SearchCheck,
 } from 'lucide-react';
@@ -298,7 +300,7 @@ export default function Home() {
 
           <nav className="space-y-2">
             <button className="flex w-full items-center gap-3 rounded-xl bg-[#14532d] px-4 py-3 text-left text-sm font-bold text-white">
-              <Home size={18} /> Inicio
+              <HomeIcon size={18} /> Inicio
             </button>
             <button className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-semibold text-slate-700 hover:bg-green-50">
               <Boxes size={18} /> Inventario
