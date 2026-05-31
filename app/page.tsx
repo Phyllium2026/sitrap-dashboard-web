@@ -20,6 +20,9 @@ const API = '/api/sitrap';
 const GREEN = '#166534';
 const COLORS = ['#166534', '#3f7f34', '#77a86c', '#adc7a7', '#d1d8dc'];
 
+const FORM_E1_LOTES = 'https://forms.gle/rmeVotdbvr1Mcmay8';
+const FORM_E2_MOVIMIENTOS = 'https://forms.gle/87vXapaf6nDGR9gN9';
+
 const n = (v: any) => {
   if (v === null || v === undefined || v === '') return 0;
   const x = Number(String(v).replace(/\./g, '').replace(',', '.'));
@@ -342,10 +345,22 @@ export default function Home() {
               <SidebarTitle>Acciones rápidas</SidebarTitle>
 
               <div className="space-y-0.5">
-                <a href="#" className="flex items-center justify-between rounded-md border border-green-200 bg-white px-2 py-0.5 text-[8.5px] font-bold text-[#14532d]">
+                <a
+                  href={FORM_E1_LOTES}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title="Abrir Formulario E1: Codificación de lotes"
+                  className="flex items-center justify-between rounded-md border border-[#166534] bg-[#166534] px-2 py-0.5 text-[8.5px] font-bold text-white"
+                >
                   Codificar Lote <ExternalLink size={9} />
                 </a>
-                <a href="#" className="flex items-center justify-between rounded-md border border-green-200 bg-white px-2 py-0.5 text-[8.5px] font-bold text-[#14532d]">
+                <a
+                  href={FORM_E2_MOVIMIENTOS}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title="Abrir Formulario E2: Movimientos de lotes"
+                  className="flex items-center justify-between rounded-md border border-green-200 bg-white px-2 py-0.5 text-[8.5px] font-bold text-[#14532d]"
+                >
                   Registrar Movimiento <ExternalLink size={9} />
                 </a>
               </div>
@@ -556,7 +571,7 @@ export default function Home() {
 
       <footer className="flex h-8 w-full items-center justify-center bg-[#14532d] px-4 text-[11px] font-semibold text-white">
         <span>SITRAP · Sistema de Inventario y Trazabilidad de Plantas</span>
-        <span className="absolute right-4">Versión 3.19</span>
+        <span className="absolute right-4">Versión 4.0</span>
       </footer>
     </main>
   );
