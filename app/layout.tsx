@@ -2,11 +2,28 @@ import './globals.css';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'SITRAP Dashboard Web',
+  title: 'SITRAP',
   description: 'Sistema de Inventario y Trazabilidad de Plantas',
+
+  manifest: '/manifest.json',
+
+  icons: {
+    icon: '/sitrap-app-icon.png.png',
+    apple: '/sitrap-app-icon.png.png',
+  },
+
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'SITRAP',
+  },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="es">
       <body>{children}</body>
