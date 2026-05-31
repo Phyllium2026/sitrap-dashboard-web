@@ -38,11 +38,11 @@ const short = (v: any, max = 18) => {
 function SelectFilter({ label, value, options, onChange }: any) {
   return (
     <div>
-      <label className="mb-0.5 block text-[8.5px] font-black uppercase tracking-wide text-[#14532d]">
+      <label className="mb-0 block text-[8px] font-black uppercase tracking-wide text-[#14532d]">
         {label}
       </label>
       <select
-        className="w-full rounded-md border border-green-200 bg-white px-2 py-0.5 text-[9.5px] font-semibold text-slate-800 outline-none focus:border-[#166534]"
+        className="w-full rounded-md border border-green-200 bg-white px-2 py-[2px] text-[9px] font-semibold text-slate-800 outline-none focus:border-[#166534]"
         value={value}
         onChange={(e) => onChange(e.target.value)}
       >
@@ -301,55 +301,55 @@ export default function Home() {
   return (
     <main className="h-screen overflow-hidden bg-[#f7f9f6] text-slate-900">
       <div className="grid h-screen grid-cols-1 lg:grid-cols-[205px_1fr]">
-        <aside className="h-screen overflow-hidden bg-white border-r border-slate-200 px-3 py-2.5 flex flex-col">
+        <aside className="h-screen overflow-hidden bg-white border-r border-slate-200 px-3 py-2 flex flex-col">
           <div className="mb-1.5 flex justify-center">
             <Image
               src="/sitrap-logo.png"
               alt="SITRAP"
-              width={132}
-              height={86}
+              width={118}
+              height={76}
               className="object-contain"
               priority
             />
           </div>
 
-          <nav className="space-y-0.5">
-            <button className="flex w-full items-center gap-2 rounded-md bg-[#14532d] px-2.5 py-1.5 text-left text-xs font-bold text-white">
+          <nav className="space-y-0.5 text-[11px]">
+            <button className="flex w-full items-center gap-2 rounded-md bg-[#14532d] px-2.5 py-1 text-left text-[11px] font-bold text-white">
               <HomeIcon size={13} /> Inicio
             </button>
-            <button className="flex w-full items-center gap-2 rounded-md px-2.5 py-1.5 text-left text-xs font-semibold text-slate-700 hover:bg-green-50">
+            <button className="flex w-full items-center gap-2 rounded-md px-2.5 py-1 text-left text-[11px] font-semibold text-slate-700 hover:bg-green-50">
               <Boxes size={13} /> Inventario
             </button>
-            <button className="flex w-full items-center gap-2 rounded-md px-2.5 py-1.5 text-left text-xs font-semibold text-slate-700 hover:bg-green-50">
+            <button className="flex w-full items-center gap-2 rounded-md px-2.5 py-1 text-left text-[11px] font-semibold text-slate-700 hover:bg-green-50">
               <ArrowLeftRight size={13} /> Movimientos
             </button>
-            <button className="flex w-full items-center gap-2 rounded-md px-2.5 py-1.5 text-left text-xs font-semibold text-slate-700 hover:bg-green-50">
+            <button className="flex w-full items-center gap-2 rounded-md px-2.5 py-1 text-left text-[11px] font-semibold text-slate-700 hover:bg-green-50">
               <ClipboardList size={13} /> Contratos
             </button>
-            <button className="flex w-full items-center gap-2 rounded-md px-2.5 py-1.5 text-left text-xs font-semibold text-slate-700 hover:bg-green-50">
+            <button className="flex w-full items-center gap-2 rounded-md px-2.5 py-1 text-left text-[11px] font-semibold text-slate-700 hover:bg-green-50">
               <BarChart3 size={13} /> Dashboard
             </button>
           </nav>
 
-          <div className="mt-1.5">
-            <p className="mb-1 text-[9px] font-black uppercase tracking-wide text-[#14532d]">Acciones rápidas</p>
+          <div className="mt-1">
+            <p className="mb-0.5 text-[8.5px] font-black uppercase tracking-wide text-[#14532d]">Acciones rápidas</p>
             <div className="space-y-1">
-              <a href="#" className="flex items-center justify-between rounded-md bg-[#166534] px-2.5 py-1.5 text-[10px] font-bold text-white">
+              <a href="#" className="flex items-center justify-between rounded-md bg-[#166534] px-2.5 py-1 text-[9.5px] font-bold text-white">
                 Codificar Lote <ExternalLink size={11} />
               </a>
-              <a href="#" className="flex items-center justify-between rounded-md border border-green-200 px-2.5 py-1.5 text-[10px] font-bold text-[#14532d]">
+              <a href="#" className="flex items-center justify-between rounded-md border border-green-200 px-2.5 py-1 text-[9.5px] font-bold text-[#14532d]">
                 Registrar Movimiento <ExternalLink size={11} />
               </a>
             </div>
           </div>
 
-          <div className="mt-1.5">
-            <div className="mb-1 flex items-center gap-1.5">
+          <div className="mt-1">
+            <div className="mb-0.5 flex items-center gap-1.5">
               <Filter size={11} className="text-[#14532d]" />
               <p className="text-[9px] font-black uppercase tracking-wide text-[#14532d]">Filtros rápidos</p>
             </div>
 
-            <div className="space-y-1">
+            <div className="space-y-0.5">
               <SelectFilter label="Vivero" value={vivero} options={options.viveros} onChange={setVivero} />
               <SelectFilter label="Especie" value={especie} options={options.especies} onChange={setEspecie} />
               <SelectFilter label="Contrato" value={contrato} options={options.contratos} onChange={setContrato} />
@@ -358,7 +358,7 @@ export default function Home() {
 
               <button
                 onClick={() => { setVivero(''); setEspecie(''); setContrato(''); setEmpresa(''); setFecha(''); }}
-                className="flex w-full items-center justify-center gap-1 rounded-md border border-green-200 px-2 py-1 text-[10px] font-bold text-[#14532d] hover:bg-green-50"
+                className="flex w-full items-center justify-center gap-1 rounded-md border border-green-200 px-2 py-0.5 text-[9.5px] font-bold text-[#14532d] hover:bg-green-50"
               >
                 <RotateCcw size={11} /> Limpiar filtros
               </button>
@@ -413,16 +413,16 @@ export default function Home() {
 
             <div className="rounded-xl bg-white p-3 shadow-sm border border-slate-100 h-[290px] overflow-hidden">
               <SectionHeader title="Stock por Especie" />
-              <div className="grid h-[245px] grid-cols-[0.55fr_1.45fr] items-center gap-3">
-                <div className="relative h-[155px] min-w-0 overflow-visible">
+              <div className="grid h-[245px] grid-cols-[150px_minmax(0,1fr)] items-center gap-2">
+                <div className="relative h-[145px] w-[145px] min-w-[145px] overflow-visible">
                   <ResponsiveContainer width="100%" height="100%">
-                    <PieChart margin={{ top: 8, right: 8, bottom: 8, left: 8 }}>
+                    <PieChart margin={{ top: 14, right: 14, bottom: 14, left: 14 }}>
                       <Pie
                         data={stockPorEspecie}
                         dataKey="value"
                         nameKey="name"
-                        innerRadius={40}
-                        outerRadius={58}
+                        innerRadius={36}
+                        outerRadius={52}
                         paddingAngle={2}
                       >
                         {stockPorEspecie.map((_, i) => (
@@ -442,9 +442,9 @@ export default function Home() {
                   {stockPorEspecie.map((e, i) => {
                     const pct = totalEspecies ? (e.value / totalEspecies) * 100 : 0;
                     return (
-                      <div key={e.name} className="grid grid-cols-[8px_minmax(0,1fr)_34px_48px] items-center gap-1.5 text-[9.5px]">
+                      <div key={e.name} className="grid grid-cols-[8px_minmax(0,1fr)_32px_46px] items-center gap-1.5 text-[9.3px]">
                         <span className="h-2 w-2 rounded-full" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
-                        <span className="truncate text-slate-700" title={e.name}>{short(e.name, 16)}</span>
+                        <span className="truncate text-slate-700" title={e.name}>{short(e.name, 15)}</span>
                         <span className="font-semibold text-slate-700">{pct.toFixed(1)}%</span>
                         <span className="text-right font-black text-[#14532d]">{fmt(e.value)}</span>
                       </div>
@@ -553,7 +553,7 @@ export default function Home() {
 
           <footer className="mt-2 -mx-3 flex h-8 items-center justify-center bg-[#14532d] px-4 text-[11px] font-semibold text-white">
             <span>SITRAP · Sistema de Inventario y Trazabilidad de Plantas</span>
-            <span className="absolute right-4">Versión 3.10</span>
+            <span className="absolute right-4">Versión 3.11</span>
           </footer>
         </section>
       </div>
