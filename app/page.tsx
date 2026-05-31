@@ -3,35 +3,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import {
-  BarChart as ReBarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
+  BarChart as ReBarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
+  PieChart, Pie, Cell,
 } from 'recharts';
 import {
-  Home as HomeIcon,
-  Boxes,
-  PackageCheck,
-  PackagePlus,
-  PackageMinus,
-  Truck,
-  Warehouse,
-  CalendarClock,
-  RefreshCw,
-  ClipboardList,
-  ArrowLeftRight,
-  BarChart3,
-  Filter,
-  AlertTriangle,
-  ExternalLink,
-  RotateCcw,
-  SearchCheck,
-  Tag,
+  Home as HomeIcon, Boxes, PackageCheck, PackagePlus, PackageMinus, Truck,
+  Warehouse, CalendarClock, RefreshCw, ClipboardList, ArrowLeftRight, BarChart3,
+  Filter, AlertTriangle, ExternalLink, RotateCcw, SearchCheck, Tag,
 } from 'lucide-react';
 
 type Kpis = Record<string, any>;
@@ -49,9 +27,7 @@ const n = (v: any) => {
 };
 
 const txt = (v: any) => String(v || '').trim();
-
-const fmt = (v: any) =>
-  new Intl.NumberFormat('es-CL').format(n(v));
+const fmt = (v: any) => new Intl.NumberFormat('es-CL').format(n(v));
 
 const short = (v: any, max = 18) => {
   const s = txt(v);
@@ -61,7 +37,7 @@ const short = (v: any, max = 18) => {
 
 function SidebarTitle({ children }: any) {
   return (
-    <div className="mb-1 rounded-md bg-[#14532d] px-2.5 py-1 text-[9px] font-black uppercase tracking-wide text-white">
+    <div className="mb-0.5 rounded-md bg-[#14532d] px-2.5 py-0.5 text-[8.5px] font-black uppercase tracking-wide text-white">
       {children}
     </div>
   );
@@ -70,19 +46,17 @@ function SidebarTitle({ children }: any) {
 function SelectFilter({ label, value, options, onChange }: any) {
   return (
     <div>
-      <label className="mb-0.5 block text-[7.5px] font-black uppercase tracking-wide text-[#14532d]">
+      <label className="mb-0 block text-[7px] font-black uppercase tracking-wide text-[#14532d]">
         {label}
       </label>
       <select
-        className="w-full rounded-md border border-green-200 bg-white px-2 py-1 text-[9.5px] font-semibold text-slate-800 outline-none focus:border-[#166534]"
+        className="w-full rounded-md border border-green-200 bg-white px-2 py-0.5 text-[9px] font-semibold text-slate-800 outline-none focus:border-[#166534]"
         value={value}
         onChange={(e) => onChange(e.target.value)}
       >
         <option value="">Todas</option>
         {options.map((x: string) => (
-          <option key={x} value={x}>
-            {x}
-          </option>
+          <option key={x} value={x}>{x}</option>
         ))}
       </select>
     </div>
@@ -92,14 +66,8 @@ function SelectFilter({ label, value, options, onChange }: any) {
 function SectionHeader({ title, action }: any) {
   return (
     <div className="mb-2 flex items-center justify-between">
-      <h2 className="text-[15px] font-black leading-none text-[#14532d]">
-        {title}
-      </h2>
-      {action && (
-        <span className="text-[9px] font-bold text-[#166534]">
-          {action}
-        </span>
-      )}
+      <h2 className="text-[15px] font-black leading-none text-[#14532d]">{title}</h2>
+      {action && <span className="text-[9px] font-bold text-[#166534]">{action}</span>}
     </div>
   );
 }
@@ -111,20 +79,12 @@ function CompactKpi({ title, value, subtitle, icon: Icon }: any) {
         <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-green-50 text-[#166534]">
           <Icon size={15} strokeWidth={1.8} />
         </div>
-
         <div className="min-w-0 text-left">
-          <p className="truncate text-[10px] font-black leading-tight text-slate-800">
-            {title}
-          </p>
-          <p className="text-[8.5px] leading-tight text-slate-500">
-            {subtitle}
-          </p>
+          <p className="truncate text-[10px] font-black leading-tight text-slate-800">{title}</p>
+          <p className="text-[8.5px] leading-tight text-slate-500">{subtitle}</p>
         </div>
       </div>
-
-      <p className="pl-3 text-right text-[17px] font-black leading-none text-[#14532d]">
-        {fmt(value)}
-      </p>
+      <p className="pl-3 text-right text-[17px] font-black leading-none text-[#14532d]">{fmt(value)}</p>
     </div>
   );
 }
@@ -144,35 +104,26 @@ export default function Home() {
   useEffect(() => {
     async function load() {
       setLoading(true);
-
       const [k, l, m] = await Promise.all([
         fetch(`${API}?view=kpis`).then((r) => r.json()),
         fetch(`${API}?view=lotes`).then((r) => r.json()),
         fetch(`${API}?view=movimientos`).then((r) => r.json()),
       ]);
-
       setKpis(k);
       setLotes(Array.isArray(l) ? l : []);
       setMovimientos(Array.isArray(m) ? m : []);
       setLoading(false);
     }
-
     load();
   }, []);
 
   const options = useMemo(() => {
-    const uniq = (arr: string[]) =>
-      Array.from(new Set(arr.filter(Boolean))).sort();
-
+    const uniq = (arr: string[]) => Array.from(new Set(arr.filter(Boolean))).sort();
     return {
       viveros: uniq(lotes.map((x) => txt(x.Vivero))),
       especies: uniq(lotes.map((x) => txt(x.EspecieMaterial))),
-      contratos: uniq(
-        movimientos.map((x) => txt(x.Contrato_Final || x.Contrato))
-      ),
-      empresas: uniq(
-        movimientos.map((x) => txt(x.Empresa_EECC_Final || x.Empresa_EECC))
-      ),
+      contratos: uniq(movimientos.map((x) => txt(x.Contrato_Final || x.Contrato))),
+      empresas: uniq(movimientos.map((x) => txt(x.Empresa_EECC_Final || x.Empresa_EECC))),
       fechas: ['Últimos 30 días', 'Últimos 90 días', 'Año 2026'],
     };
   }, [lotes, movimientos]);
@@ -192,18 +143,11 @@ export default function Home() {
 
   const movimientosFiltrados = useMemo(() => {
     const now = new Date();
-
     return movimientos.filter((m) => {
       const id = txt(m.ID_Final_Lote);
       if (idsFiltrados.size && id && !idsFiltrados.has(id)) return false;
-
-      if (contrato && txt(m.Contrato_Final || m.Contrato) !== contrato) {
-        return false;
-      }
-
-      if (empresa && txt(m.Empresa_EECC_Final || m.Empresa_EECC) !== empresa) {
-        return false;
-      }
+      if (contrato && txt(m.Contrato_Final || m.Contrato) !== contrato) return false;
+      if (empresa && txt(m.Empresa_EECC_Final || m.Empresa_EECC) !== empresa) return false;
 
       if (vivero) {
         const origen = txt(m.Origen);
@@ -212,10 +156,7 @@ export default function Home() {
       }
 
       if (fecha) {
-        const f = new Date(
-          m.Fecha_Movimiento || m.Fecha_Registro || m.Timestamp || ''
-        );
-
+        const f = new Date(m.Fecha_Movimiento || m.Fecha_Registro || m.Timestamp || '');
         if (Number.isNaN(f.getTime())) return false;
 
         if (fecha === 'Últimos 30 días') {
@@ -238,10 +179,7 @@ export default function Home() {
   }, [movimientos, idsFiltrados, contrato, empresa, fecha, vivero]);
 
   const calc = useMemo(() => {
-    const stockInicial = lotesFiltrados.reduce(
-      (s, l) => s + n(l.CantidadInicialP),
-      0
-    );
+    const stockInicial = lotesFiltrados.reduce((s, l) => s + n(l.CantidadInicialP), 0);
 
     let entradasVMA = 0;
     let salidasViveros = 0;
@@ -256,19 +194,12 @@ export default function Home() {
       const tipo = txt(m.Tipo_Evento);
       const cantidad = n(m.Cantidad);
 
-      if (
-        subtipo === 'Recepción en VMA' ||
-        subtipo === 'Ingreso a VMA' ||
-        subtipo === 'Ingreso a vivero'
-      ) {
+      if (subtipo === 'Recepción en VMA' || subtipo === 'Ingreso a VMA' || subtipo === 'Ingreso a vivero') {
         entradasVMA += cantidad;
         ingresos += cantidad;
       }
 
-      if (
-        subtipo === 'Despacho a VMA' ||
-        subtipo === 'Traslado entre viveros'
-      ) {
+      if (subtipo === 'Despacho a VMA' || subtipo === 'Traslado entre viveros') {
         salidasViveros += cantidad;
         egresos += cantidad;
       }
@@ -278,13 +209,8 @@ export default function Home() {
         egresos += cantidad;
       }
 
-      if (subtipo.includes('Baja') || txt(m.Afecta_Stock) === 'Resta') {
-        bajas += cantidad;
-      }
-
-      if (tipo === 'Transformación' || subtipo.includes('Transform')) {
-        transformaciones += cantidad;
-      }
+      if (subtipo.includes('Baja') || txt(m.Afecta_Stock) === 'Resta') bajas += cantidad;
+      if (tipo === 'Transformación' || subtipo.includes('Transform')) transformaciones += cantidad;
     });
 
     const trasladosPendientes = Math.max(salidasViveros - entradasVMA, 0);
@@ -293,11 +219,7 @@ export default function Home() {
     let stockViveroSeleccionado = stockActual;
 
     if (vivero) {
-      const inicialVivero = lotesFiltrados.reduce(
-        (s, l) => s + n(l.CantidadInicialP),
-        0
-      );
-
+      const inicialVivero = lotesFiltrados.reduce((s, l) => s + n(l.CantidadInicialP), 0);
       let movVivero = 0;
 
       movimientosFiltrados.forEach((m) => {
@@ -306,25 +228,11 @@ export default function Home() {
         const origen = txt(m.Origen);
         const destino = txt(m.Destino);
 
-        if (
-          origen === vivero &&
-          ['Despacho a VMA', 'Traslado entre viveros', 'Salida a EECC'].includes(
-            subtipo
-          )
-        ) {
+        if (origen === vivero && ['Despacho a VMA', 'Traslado entre viveros', 'Salida a EECC'].includes(subtipo)) {
           movVivero -= cantidad;
         }
 
-        if (
-          destino === vivero &&
-          [
-            'Recepción en VMA',
-            'Ingreso a VMA',
-            'Ingreso a vivero',
-            'Devolución desde EECC',
-            'Devolución',
-          ].includes(subtipo)
-        ) {
+        if (destino === vivero && ['Recepción en VMA', 'Ingreso a VMA', 'Ingreso a vivero', 'Devolución desde EECC', 'Devolución'].includes(subtipo)) {
           movVivero += cantidad;
         }
       });
@@ -347,25 +255,19 @@ export default function Home() {
 
   const stockPorVivero = useMemo(() => {
     const data: Record<string, number> = {};
-
     lotesFiltrados.forEach((l) => {
       const v = txt(l.Vivero) || 'Sin vivero';
       data[v] = (data[v] || 0) + n(l.CantidadInicialP);
     });
 
     return Object.entries(data)
-      .map(([name, value]) => ({
-        name: short(name, 14),
-        fullName: name,
-        value,
-      }))
+      .map(([name, value]) => ({ name: short(name, 14), fullName: name, value }))
       .sort((a, b) => b.value - a.value)
       .slice(0, 5);
   }, [lotesFiltrados]);
 
   const stockPorEspecie = useMemo(() => {
     const data: Record<string, number> = {};
-
     lotesFiltrados.forEach((l) => {
       const e = txt(l.EspecieMaterial) || 'Sin especie';
       data[e] = (data[e] || 0) + n(l.CantidadInicialP);
@@ -378,32 +280,20 @@ export default function Home() {
   }, [lotesFiltrados]);
 
   const stockPorContrato = useMemo(() => {
-    const data: Record<
-      string,
-      { contrato: string; empresa: string; movimientos: number }
-    > = {};
+    const data: Record<string, { contrato: string; empresa: string; movimientos: number }> = {};
 
     movimientosFiltrados.forEach((m) => {
       const c = txt(m.Contrato_Final || m.Contrato) || 'Sin contrato';
       const e = txt(m.Empresa_EECC_Final || m.Empresa_EECC) || '-';
 
-      if (!data[c]) {
-        data[c] = { contrato: c, empresa: e, movimientos: 0 };
-      }
-
+      if (!data[c]) data[c] = { contrato: c, empresa: e, movimientos: 0 };
       data[c].movimientos += n(m.Cantidad);
     });
 
-    return Object.values(data)
-      .sort((a, b) => b.movimientos - a.movimientos)
-      .slice(0, 5);
+    return Object.values(data).sort((a, b) => b.movimientos - a.movimientos).slice(0, 5);
   }, [movimientosFiltrados]);
 
-  const maxContrato = Math.max(
-    ...stockPorContrato.map((x) => x.movimientos),
-    1
-  );
-
+  const maxContrato = Math.max(...stockPorContrato.map((x) => x.movimientos), 1);
   const totalEspecies = stockPorEspecie.reduce((s, x) => s + x.value, 0);
 
   if (loading || !kpis) {
@@ -416,14 +306,14 @@ export default function Home() {
 
   return (
     <main className="h-screen overflow-hidden bg-[#f7f9f6] text-slate-900">
-      <div className="grid h-screen grid-cols-1 lg:grid-cols-[205px_1fr]">
-        <aside className="h-screen overflow-hidden border-r border-slate-200 bg-white px-2.5 py-1.5">
-          <div className="mb-1 flex justify-center">
+      <div className="grid h-[calc(100vh-2rem)] grid-cols-1 lg:grid-cols-[205px_1fr]">
+        <aside className="h-[calc(100vh-2rem)] overflow-hidden border-r border-slate-200 bg-white px-2.5 py-1">
+          <div className="mb-0.5 flex justify-center">
             <Image
               src="/sitrap-logo.png"
               alt="SITRAP"
-              width={106}
-              height={70}
+              width={98}
+              height={64}
               className="object-contain"
               priority
             />
@@ -431,91 +321,51 @@ export default function Home() {
 
           <SidebarTitle>Inicio</SidebarTitle>
 
-          <nav className="space-y-0 text-[10.5px]">
+          <nav className="space-y-0 text-[10px]">
             <button className="flex w-full items-center gap-2 rounded-md px-2 py-0.5 text-left font-bold text-[#14532d] hover:bg-green-50">
-              <HomeIcon size={12} /> Inicio
+              <HomeIcon size={11} /> Inicio
             </button>
-
             <button className="flex w-full items-center gap-2 rounded-md px-2 py-0.5 text-left font-semibold text-slate-700 hover:bg-green-50">
-              <Boxes size={12} /> Inventario
+              <Boxes size={11} /> Inventario
             </button>
-
             <button className="flex w-full items-center gap-2 rounded-md px-2 py-0.5 text-left font-semibold text-slate-700 hover:bg-green-50">
-              <ArrowLeftRight size={12} /> Movimientos
+              <ArrowLeftRight size={11} /> Movimientos
             </button>
-
             <button className="flex w-full items-center gap-2 rounded-md px-2 py-0.5 text-left font-semibold text-slate-700 hover:bg-green-50">
-              <ClipboardList size={12} /> Contratos
+              <ClipboardList size={11} /> Contratos
             </button>
-
             <button className="flex w-full items-center gap-2 rounded-md px-2 py-0.5 text-left font-semibold text-slate-700 hover:bg-green-50">
-              <BarChart3 size={12} /> Dashboard
+              <BarChart3 size={11} /> Dashboard
             </button>
           </nav>
 
-          <div className="mt-1.5">
+          <div className="mt-1">
             <SidebarTitle>Acciones rápidas</SidebarTitle>
 
-            <div className="space-y-1">
-              <a
-                href="#"
-                className="flex items-center justify-between rounded-md border border-green-200 bg-white px-2 py-1 text-[9px] font-bold text-[#14532d]"
-              >
-                Codificar Lote <ExternalLink size={10} />
+            <div className="space-y-0.5">
+              <a href="#" className="flex items-center justify-between rounded-md border border-green-200 bg-white px-2 py-0.5 text-[8.5px] font-bold text-[#14532d]">
+                Codificar Lote <ExternalLink size={9} />
               </a>
-
-              <a
-                href="#"
-                className="flex items-center justify-between rounded-md border border-green-200 bg-white px-2 py-1 text-[9px] font-bold text-[#14532d]"
-              >
-                Registrar Movimiento <ExternalLink size={10} />
+              <a href="#" className="flex items-center justify-between rounded-md border border-green-200 bg-white px-2 py-0.5 text-[8.5px] font-bold text-[#14532d]">
+                Registrar Movimiento <ExternalLink size={9} />
               </a>
             </div>
           </div>
 
-          <div className="mt-1.5">
+          <div className="mt-1">
             <SidebarTitle>
               <span className="flex items-center gap-1.5">
-                <Filter size={10} />
+                <Filter size={9} />
                 Filtros rápidos
               </span>
             </SidebarTitle>
 
-            <div className="space-y-1">
-              <SelectFilter
-                label="Vivero"
-                value={vivero}
-                options={options.viveros}
-                onChange={setVivero}
-              />
-
-              <SelectFilter
-                label="Especie"
-                value={especie}
-                options={options.especies}
-                onChange={setEspecie}
-              />
-
-              <SelectFilter
-                label="Contrato"
-                value={contrato}
-                options={options.contratos}
-                onChange={setContrato}
-              />
-
-              <SelectFilter
-                label="Empresa / EECC"
-                value={empresa}
-                options={options.empresas}
-                onChange={setEmpresa}
-              />
-
-              <SelectFilter
-                label="Fecha"
-                value={fecha}
-                options={options.fechas}
-                onChange={setFecha}
-              />
+            <div className="space-y-0.5">
+              <SelectFilter label="Vivero" value={vivero} options={options.viveros} onChange={setVivero} />
+              <SelectFilter label="Especie" value={especie} options={options.especies} onChange={setEspecie} />
+              <SelectFilter label="Contrato" value={contrato} options={options.contratos} onChange={setContrato} />
+              <SelectFilter label="Empresa / EECC" value={empresa} options={options.empresas} onChange={setEmpresa} />
+              <SelectFilter label="Fecha" value={fecha} options={options.fechas} onChange={setFecha} />
 
               <button
                 onClick={() => {
@@ -525,21 +375,19 @@ export default function Home() {
                   setEmpresa('');
                   setFecha('');
                 }}
-                className="flex w-full items-center justify-center gap-1 rounded-md border border-green-200 px-2 py-1 text-[9.5px] font-bold text-[#14532d] hover:bg-green-50"
+                className="flex w-full items-center justify-center gap-1 rounded-md border border-green-200 px-2 py-0.5 text-[9px] font-bold text-[#14532d] hover:bg-green-50"
               >
-                <RotateCcw size={10} />
+                <RotateCcw size={9} />
                 Limpiar filtros
               </button>
             </div>
           </div>
         </aside>
 
-        <section className="flex h-screen flex-col overflow-hidden p-3 pb-0">
+        <section className="flex h-[calc(100vh-2rem)] flex-col overflow-hidden p-3 pb-0">
           <header className="mb-2 flex items-start justify-between gap-3">
             <div>
-              <h1 className="text-xl font-black leading-tight text-[#14532d]">
-                Bienvenido a SITRAP
-              </h1>
+              <h1 className="text-xl font-black leading-tight text-[#14532d]">Bienvenido a SITRAP</h1>
               <p className="mt-0.5 text-xs text-slate-600">
                 Resumen ejecutivo de inventario y trazabilidad de plantas
               </p>
@@ -548,13 +396,9 @@ export default function Home() {
             <div className="flex shrink-0 items-center gap-2 rounded-lg border border-slate-100 bg-white px-3 py-1.5 text-[#14532d] shadow-sm">
               <CalendarClock size={16} />
               <div>
-                <p className="text-[9px] text-slate-500">
-                  Última actualización
-                </p>
+                <p className="text-[9px] text-slate-500">Última actualización</p>
                 <p className="text-xs font-black">
-                  {new Date(kpis.fecha_actualizacion).toLocaleDateString(
-                    'es-CL'
-                  )}
+                  {new Date(kpis.fecha_actualizacion).toLocaleDateString('es-CL')}
                 </p>
               </div>
             </div>
@@ -581,7 +425,6 @@ export default function Home() {
                       angle={0}
                       textAnchor="middle"
                     />
-
                     <YAxis
                       width={42}
                       tick={{ fontSize: 8 }}
@@ -589,20 +432,13 @@ export default function Home() {
                       axisLine={false}
                       tickMargin={6}
                     />
-
                     <Tooltip
                       formatter={(v: any) => fmt(v)}
                       labelFormatter={(_, payload: any) =>
                         payload?.[0]?.payload?.fullName || ''
                       }
                     />
-
-                    <Bar
-                      dataKey="value"
-                      fill={GREEN}
-                      radius={[7, 7, 0, 0]}
-                      maxBarSize={70}
-                    />
+                    <Bar dataKey="value" fill={GREEN} radius={[7, 7, 0, 0]} maxBarSize={70} />
                   </ReBarChart>
                 </ResponsiveContainer>
               </div>
@@ -627,15 +463,12 @@ export default function Home() {
                           <Cell key={i} fill={COLORS[i % COLORS.length]} />
                         ))}
                       </Pie>
-
                       <Tooltip formatter={(v: any) => fmt(v)} />
                     </PieChart>
                   </ResponsiveContainer>
 
                   <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center">
-                    <p className="text-sm font-black text-[#14532d]">
-                      {fmt(calc.stockActual)}
-                    </p>
+                    <p className="text-sm font-black text-[#14532d]">{fmt(calc.stockActual)}</p>
                     <p className="text-[9px] text-slate-500">plantas</p>
                   </div>
                 </div>
@@ -645,26 +478,11 @@ export default function Home() {
                     const pct = totalEspecies ? (e.value / totalEspecies) * 100 : 0;
 
                     return (
-                      <div
-                        key={e.name}
-                        className="grid grid-cols-[8px_minmax(0,1fr)_32px_46px] items-center gap-1.5 text-[9.3px]"
-                      >
-                        <span
-                          className="h-2 w-2 rounded-full"
-                          style={{ backgroundColor: COLORS[i % COLORS.length] }}
-                        />
-
-                        <span className="truncate text-slate-700" title={e.name}>
-                          {short(e.name, 15)}
-                        </span>
-
-                        <span className="font-semibold text-slate-700">
-                          {pct.toFixed(1)}%
-                        </span>
-
-                        <span className="text-right font-black text-[#14532d]">
-                          {fmt(e.value)}
-                        </span>
+                      <div key={e.name} className="grid grid-cols-[8px_minmax(0,1fr)_32px_46px] items-center gap-1.5 text-[9.3px]">
+                        <span className="h-2 w-2 rounded-full" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
+                        <span className="truncate text-slate-700" title={e.name}>{short(e.name, 15)}</span>
+                        <span className="font-semibold text-slate-700">{pct.toFixed(1)}%</span>
+                        <span className="text-right font-black text-[#14532d]">{fmt(e.value)}</span>
                       </div>
                     );
                   })}
@@ -676,40 +494,11 @@ export default function Home() {
               <SectionHeader title="Indicadores Clave (KPI)" />
 
               <div className="grid gap-1.5">
-                <CompactKpi
-                  title="Stock General Inicial"
-                  value={calc.stockInicial}
-                  subtitle="plantas registradas"
-                  icon={Boxes}
-                />
-
-                <CompactKpi
-                  title="Stock General Actual"
-                  value={calc.stockActual}
-                  subtitle="plantas disponibles"
-                  icon={PackageCheck}
-                />
-
-                <CompactKpi
-                  title="Stock por Vivero (según filtro)"
-                  value={calc.stockViveroSeleccionado}
-                  subtitle="plantas"
-                  icon={Warehouse}
-                />
-
-                <CompactKpi
-                  title="Lotes Registrados"
-                  value={lotesFiltrados.length}
-                  subtitle="registros filtrados"
-                  icon={Tag}
-                />
-
-                <CompactKpi
-                  title="Entradas VMA"
-                  value={calc.entradasVMA}
-                  subtitle="plantas"
-                  icon={PackagePlus}
-                />
+                <CompactKpi title="Stock General Inicial" value={calc.stockInicial} subtitle="plantas registradas" icon={Boxes} />
+                <CompactKpi title="Stock General Actual" value={calc.stockActual} subtitle="plantas disponibles" icon={PackageCheck} />
+                <CompactKpi title="Stock por Vivero (según filtro)" value={calc.stockViveroSeleccionado} subtitle="plantas" icon={Warehouse} />
+                <CompactKpi title="Lotes Registrados" value={lotesFiltrados.length} subtitle="registros filtrados" icon={Tag} />
+                <CompactKpi title="Entradas VMA" value={calc.entradasVMA} subtitle="plantas" icon={PackagePlus} />
               </div>
             </div>
           </div>
@@ -727,33 +516,19 @@ export default function Home() {
                     <th className="py-1 text-right">Mov.</th>
                   </tr>
                 </thead>
-
                 <tbody>
                   {stockPorContrato.map((r, i) => {
                     const pct = Math.round((r.movimientos / maxContrato) * 100);
-
                     return (
                       <tr key={i} className="border-t border-slate-100">
-                        <td className="py-1 font-black text-[#14532d]">
-                          {r.contrato}
-                        </td>
-
-                        <td className="py-1 text-slate-600">
-                          {r.empresa}
-                        </td>
-
+                        <td className="py-1 font-black text-[#14532d]">{r.contrato}</td>
+                        <td className="py-1 text-slate-600">{r.empresa}</td>
                         <td className="min-w-[100px] py-1">
                           <div className="h-2 rounded-full bg-slate-100">
-                            <div
-                              className="h-2 rounded-full bg-[#166534]"
-                              style={{ width: `${Math.max(pct, 5)}%` }}
-                            />
+                            <div className="h-2 rounded-full bg-[#166534]" style={{ width: `${Math.max(pct, 5)}%` }} />
                           </div>
                         </td>
-
-                        <td className="py-1 text-right font-black">
-                          {fmt(r.movimientos)}
-                        </td>
+                        <td className="py-1 text-right font-black">{fmt(r.movimientos)}</td>
                       </tr>
                     );
                   })}
@@ -768,12 +543,8 @@ export default function Home() {
                 <div className="flex items-center gap-2 rounded-md bg-amber-50 p-2.5">
                   <AlertTriangle className="text-amber-600" size={14} />
                   <div>
-                    <p className="text-[10px] font-black">
-                      Traslados pendientes
-                    </p>
-                    <p className="text-[9px] text-slate-500">
-                      {fmt(calc.trasladosPendientes)} plantas
-                    </p>
+                    <p className="text-[10px] font-black">Traslados pendientes</p>
+                    <p className="text-[9px] text-slate-500">{fmt(calc.trasladosPendientes)} plantas</p>
                   </div>
                 </div>
 
@@ -781,9 +552,7 @@ export default function Home() {
                   <AlertTriangle className="text-red-600" size={14} />
                   <div>
                     <p className="text-[10px] font-black">Bajas / pérdidas</p>
-                    <p className="text-[9px] text-slate-500">
-                      {fmt(calc.bajas)} plantas
-                    </p>
+                    <p className="text-[9px] text-slate-500">{fmt(calc.bajas)} plantas</p>
                   </div>
                 </div>
 
@@ -791,9 +560,7 @@ export default function Home() {
                   <SearchCheck className="text-[#166534]" size={14} />
                   <div>
                     <p className="text-[10px] font-black">Lotes registrados</p>
-                    <p className="text-[9px] text-slate-500">
-                      {fmt(lotesFiltrados.length)} registros
-                    </p>
+                    <p className="text-[9px] text-slate-500">{fmt(lotesFiltrados.length)} registros</p>
                   </div>
                 </div>
               </div>
@@ -803,43 +570,20 @@ export default function Home() {
               <SectionHeader title="Indicadores Operacionales" />
 
               <div className="grid gap-1.5">
-                <CompactKpi
-                  title="Salidas Viveros"
-                  value={calc.salidasViveros}
-                  subtitle="plantas"
-                  icon={PackageMinus}
-                />
-
-                <CompactKpi
-                  title="Despachos EECC"
-                  value={calc.salidasEECC}
-                  subtitle="plantas"
-                  icon={Truck}
-                />
-
-                <CompactKpi
-                  title="Transformaciones"
-                  value={calc.transformaciones}
-                  subtitle="plantas"
-                  icon={RefreshCw}
-                />
-
-                <CompactKpi
-                  title="Traslados Pendientes"
-                  value={calc.trasladosPendientes}
-                  subtitle="plantas"
-                  icon={Warehouse}
-                />
+                <CompactKpi title="Salidas Viveros" value={calc.salidasViveros} subtitle="plantas" icon={PackageMinus} />
+                <CompactKpi title="Despachos EECC" value={calc.salidasEECC} subtitle="plantas" icon={Truck} />
+                <CompactKpi title="Transformaciones" value={calc.transformaciones} subtitle="plantas" icon={RefreshCw} />
+                <CompactKpi title="Traslados Pendientes" value={calc.trasladosPendientes} subtitle="plantas" icon={Warehouse} />
               </div>
             </div>
           </div>
-
-          <footer className="-mx-3 mt-2 flex h-8 items-center justify-center bg-[#14532d] px-4 text-[11px] font-semibold text-white">
-            <span>SITRAP · Sistema de Inventario y Trazabilidad de Plantas</span>
-            <span className="absolute right-4">Versión 3.14</span>
-          </footer>
         </section>
       </div>
+
+      <footer className="flex h-8 w-full items-center justify-center bg-[#14532d] px-4 text-[11px] font-semibold text-white">
+        <span>SITRAP · Sistema de Inventario y Trazabilidad de Plantas</span>
+        <span className="absolute right-4">Versión 3.15</span>
+      </footer>
     </main>
   );
 }
