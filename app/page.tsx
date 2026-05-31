@@ -55,9 +55,7 @@ function SelectFilter({ label, value, options, onChange }: any) {
         onChange={(e) => onChange(e.target.value)}
       >
         <option value="">Todas</option>
-        {options.map((x: string) => (
-          <option key={x} value={x}>{x}</option>
-        ))}
+        {options.map((x: string) => <option key={x} value={x}>{x}</option>)}
       </select>
     </div>
   );
@@ -308,7 +306,7 @@ export default function Home() {
     <main className="h-screen overflow-hidden bg-[#f7f9f6] text-slate-900">
       <div className="grid h-[calc(100vh-2rem)] grid-cols-1 lg:grid-cols-[205px_1fr]">
         <aside className="flex h-[calc(100vh-2rem)] flex-col overflow-hidden border-r border-slate-200 bg-white px-2.5 py-1">
-          <div>
+          <div className="mb-1">
             <div className="mb-0.5 flex justify-center">
               <Image
                 src="/sitrap-logo.png"
@@ -414,14 +412,14 @@ export default function Home() {
                 <ResponsiveContainer width="100%" height="100%">
                   <ReBarChart
                     data={stockPorVivero}
-                    margin={{ top: 8, right: 4, bottom: 26, left: 26 }}
+                    margin={{ top: 8, right: 2, bottom: 26, left: -12 }}
                     barCategoryGap="4%"
                     barGap={2}
                   >
                     <XAxis dataKey="name" tick={{ fontSize: 8 }} interval={0} height={34} tickLine={false} angle={0} textAnchor="middle" />
-                    <YAxis width={42} tick={{ fontSize: 8 }} tickLine={false} axisLine={false} tickMargin={6} />
+                    <YAxis width={42} tick={{ fontSize: 8 }} tickLine={false} axisLine={false} tickMargin={4} />
                     <Tooltip formatter={(v: any) => fmt(v)} labelFormatter={(_, payload: any) => payload?.[0]?.payload?.fullName || ''} />
-                    <Bar dataKey="value" fill={GREEN} radius={[7, 7, 0, 0]} maxBarSize={70} />
+                    <Bar dataKey="value" fill={GREEN} radius={[7, 7, 0, 0]} maxBarSize={78} />
                   </ReBarChart>
                 </ResponsiveContainer>
               </div>
@@ -558,7 +556,7 @@ export default function Home() {
 
       <footer className="flex h-8 w-full items-center justify-center bg-[#14532d] px-4 text-[11px] font-semibold text-white">
         <span>SITRAP · Sistema de Inventario y Trazabilidad de Plantas</span>
-        <span className="absolute right-4">Versión 3.16</span>
+        <span className="absolute right-4">Versión 3.17</span>
       </footer>
     </main>
   );
