@@ -180,66 +180,80 @@ export default function Home() {
   }, [movimientos, idsFiltrados, contrato, empresa, fecha, vivero]);
 
   const calc = useMemo(() => {
-    const stockInicial = lotesFiltrados.reduce((s, l) => s + n(l.CantidadInicialP), 0);
+    // Lógica alineada con medidas Power BI / DAX
+    // Stock General Inicial = SUM(DIM_LOTES[CantidadInicialP]) removiendo filtro de Vivero,
+    // pero respetando otros filtros propios del lote, como Especie.
+    const lotesStockInicial = lotes.filter((l) => {
+      if (especie && txt(l.EspecieMaterial) !== especie) return false;
+      return true;
+    });
+
+    const stockInicial = lotesStockInicial.reduce((s, l) => s + n(l.CantidadInicialP), 0);
+    const stockViveroSeleccionado = lotesFiltrados.reduce((s, l) => s + n(l.CantidadInicialP), 0);
 
     let entradasVMA = 0;
-    let salidasViveros = 0;
+    let salidasFirmadas = 0;
     let salidasEECC = 0;
     let bajas = 0;
     let transformaciones = 0;
-    let ingresos = 0;
-    let egresos = 0;
+
+    const valorFirmado = (m: Movimiento) => {
+      if (m.Cantidad_Con_Signo !== undefined && m.Cantidad_Con_Signo !== null && m.Cantidad_Con_Signo !== '') {
+        return n(m.Cantidad_Con_Signo);
+      }
+
+      // Respaldo si la API no entrega Cantidad_Con_Signo.
+      // En la BD de movimientos existen deltas de origen/destino que permiten aproximar el signo.
+      const deltaOrigen = n(m.Delta_Origen);
+      const deltaDestino = n(m.Delta_Destino);
+      const deltaNeto = deltaOrigen + deltaDestino;
+      if (deltaNeto !== 0) return deltaNeto;
+
+      const subtipo = txt(m.Subtipo_Movimiento);
+      const cantidad = n(m.Cantidad);
+      if (['Recepción en VMA', 'Ingreso a VMA', 'Ingreso a vivero', 'Devolución desde EECC', 'Devolución'].includes(subtipo)) {
+        return cantidad;
+      }
+      if (['Despacho a VMA', 'Traslado entre viveros', 'Salida a EECC'].includes(subtipo)) {
+        return -cantidad;
+      }
+      return 0;
+    };
 
     movimientosFiltrados.forEach((m) => {
       const subtipo = txt(m.Subtipo_Movimiento);
       const tipo = txt(m.Tipo_Evento);
+      const tipoDestino = txt(m.Tipo_Destino);
       const cantidad = n(m.Cantidad);
+      const firmado = valorFirmado(m);
 
-      if (subtipo === 'Recepción en VMA' || subtipo === 'Ingreso a VMA' || subtipo === 'Ingreso a vivero') {
-        entradasVMA += cantidad;
-        ingresos += cantidad;
-      }
+      // Entradas a VMA = SUM(Cantidad_Con_Signo), donde Cantidad_Con_Signo > 0
+      if (firmado > 0) entradasVMA += firmado;
 
-      if (subtipo === 'Despacho a VMA' || subtipo === 'Traslado entre viveros') {
-        salidasViveros += cantidad;
-        egresos += cantidad;
-      }
+      // Salidas desde viveros = ABS(SUM(Cantidad_Con_Signo)), donde Cantidad_Con_Signo < 0
+      if (firmado < 0) salidasFirmadas += firmado;
 
-      if (subtipo === 'Salida a EECC') {
+      // Despachos a EECC = SUM(Cantidad), donde Tipo_Destino = "EECC"
+      if (tipoDestino === 'EECC') {
         salidasEECC += cantidad;
-        egresos += cantidad;
       }
 
-      if (subtipo.includes('Baja') || txt(m.Afecta_Stock) === 'Resta') bajas += cantidad;
-      if (tipo === 'Transformación' || subtipo.includes('Transform')) transformaciones += cantidad;
+      // Bajas_Perdidas = SUM(Cantidad), solo para Baja, Pérdida o Ajuste inventario
+      if (['Baja', 'Pérdida', 'Ajuste inventario'].includes(subtipo)) {
+        bajas += cantidad;
+      }
+
+      // Transformaciones_Lote = SUM(Cantidad), donde Tipo_Evento = "Transformación"
+      if (tipo === 'Transformación') {
+        transformaciones += cantidad;
+      }
     });
 
-    const trasladosPendientes = Math.max(salidasViveros - entradasVMA, 0);
-    const stockActual = stockInicial + ingresos - egresos;
+    const salidasViveros = Math.abs(salidasFirmadas);
+    const trasladosPendientes = salidasViveros - entradasVMA;
 
-    let stockViveroSeleccionado = stockActual;
-
-    if (vivero) {
-      const inicialVivero = lotesFiltrados.reduce((s, l) => s + n(l.CantidadInicialP), 0);
-      let movVivero = 0;
-
-      movimientosFiltrados.forEach((m) => {
-        const cantidad = n(m.Cantidad);
-        const subtipo = txt(m.Subtipo_Movimiento);
-        const origen = txt(m.Origen);
-        const destino = txt(m.Destino);
-
-        if (origen === vivero && ['Despacho a VMA', 'Traslado entre viveros', 'Salida a EECC'].includes(subtipo)) {
-          movVivero -= cantidad;
-        }
-
-        if (destino === vivero && ['Recepción en VMA', 'Ingreso a VMA', 'Ingreso a vivero', 'Devolución desde EECC', 'Devolución'].includes(subtipo)) {
-          movVivero += cantidad;
-        }
-      });
-
-      stockViveroSeleccionado = inicialVivero + movVivero;
-    }
+    // Stock General Actual = Stock General Inicial - Despachos a EECC - Bajas_Perdidas
+    const stockActual = stockInicial - salidasEECC - bajas;
 
     return {
       stockInicial,
@@ -252,7 +266,7 @@ export default function Home() {
       bajas,
       transformaciones,
     };
-  }, [lotesFiltrados, movimientosFiltrados, vivero]);
+  }, [lotes, lotesFiltrados, movimientosFiltrados, especie]);
 
   const stockPorVivero = useMemo(() => {
     const data: Record<string, number> = {};
@@ -571,7 +585,7 @@ export default function Home() {
 
       <footer className="flex h-8 w-full items-center justify-center bg-[#14532d] px-4 text-[11px] font-semibold text-white">
         <span>SITRAP · Sistema de Inventario y Trazabilidad de Plantas</span>
-        <span className="absolute right-4">Versión 4.0</span>
+        <span className="absolute right-4">Versión 4.1</span>
       </footer>
     </main>
   );
