@@ -306,18 +306,18 @@ export default function Home() {
     <main className="h-screen overflow-hidden bg-[#f7f9f6] text-slate-900">
       <div className="grid h-[calc(100vh-2rem)] grid-cols-1 lg:grid-cols-[205px_1fr]">
         <aside className="flex h-[calc(100vh-2rem)] flex-col overflow-hidden border-r border-slate-200 bg-white px-2.5 py-1">
-          <div>
-            <div className="mb-0.5 flex justify-center">
-              <Image
-                src="/sitrap-logo.png"
-                alt="SITRAP"
-                width={98}
-                height={64}
-                className="object-contain"
-                priority
-              />
-            </div>
+          <div className="h-[178px] flex items-start justify-center pt-2">
+            <Image
+              src="/sitrap-logo.png"
+              alt="SITRAP"
+              width={145}
+              height={105}
+              className="object-contain"
+              priority
+            />
+          </div>
 
+          <div>
             <SidebarTitle>Inicio</SidebarTitle>
 
             <nav className="space-y-0 text-[10px]">
@@ -556,7 +556,7 @@ export default function Home() {
 
       <footer className="flex h-8 w-full items-center justify-center bg-[#14532d] px-4 text-[11px] font-semibold text-white">
         <span>SITRAP · Sistema de Inventario y Trazabilidad de Plantas</span>
-        <span className="absolute right-4">Versión 3.18</span>
+        <span className="absolute right-4">Versión 3.19</span>
       </footer>
     </main>
   );
