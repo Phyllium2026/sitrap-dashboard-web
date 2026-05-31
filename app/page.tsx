@@ -32,6 +32,12 @@ const n = (v: any) => {
 const txt = (v: any) => String(v || '').trim();
 const fmt = (v: any) => new Intl.NumberFormat('es-CL').format(n(v));
 
+const fmtDate = (v: any) => {
+  const d = new Date(v || Date.now());
+  if (Number.isNaN(d.getTime())) return new Date().toLocaleDateString('es-CL');
+  return d.toLocaleDateString('es-CL');
+};
+
 const short = (v: any, max = 18) => {
   const s = txt(v);
   if (s.length <= max) return s;
@@ -180,85 +186,45 @@ export default function Home() {
   }, [movimientos, idsFiltrados, contrato, empresa, fecha, vivero]);
 
   const calc = useMemo(() => {
-    // Lógica alineada con medidas Power BI / DAX
-    // Stock General Inicial = SUM(DIM_LOTES[CantidadInicialP]) removiendo filtro de Vivero,
-    // pero respetando otros filtros propios del lote, como Especie.
-    const lotesStockInicial = lotes.filter((l) => {
-      if (especie && txt(l.EspecieMaterial) !== especie) return false;
-      return true;
-    });
+    // KPIs oficiales desde la API SITRAP.
+    // La API ya consolida STOCK_VIVERO, STOCK_LOTES y BD_MOVIMIENTOS_LOTES.
+    const stockInicial = n(kpis?.stockGeneralInicial ?? kpis?.stockInicial ?? kpis?.stock_inicial);
+    const stockActual = n(kpis?.stockGeneralActual ?? kpis?.stockActual ?? kpis?.stock_actual);
+    const totalLotes = n(kpis?.totalLotes ?? kpis?.total_lotes ?? kpis?.lotesRegistrados);
+    const entradasVMA = n(kpis?.entradasVMA ?? kpis?.recepcionesVMA ?? kpis?.ingresos_destino);
+    const salidasViveros = n(kpis?.salidasViveros ?? kpis?.salidas_viveros ?? kpis?.despachosAVMA);
+    const trasladosPendientes = n(kpis?.trasladosPendientes ?? kpis?.lotesEnTransito ?? kpis?.lotes_en_transito);
+    const salidasEECC = n(kpis?.despachosEECC ?? kpis?.salidasEECC ?? kpis?.salidas_eecc);
+    const bajas = n(kpis?.bajasPerdidas ?? kpis?.bajas_perdidas ?? kpis?.bajas);
+    const transformaciones = n(kpis?.transformaciones ?? kpis?.transformacionesLote ?? kpis?.transformaciones_lote);
 
-    const stockInicial = lotesStockInicial.reduce((s, l) => s + n(l.CantidadInicialP), 0);
-    const stockViveroSeleccionado = lotesFiltrados.reduce((s, l) => s + n(l.CantidadInicialP), 0);
+    // Stock actual por vivero seleccionado, calculado con la misma lógica validada en STOCK_VIVERO:
+    // Stock Actual Vivero = Stock Inicial - Salidas + Ingresos.
+    const stockViveroSeleccionado = vivero
+      ? (() => {
+          const inicial = lotes
+            .filter((l) => txt(l.Vivero) === vivero)
+            .reduce((s, l) => s + n(l.CantidadInicialP), 0);
 
-    let entradasVMA = 0;
-    let salidasFirmadas = 0;
-    let salidasEECC = 0;
-    let bajas = 0;
-    let transformaciones = 0;
+          const salidas = movimientos
+            .filter((m) => txt(m.Origen) === vivero)
+            .filter((m) => ['Traslado entre viveros', 'Despacho a EECC'].includes(txt(m.Subtipo_Movimiento)))
+            .reduce((s, m) => s + n(m.Cantidad), 0);
 
-    const valorFirmado = (m: Movimiento) => {
-      if (m.Cantidad_Con_Signo !== undefined && m.Cantidad_Con_Signo !== null && m.Cantidad_Con_Signo !== '') {
-        return n(m.Cantidad_Con_Signo);
-      }
+          const ingresos = movimientos
+            .filter((m) => txt(m.Destino) === vivero)
+            .filter((m) => ['Recepción en vivero', 'Devolución desde EECC'].includes(txt(m.Subtipo_Movimiento)))
+            .reduce((s, m) => s + n(m.Cantidad), 0);
 
-      // Respaldo si la API no entrega Cantidad_Con_Signo.
-      // En la BD de movimientos existen deltas de origen/destino que permiten aproximar el signo.
-      const deltaOrigen = n(m.Delta_Origen);
-      const deltaDestino = n(m.Delta_Destino);
-      const deltaNeto = deltaOrigen + deltaDestino;
-      if (deltaNeto !== 0) return deltaNeto;
-
-      const subtipo = txt(m.Subtipo_Movimiento);
-      const cantidad = n(m.Cantidad);
-      if (['Recepción en VMA', 'Ingreso a VMA', 'Ingreso a vivero', 'Devolución desde EECC', 'Devolución'].includes(subtipo)) {
-        return cantidad;
-      }
-      if (['Despacho a VMA', 'Traslado entre viveros', 'Salida a EECC'].includes(subtipo)) {
-        return -cantidad;
-      }
-      return 0;
-    };
-
-    movimientosFiltrados.forEach((m) => {
-      const subtipo = txt(m.Subtipo_Movimiento);
-      const tipo = txt(m.Tipo_Evento);
-      const tipoDestino = txt(m.Tipo_Destino);
-      const cantidad = n(m.Cantidad);
-      const firmado = valorFirmado(m);
-
-      // Entradas a VMA = SUM(Cantidad_Con_Signo), donde Cantidad_Con_Signo > 0
-      if (firmado > 0) entradasVMA += firmado;
-
-      // Salidas desde viveros = ABS(SUM(Cantidad_Con_Signo)), donde Cantidad_Con_Signo < 0
-      if (firmado < 0) salidasFirmadas += firmado;
-
-      // Despachos a EECC = SUM(Cantidad), donde Tipo_Destino = "EECC"
-      if (tipoDestino === 'EECC') {
-        salidasEECC += cantidad;
-      }
-
-      // Bajas_Perdidas = SUM(Cantidad), solo para Baja, Pérdida o Ajuste inventario
-      if (['Baja', 'Pérdida', 'Ajuste inventario'].includes(subtipo)) {
-        bajas += cantidad;
-      }
-
-      // Transformaciones_Lote = SUM(Cantidad), donde Tipo_Evento = "Transformación"
-      if (tipo === 'Transformación') {
-        transformaciones += cantidad;
-      }
-    });
-
-    const salidasViveros = Math.abs(salidasFirmadas);
-    const trasladosPendientes = salidasViveros - entradasVMA;
-
-    // Stock General Actual = Stock General Inicial - Despachos a EECC - Bajas_Perdidas
-    const stockActual = stockInicial - salidasEECC - bajas;
+          return inicial - salidas + ingresos;
+        })()
+      : stockInicial;
 
     return {
       stockInicial,
       stockActual,
       stockViveroSeleccionado,
+      totalLotes,
       entradasVMA,
       salidasViveros,
       trasladosPendientes,
@@ -266,7 +232,7 @@ export default function Home() {
       bajas,
       transformaciones,
     };
-  }, [lotes, lotesFiltrados, movimientosFiltrados, especie]);
+  }, [kpis, vivero, lotes, movimientos]);
 
   const stockPorVivero = useMemo(() => {
     const data: Record<string, number> = {};
@@ -427,7 +393,7 @@ export default function Home() {
               <div>
                 <p className="text-[9px] text-slate-500">Última actualización</p>
                 <p className="text-xs font-black">
-                  {new Date(kpis.fecha_actualizacion).toLocaleDateString('es-CL')}
+                  {fmtDate(kpis.fechaActualizacion || kpis.fecha_actualizacion)}
                 </p>
               </div>
             </div>
@@ -500,7 +466,7 @@ export default function Home() {
                 <CompactKpi title="Stock General Inicial" value={calc.stockInicial} subtitle="plantas registradas" icon={Boxes} />
                 <CompactKpi title="Stock General Actual" value={calc.stockActual} subtitle="plantas disponibles" icon={PackageCheck} />
                 <CompactKpi title="Stock por Vivero (según filtro)" value={calc.stockViveroSeleccionado} subtitle="plantas" icon={Warehouse} />
-                <CompactKpi title="Lotes Registrados" value={lotesFiltrados.length} subtitle="registros filtrados" icon={Tag} />
+                <CompactKpi title="Lotes Registrados" value={calc.totalLotes} subtitle="registros filtrados" icon={Tag} />
                 <CompactKpi title="Entradas VMA" value={calc.entradasVMA} subtitle="plantas" icon={PackagePlus} />
               </div>
             </div>
@@ -563,7 +529,7 @@ export default function Home() {
                   <SearchCheck className="text-[#166534]" size={14} />
                   <div>
                     <p className="text-[10px] font-black">Lotes registrados</p>
-                    <p className="text-[9px] text-slate-500">{fmt(lotesFiltrados.length)} registros</p>
+                    <p className="text-[9px] text-slate-500">{fmt(calc.totalLotes)} registros</p>
                   </div>
                 </div>
               </div>
@@ -585,7 +551,7 @@ export default function Home() {
 
       <footer className="flex h-8 w-full items-center justify-center bg-[#14532d] px-4 text-[11px] font-semibold text-white">
         <span>SITRAP · Sistema de Inventario y Trazabilidad de Plantas</span>
-        <span className="absolute right-4">Versión 4.1</span>
+        <span className="absolute right-4">Versión 4.2</span>
       </footer>
     </main>
   );
