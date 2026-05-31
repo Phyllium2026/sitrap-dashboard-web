@@ -10,6 +10,7 @@ import {
   Home as HomeIcon, Boxes, PackageCheck, PackagePlus, PackageMinus, Truck,
   Warehouse, CalendarClock, RefreshCw, ClipboardList, ArrowLeftRight, BarChart3,
   Filter, AlertTriangle, ExternalLink, RotateCcw, SearchCheck, Tag,
+  QrCode, FileText, ChevronRight, ScanLine,
 } from 'lucide-react';
 
 type Kpis = Record<string, any>;
@@ -92,6 +93,59 @@ function CompactKpi({ title, value, subtitle, icon: Icon }: any) {
         </div>
       </div>
       <p className="pl-3 text-right text-[17px] font-black leading-none text-[#14532d]">{fmt(value)}</p>
+    </div>
+  );
+}
+
+
+function MobileAction({ title, subtitle, icon: Icon, href, onClick, badge }: any) {
+  const content = (
+    <>
+      <div className="flex items-center gap-3">
+        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-green-50 text-[#166534]">
+          <Icon size={22} strokeWidth={2} />
+        </div>
+        <div className="min-w-0 text-left">
+          <p className="text-[15px] font-black leading-tight text-slate-900">{title}</p>
+          <p className="mt-0.5 text-[12px] leading-tight text-slate-500">{subtitle}</p>
+        </div>
+      </div>
+      <div className="flex items-center gap-2">
+        {badge && (
+          <span className="rounded-full bg-amber-50 px-2 py-1 text-[10px] font-black text-amber-700">
+            {badge}
+          </span>
+        )}
+        <ChevronRight size={18} className="text-slate-400" />
+      </div>
+    </>
+  );
+
+  const className =
+    'flex w-full items-center justify-between rounded-2xl border border-slate-100 bg-white p-3.5 shadow-sm active:scale-[0.99]';
+
+  if (href) {
+    return (
+      <a href={href} target="_blank" rel="noopener noreferrer" className={className}>
+        {content}
+      </a>
+    );
+  }
+
+  return (
+    <button type="button" onClick={onClick} className={className}>
+      {content}
+    </button>
+  );
+}
+
+function MobileMiniKpi({ label, value, tone = 'normal' }: any) {
+  const toneClass = tone === 'warn' ? 'bg-amber-50 text-amber-800' : 'bg-white text-[#14532d]';
+  return (
+    <div className={`rounded-2xl border border-slate-100 p-3 shadow-sm ${toneClass}`}>
+      <p className="text-[11px] font-bold text-slate-500">{label}</p>
+      <p className="mt-1 text-[20px] font-black leading-none">{fmt(value)}</p>
+      <p className="mt-1 text-[10px] text-slate-500">plantas</p>
     </div>
   );
 }
@@ -286,7 +340,110 @@ export default function Home() {
   }
 
   return (
-    <main className="h-screen overflow-hidden bg-[#f7f9f6] text-slate-900">
+    <>
+      <main className="block min-h-screen bg-[#f7f9f6] text-slate-900 lg:hidden">
+        <section className="mx-auto flex min-h-screen max-w-md flex-col px-4 pb-5 pt-4">
+          <header className="mb-4 flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-100">
+                <Image
+                  src="/sitrap-app-icon.png.png"
+                  alt="SITRAP"
+                  width={54}
+                  height={54}
+                  className="h-14 w-14 object-cover"
+                  priority
+                />
+              </div>
+              <div>
+                <h1 className="text-[22px] font-black leading-none text-[#14532d]">SITRAP</h1>
+                <p className="mt-1 text-[12px] font-semibold text-slate-500">Operación en terreno</p>
+              </div>
+            </div>
+
+            <div className="rounded-2xl bg-white px-3 py-2 text-right shadow-sm ring-1 ring-slate-100">
+              <p className="text-[9px] font-bold text-slate-400">Actualizado</p>
+              <p className="text-[11px] font-black text-[#14532d]">
+                {new Date(kpis.fechaActualizacion || kpis.fecha_actualizacion).toLocaleDateString('es-CL')}
+              </p>
+            </div>
+          </header>
+
+          <section className="mb-4 rounded-[28px] bg-gradient-to-br from-[#14532d] via-[#166534] to-[#0b3d22] p-5 text-white shadow-lg">
+            <p className="text-[12px] font-bold text-green-100">Stock actual del sistema</p>
+            <p className="mt-2 text-[38px] font-black leading-none tracking-tight">{fmt(calc.stockActual)}</p>
+            <p className="mt-1 text-[13px] font-semibold text-green-100">plantas disponibles</p>
+
+            <div className="mt-4 grid grid-cols-2 gap-2">
+              <div className="rounded-2xl bg-white/10 p-3 backdrop-blur">
+                <p className="text-[10px] font-bold text-green-100">Stock inicial</p>
+                <p className="mt-1 text-[17px] font-black">{fmt(calc.stockInicial)}</p>
+              </div>
+              <div className="rounded-2xl bg-white/10 p-3 backdrop-blur">
+                <p className="text-[10px] font-bold text-green-100">Lotes</p>
+                <p className="mt-1 text-[17px] font-black">{fmt(calc.totalLotes)}</p>
+              </div>
+            </div>
+          </section>
+
+          <section className="mb-4 space-y-2.5">
+            <MobileAction
+              title="Escanear QR"
+              subtitle="Leer código de lote en terreno"
+              icon={ScanLine}
+              badge="Sprint 2"
+              onClick={() => alert('Escaneo QR reservado para Sprint 2.')}
+            />
+            <MobileAction
+              title="Registrar movimiento"
+              subtitle="Abrir formulario E2 de movimientos"
+              icon={ClipboardList}
+              href={FORM_E2_MOVIMIENTOS}
+            />
+            <MobileAction
+              title="Consultar lote"
+              subtitle="Ver ficha rápida del lote"
+              icon={PackageCheck}
+              badge="Sprint 2"
+              onClick={() => alert('Consulta de lote reservada para Sprint 2.')}
+            />
+            <MobileAction
+              title="Ticket despacho"
+              subtitle="Generar comprobante para impresora térmica"
+              icon={FileText}
+              badge="Sprint 3"
+              onClick={() => alert('Ticket de despacho reservado para Sprint 3.')}
+            />
+          </section>
+
+          <section className="mb-4">
+            <div className="mb-2 flex items-center justify-between">
+              <h2 className="text-[16px] font-black text-[#14532d]">KPIs rápidos</h2>
+              <span className="text-[11px] font-bold text-slate-400">V5 Mobile</span>
+            </div>
+            <div className="grid grid-cols-2 gap-2.5">
+              <MobileMiniKpi label="Entradas VMA" value={calc.entradasVMA} />
+              <MobileMiniKpi label="Salidas viveros" value={calc.salidasViveros} />
+              <MobileMiniKpi label="Despachos EECC" value={calc.salidasEECC} />
+              <MobileMiniKpi label="Pendientes" value={calc.trasladosPendientes} tone="warn" />
+            </div>
+          </section>
+
+          <section className="mt-auto rounded-2xl border border-green-100 bg-white p-3 shadow-sm">
+            <div className="flex items-center gap-2 text-[#14532d]">
+              <AlertTriangle size={16} className="text-amber-600" />
+              <div>
+                <p className="text-[12px] font-black">Traslados pendientes</p>
+                <p className="text-[11px] text-slate-500">
+                  {fmt(calc.trasladosPendientes)} plantas despachadas aún no recepcionadas.
+                </p>
+              </div>
+            </div>
+          </section>
+        </section>
+      </main>
+
+      <main className="hidden h-screen overflow-hidden bg-[#f7f9f6] text-slate-900 lg:block">
       <div className="grid h-[calc(100vh-2rem)] grid-cols-1 lg:grid-cols-[205px_1fr]">
         <aside className="flex h-[calc(100vh-2rem)] flex-col overflow-hidden border-r border-slate-200 bg-white px-2.5 py-1">
           <div className="h-[178px] flex items-start justify-center pt-2">
@@ -551,8 +708,9 @@ export default function Home() {
 
       <footer className="flex h-8 w-full items-center justify-center bg-[#14532d] px-4 text-[11px] font-semibold text-white">
         <span>SITRAP · Sistema de Inventario y Trazabilidad de Plantas</span>
-        <span className="absolute right-4">Versión 4.2</span>
+        <span className="absolute right-4">Versión 5.0</span>
       </footer>
-    </main>
+      </main>
+    </>
   );
 }
