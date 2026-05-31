@@ -18,7 +18,6 @@ type Movimiento = Record<string, any>;
 
 const API = '/api/sitrap';
 const GREEN = '#166534';
-const DARK = '#14532d';
 const COLORS = ['#166534', '#3f7f34', '#77a86c', '#adc7a7', '#d1d8dc'];
 
 const n = (v: any) => {
@@ -30,14 +29,20 @@ const n = (v: any) => {
 const txt = (v: any) => String(v || '').trim();
 const fmt = (v: any) => new Intl.NumberFormat('es-CL').format(n(v));
 
+const short = (v: any, max = 16) => {
+  const s = txt(v);
+  if (s.length <= max) return s;
+  return `${s.slice(0, max - 1)}…`;
+};
+
 function SelectFilter({ label, value, options, onChange, compact = false }: any) {
   return (
     <div>
-      <label className={`${compact ? 'mb-0.5 text-[9px]' : 'mb-1 text-[10px]'} block font-black uppercase tracking-wide text-[#14532d]`}>
+      <label className={`${compact ? 'mb-0.5 text-[8px]' : 'mb-0.5 text-[9px]'} block font-black uppercase tracking-wide text-[#14532d]`}>
         {label}
       </label>
       <select
-        className={`${compact ? 'px-2 py-1 text-[10px]' : 'px-2.5 py-1.5 text-[11px]'} w-full rounded-md border border-green-200 bg-white/90 font-semibold text-slate-800 outline-none focus:border-[#166534]`}
+        className={`${compact ? 'px-2 py-0.5 text-[9px]' : 'px-2 py-1 text-[10px]'} w-full rounded-md border border-green-200 bg-white/90 font-semibold text-slate-800 outline-none focus:border-[#166534]`}
         value={value}
         onChange={(e) => onChange(e.target.value)}
       >
@@ -52,26 +57,26 @@ function SelectFilter({ label, value, options, onChange, compact = false }: any)
 
 function SectionHeader({ title, action }: any) {
   return (
-    <div className="mb-2 flex items-center justify-between">
-      <h2 className="text-[15px] font-black text-[#14532d] leading-none">{title}</h2>
-      {action && <span className="text-[10px] font-bold text-[#166534]">{action}</span>}
+    <div className="mb-1.5 flex items-center justify-between">
+      <h2 className="text-[14px] font-black text-[#14532d] leading-none">{title}</h2>
+      {action && <span className="text-[9px] font-bold text-[#166534]">{action}</span>}
     </div>
   );
 }
 
 function CompactKpi({ title, value, subtitle, icon: Icon }: any) {
   return (
-    <div className="flex items-center justify-between rounded-lg border border-slate-100 bg-white px-2.5 py-1.5 shadow-sm min-h-[44px]">
+    <div className="flex items-center justify-between rounded-lg border border-slate-100 bg-white px-2.5 py-1 shadow-sm min-h-[40px]">
       <div className="flex min-w-0 items-center gap-2">
-        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-green-50 text-[#166534]">
-          <Icon size={16} strokeWidth={1.8} />
+        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-green-50 text-[#166534]">
+          <Icon size={14} strokeWidth={1.8} />
         </div>
         <div className="min-w-0">
-          <p className="truncate text-[10px] font-black text-slate-800 leading-tight">{title}</p>
-          <p className="text-[9px] text-slate-500 leading-tight">{subtitle}</p>
+          <p className="truncate text-[9.5px] font-black text-slate-800 leading-tight">{title}</p>
+          <p className="text-[8.5px] text-slate-500 leading-tight">{subtitle}</p>
         </div>
       </div>
-      <p className="pl-2 text-[17px] font-black text-[#14532d] leading-none">{fmt(value)}</p>
+      <p className="pl-2 text-[16px] font-black text-[#14532d] leading-none">{fmt(value)}</p>
     </div>
   );
 }
@@ -251,7 +256,7 @@ export default function Home() {
       data[v] = (data[v] || 0) + n(l.CantidadInicialP);
     });
     return Object.entries(data)
-      .map(([name, value]) => ({ name, value }))
+      .map(([name, value]) => ({ name: short(name, 12), fullName: name, value }))
       .sort((a, b) => b.value - a.value)
       .slice(0, 5);
   }, [lotesFiltrados]);
@@ -278,11 +283,11 @@ export default function Home() {
       data[c].movimientos += n(m.Cantidad);
     });
 
-    return Object.values(data).sort((a, b) => b.movimientos - a.movimientos).slice(0, 5);
+    return Object.values(data).sort((a, b) => b.movimientos - a.movimientos).slice(0, 4);
   }, [movimientosFiltrados]);
 
   const maxContrato = Math.max(...stockPorContrato.map(x => x.movimientos), 1);
-  const ultimosMovimientos = useMemo(() => [...movimientosFiltrados].slice(0, 4), [movimientosFiltrados]);
+  const ultimosMovimientos = useMemo(() => [...movimientosFiltrados].slice(0, 3), [movimientosFiltrados]);
   const totalEspecies = stockPorEspecie.reduce((s, x) => s + x.value, 0);
 
   if (loading || !kpis) {
@@ -295,20 +300,20 @@ export default function Home() {
 
   return (
     <main className="h-screen overflow-hidden bg-[#f7f9f6] text-slate-900">
-      <div className="grid h-screen grid-cols-1 lg:grid-cols-[210px_1fr]">
-        <aside className="h-screen overflow-hidden bg-white border-r border-slate-200 px-3 py-3 flex flex-col">
-          <div className="mb-2 flex justify-center">
+      <div className="grid h-screen grid-cols-1 lg:grid-cols-[205px_1fr]">
+        <aside className="h-screen overflow-hidden bg-white border-r border-slate-200 px-3 py-2.5 flex flex-col">
+          <div className="mb-1.5 flex justify-center">
             <Image
               src="/sitrap-logo.png"
               alt="SITRAP"
-              width={150}
-              height={104}
+              width={145}
+              height={96}
               className="object-contain"
               priority
             />
           </div>
 
-          <nav className="space-y-1">
+          <nav className="space-y-0.5">
             <button className="flex w-full items-center gap-2 rounded-md bg-[#14532d] px-2.5 py-1.5 text-left text-xs font-bold text-white">
               <HomeIcon size={13} /> Inicio
             </button>
@@ -326,7 +331,7 @@ export default function Home() {
             </button>
           </nav>
 
-          <div className="mt-2">
+          <div className="mt-1.5">
             <p className="mb-1 text-[9px] font-black uppercase tracking-wide text-[#14532d]">Acciones rápidas</p>
             <div className="space-y-1">
               <a href="#" className="flex items-center justify-between rounded-md bg-[#166534] px-2.5 py-1.5 text-[10px] font-bold text-white">
@@ -338,13 +343,13 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="mt-2">
+          <div className="mt-1.5">
             <div className="mb-1 flex items-center gap-1.5">
               <Filter size={11} className="text-[#14532d]" />
               <p className="text-[9px] font-black uppercase tracking-wide text-[#14532d]">Filtros rápidos</p>
             </div>
 
-            <div className="space-y-1.5">
+            <div className="space-y-1">
               <SelectFilter compact label="Vivero" value={vivero} options={options.viveros} onChange={setVivero} />
               <SelectFilter compact label="Especie" value={especie} options={options.especies} onChange={setEspecie} />
               <SelectFilter compact label="Contrato" value={contrato} options={options.contratos} onChange={setContrato} />
@@ -361,11 +366,11 @@ export default function Home() {
           </div>
 
           <div className="mt-auto pt-1 text-[9px] text-slate-400">
-            SITRAP · V3.5
+            SITRAP · V3.6
           </div>
         </aside>
 
-        <section className="h-screen overflow-hidden p-3 lg:p-4">
+        <section className="h-screen overflow-hidden p-3">
           <header className="mb-2 flex items-start justify-between gap-3">
             <div>
               <h1 className="text-xl font-black text-[#14532d] leading-tight">Bienvenido a SITRAP</h1>
@@ -374,8 +379,8 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="flex shrink-0 items-center gap-2 rounded-lg bg-white px-3 py-2 shadow-sm border border-slate-100 text-[#14532d]">
-              <CalendarClock size={17} />
+            <div className="flex shrink-0 items-center gap-2 rounded-lg bg-white px-3 py-1.5 shadow-sm border border-slate-100 text-[#14532d]">
+              <CalendarClock size={16} />
               <div>
                 <p className="text-[9px] text-slate-500">Última actualización</p>
                 <p className="text-xs font-black">
@@ -404,42 +409,42 @@ export default function Home() {
           </div>
 
           <div className="mb-2 grid gap-2 xl:grid-cols-[1fr_1.08fr_0.98fr]">
-            <div className="rounded-xl bg-white p-3 shadow-sm border border-slate-100 h-[300px]">
+            <div className="rounded-xl bg-white p-3 shadow-sm border border-slate-100 h-[270px] overflow-hidden">
               <SectionHeader title="Stock por Vivero" action="Stock actual" />
-              <div className="h-[250px]">
+              <div className="h-[222px]">
                 <ResponsiveContainer>
                   <ReBarChart
                     data={stockPorVivero}
-                    margin={{ top: 14, right: 8, bottom: 28, left: -8 }}
-                    barCategoryGap="34%"
+                    margin={{ top: 10, right: 8, bottom: 18, left: 4 }}
+                    barCategoryGap="30%"
                   >
                     <XAxis
                       dataKey="name"
-                      tick={{ fontSize: 9 }}
+                      tick={{ fontSize: 8 }}
                       interval={0}
-                      height={46}
+                      height={34}
                       tickLine={false}
                     />
-                    <YAxis tick={{ fontSize: 9 }} width={42} tickLine={false} axisLine={false} />
-                    <Tooltip formatter={(v: any) => fmt(v)} />
-                    <Bar dataKey="value" fill={GREEN} radius={[6, 6, 0, 0]} barSize={24} />
+                    <YAxis tick={{ fontSize: 8 }} width={46} tickLine={false} />
+                    <Tooltip formatter={(v: any) => fmt(v)} labelFormatter={(_, payload: any) => payload?.[0]?.payload?.fullName || ''} />
+                    <Bar dataKey="value" fill={GREEN} radius={[6, 6, 0, 0]} barSize={22} />
                   </ReBarChart>
                 </ResponsiveContainer>
               </div>
             </div>
 
-            <div className="rounded-xl bg-white p-3 shadow-sm border border-slate-100 h-[300px] overflow-hidden">
+            <div className="rounded-xl bg-white p-3 shadow-sm border border-slate-100 h-[270px] overflow-hidden">
               <SectionHeader title="Stock por Especie" />
-              <div className="grid h-[250px] grid-cols-[0.82fr_1.18fr] items-center gap-2">
-                <div className="relative h-[205px]">
+              <div className="grid h-[222px] grid-cols-[0.72fr_1.28fr] items-center gap-2">
+                <div className="relative h-[178px] min-w-0">
                   <ResponsiveContainer>
-                    <PieChart>
+                    <PieChart margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
                       <Pie
                         data={stockPorEspecie}
                         dataKey="value"
                         nameKey="name"
-                        innerRadius={58}
-                        outerRadius={88}
+                        innerRadius={46}
+                        outerRadius={72}
                         paddingAngle={2}
                       >
                         {stockPorEspecie.map((_, i) => (
@@ -450,18 +455,18 @@ export default function Home() {
                     </PieChart>
                   </ResponsiveContainer>
                   <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center">
-                    <p className="text-lg font-black text-[#14532d]">{fmt(calc.stockActual)}</p>
-                    <p className="text-[11px] text-slate-500">plantas</p>
+                    <p className="text-base font-black text-[#14532d]">{fmt(calc.stockActual)}</p>
+                    <p className="text-[10px] text-slate-500">plantas</p>
                   </div>
                 </div>
 
-                <div className="space-y-2 overflow-hidden">
+                <div className="space-y-1.5 overflow-hidden">
                   {stockPorEspecie.map((e, i) => {
                     const pct = totalEspecies ? (e.value / totalEspecies) * 100 : 0;
                     return (
-                      <div key={e.name} className="grid grid-cols-[10px_minmax(0,1fr)_36px_50px] items-center gap-2 text-[11px]">
-                        <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
-                        <span className="truncate text-slate-700">{e.name}</span>
+                      <div key={e.name} className="grid grid-cols-[9px_minmax(0,1fr)_34px_48px] items-center gap-1.5 text-[10px]">
+                        <span className="h-2 w-2 rounded-full" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
+                        <span className="truncate text-slate-700" title={e.name}>{short(e.name, 16)}</span>
                         <span className="font-semibold text-slate-700">{pct.toFixed(1)}%</span>
                         <span className="text-right font-black text-[#14532d]">{fmt(e.value)}</span>
                       </div>
@@ -471,7 +476,7 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="rounded-xl bg-white p-3 shadow-sm border border-slate-100 h-[300px] overflow-hidden">
+            <div className="rounded-xl bg-white p-3 shadow-sm border border-slate-100 h-[270px] overflow-hidden">
               <SectionHeader title="Indicadores Clave (KPI)" />
               <div className="grid gap-1.5">
                 <CompactKpi title="Stock General Inicial" value={calc.stockInicial} subtitle="plantas registradas" icon={Boxes} />
@@ -479,15 +484,14 @@ export default function Home() {
                 <CompactKpi title="Stock por Vivero (según filtro)" value={calc.stockViveroSeleccionado} subtitle="plantas" icon={Warehouse} />
                 <CompactKpi title="Lotes Registrados" value={lotesFiltrados.length} subtitle="registros filtrados" icon={Tag} />
                 <CompactKpi title="Entradas VMA" value={calc.entradasVMA} subtitle="plantas" icon={PackagePlus} />
-                <CompactKpi title="Salidas Viveros" value={calc.salidasViveros} subtitle="plantas" icon={PackageMinus} />
               </div>
             </div>
           </div>
 
           <div className="grid gap-2 xl:grid-cols-[1.2fr_0.8fr_1fr]">
-            <div className="rounded-xl bg-white p-3 shadow-sm border border-slate-100 overflow-hidden h-[245px]">
+            <div className="rounded-xl bg-white p-3 shadow-sm border border-slate-100 overflow-hidden h-[225px]">
               <SectionHeader title="Resumen por Contrato" action="Ver todos" />
-              <table className="w-full text-[11px]">
+              <table className="w-full text-[10px]">
                 <thead className="uppercase text-slate-500">
                   <tr>
                     <th className="py-1 text-left">Contrato</th>
@@ -505,10 +509,7 @@ export default function Home() {
                         <td className="py-1.5 text-slate-600">{r.empresa}</td>
                         <td className="py-1.5 min-w-[100px]">
                           <div className="h-2 rounded-full bg-slate-100">
-                            <div
-                              className="h-2 rounded-full bg-[#166534]"
-                              style={{ width: `${Math.max(pct, 5)}%` }}
-                            />
+                            <div className="h-2 rounded-full bg-[#166534]" style={{ width: `${Math.max(pct, 5)}%` }} />
                           </div>
                         </td>
                         <td className="py-1.5 text-right font-black">{fmt(r.movimientos)}</td>
@@ -519,50 +520,50 @@ export default function Home() {
               </table>
             </div>
 
-            <div className="rounded-xl bg-white p-3 shadow-sm border border-slate-100 h-[245px]">
+            <div className="rounded-xl bg-white p-3 shadow-sm border border-slate-100 h-[225px] overflow-hidden">
               <SectionHeader title="Alertas SITRAP" action="Ver todas" />
 
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 <div className="flex items-center gap-2 rounded-md bg-amber-50 p-2">
-                  <AlertTriangle className="text-amber-600" size={15} />
+                  <AlertTriangle className="text-amber-600" size={14} />
                   <div>
-                    <p className="text-[11px] font-black">Traslados pendientes</p>
-                    <p className="text-[10px] text-slate-500">{fmt(calc.trasladosPendientes)} plantas</p>
+                    <p className="text-[10px] font-black">Traslados pendientes</p>
+                    <p className="text-[9px] text-slate-500">{fmt(calc.trasladosPendientes)} plantas</p>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-2 rounded-md bg-red-50 p-2">
-                  <AlertTriangle className="text-red-600" size={15} />
+                  <AlertTriangle className="text-red-600" size={14} />
                   <div>
-                    <p className="text-[11px] font-black">Bajas / pérdidas</p>
-                    <p className="text-[10px] text-slate-500">{fmt(calc.bajas)} plantas</p>
+                    <p className="text-[10px] font-black">Bajas / pérdidas</p>
+                    <p className="text-[9px] text-slate-500">{fmt(calc.bajas)} plantas</p>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-2 rounded-md bg-green-50 p-2">
-                  <SearchCheck className="text-[#166534]" size={15} />
+                  <SearchCheck className="text-[#166534]" size={14} />
                   <div>
-                    <p className="text-[11px] font-black">Lotes registrados</p>
-                    <p className="text-[10px] text-slate-500">{fmt(lotesFiltrados.length)} registros</p>
+                    <p className="text-[10px] font-black">Lotes registrados</p>
+                    <p className="text-[9px] text-slate-500">{fmt(lotesFiltrados.length)} registros</p>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="rounded-xl bg-white p-3 shadow-sm border border-slate-100 overflow-hidden h-[245px]">
+            <div className="rounded-xl bg-white p-3 shadow-sm border border-slate-100 overflow-hidden h-[225px]">
               <SectionHeader title="Últimos Movimientos" action="Ver todos" />
 
               <div className="space-y-1.5">
                 {ultimosMovimientos.map((m, i) => (
                   <div key={i} className="flex items-start justify-between gap-2 border-b border-slate-100 pb-1.5 last:border-b-0">
                     <div>
-                      <p className="text-[11px] font-black text-[#14532d]">{m.Subtipo_Movimiento || 'Movimiento'}</p>
-                      <p className="text-[10px] text-slate-500">
+                      <p className="text-[10px] font-black text-[#14532d]">{m.Subtipo_Movimiento || 'Movimiento'}</p>
+                      <p className="text-[9px] text-slate-500">
                         {m.Fecha_Movimiento ? new Date(m.Fecha_Movimiento).toLocaleDateString('es-CL') : '-'}
                       </p>
-                      <p className="text-[10px] text-slate-400 truncate max-w-[180px]">{m.ID_Final_Lote}</p>
+                      <p className="text-[9px] text-slate-400 truncate max-w-[180px]">{m.ID_Final_Lote}</p>
                     </div>
-                    <p className="whitespace-nowrap text-[11px] font-black">{fmt(m.Cantidad)}</p>
+                    <p className="whitespace-nowrap text-[10px] font-black">{fmt(m.Cantidad)}</p>
                   </div>
                 ))}
               </div>
