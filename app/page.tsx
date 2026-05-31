@@ -254,26 +254,31 @@ function CompactKpi({ title, value, subtitle, icon: Icon }: any) {
     };
   }, [lotesFiltrados, movimientosFiltrados, vivero]);
 
-  const stockPorVivero = useMemo(() => {
-    const data: Record<string, number> = {};
-    lotesFiltrados.forEach(l => {
-      const v = txt(l.Vivero) || 'Sin vivero';
-      data[v] = (data[v] || 0) + n(l.CantidadInicialP);
-    });
-    return Object.entries(data)
-      .map(([name, value]) => ({ name: short(name, 12), fullName: name, value }))
-return Object.entries(data)
-      .map(([name, value]) => ({ name: short(name, 12), fullName: name, value })) = useMemo(() => {
-    const data: Record<string, number> = {};
-    lotesFiltrados.forEach(l => {
-      const e = txt(l.EspecieMaterial) || 'Sin especie';
-      data[e] = (data[e] || 0) + n(l.CantidadInicialP);
-    });
-    return Object.entries(data)
-      .map(([name, value]) => ({ name, value }))
-      .sort((a, b) => b.value - a.value)
-      .slice(0, 5);
-  }, [lotesFiltrados]);
+const stockPorVivero = useMemo(() => {
+  const data: Record<string, number> = {};
+  lotesFiltrados.forEach(l => {
+    const v = txt(l.Vivero) || 'Sin vivero';
+    data[v] = (data[v] || 0) + n(l.CantidadInicialP);
+  });
+
+  return Object.entries(data)
+    .map(([name, value]) => ({ name: short(name, 12), fullName: name, value }))
+    .sort((a, b) => b.value - a.value)
+    .slice(0, 5);
+}, [lotesFiltrados]);
+
+const stockPorEspecie = useMemo(() => {
+  const data: Record<string, number> = {};
+  lotesFiltrados.forEach(l => {
+    const e = txt(l.EspecieMaterial) || 'Sin especie';
+    data[e] = (data[e] || 0) + n(l.CantidadInicialP);
+  });
+
+  return Object.entries(data)
+    .map(([name, value]) => ({ name, value }))
+    .sort((a, b) => b.value - a.value)
+    .slice(0, 5);
+}, [lotesFiltrados]);
 
   const stockPorContrato = useMemo(() => {
     const data: Record<string, { contrato: string; empresa: string; movimientos: number }> = {};
