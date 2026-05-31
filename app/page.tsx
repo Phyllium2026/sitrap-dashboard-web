@@ -42,7 +42,7 @@ function SelectFilter({ label, value, options, onChange }: any) {
         {label}
       </label>
       <select
-        className="w-full rounded-md border border-green-200 bg-white px-2 py-[2px] text-[9px] font-semibold text-slate-800 outline-none focus:border-[#166534]"
+        className="w-full rounded-md border border-green-200 bg-white px-2 py-1 text-[9.5px]ont-semibold text-slate-800 outline-none focus:border-[#166534]"
         value={value}
         onChange={(e) => onChange(e.target.value)}
       >
@@ -66,23 +66,15 @@ function SectionHeader({ title, action }: any) {
 
 function CompactKpi({ title, value, subtitle, icon: Icon }: any) {
   return (
-    <div className="flex min-h-[35px] items-center justify-between rounded-lg border border-slate-100 bg-white px-2.5 py-0.5 shadow-sm">
+    <div className="flflex min-h-[31px] items-center justify-between rounded-lg border border-slate-100 bg-white px-2 py-0.5 shadow-sm
       <div className="flex min-w-0 items-center gap-2">
-        <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-green-50 text-[#166534]">
-          <Icon size={13} strokeWidth={1.8} />
-        </div>
+        <div className="fle-6 sh-5 w-5 items-center justify-center rounded-full bg-green-50 text-[#166534]">
+          <Icon keWiIcon size={12}       </div>
         <div className="min-w-0">
-          <p className="truncate text-[9.5px] font-black text-slate-800 leading-tight">{title}</p>
-          <p className="text-[8.5px] text-slate-500 leading-tight">{subtitle}</p>
-        </div>
-      </div>
-      <p className="pl-2 text-[15px] font-black text-[#14532d] leading-none">{fmt(value)}</p>
+          <p className="truncate text-[9.5px] font-btle}text-[9px] font-black text-slate-800px] text-slate-500 leading-tight">{subtitle}</iv>
+  text-[8px] text-slate-500-[15px] font-black text-[#14532d] leading-none">{fmt(value)}</p>
     </div>
-  );
-}
-
-export default function Home() {
-  const [kpis, setKpis] = useState<Kpis | null>(null);
+ functiotext-[14px] font-blackis, setKpis] = useState<Kpis | null>(null);
   const [lotes, setLotes] = useState<Lote[]>([]);
   const [movimientos, setMovimientos] = useState<Movimiento[]>([]);
   const [loading, setLoading] = useState(true);
@@ -256,12 +248,9 @@ export default function Home() {
       data[v] = (data[v] || 0) + n(l.CantidadInicialP);
     });
     return Object.entries(data)
-      .map(([name, value]) => ({ name: short(name, 18), fullName: name, value }))
-      .sort((a, b) => b.value - a.value)
-      .slice(0, 5);
-  }, [lotesFiltrados]);
-
-  const stockPorEspecie = useMemo(() => {
+      .map(([name, value]) => ({ name: short(name, 12), fullName: name, value }))
+return Object.entries(data)
+      .map(([name, value]) => ({ name: short(name, 12), fullName: name, value })) = useMemo(() => {
     const data: Record<string, number> = {};
     lotesFiltrados.forEach(l => {
       const e = txt(l.EspecieMaterial) || 'Sin especie';
@@ -315,9 +304,8 @@ export default function Home() {
 
           <nav className="space-y-0.5 text-[11px]">
             <button className="flex w-full items-center gap-2 rounded-md bg-[#14532d] px-2.5 py-1 text-left text-[11px] font-bold text-white">
-              <HomeIcon size={13} /> Inicio
-            </button>
-            <button className="flex w-full items-center gap-2 rounded-md px-2.5 py-1 text-left text-[11px] font-semibold text-slate-700 hover:bg-green-50">
+              <HomeIcon size={13} /> I    </button>
+            <button className="flex w-full items-center gap-2 rounded-md px-2Icon size={12}eft text-[11px] font-semibold text-slate-700 hover:bg-green-50">
               <Boxes size={13} /> Inventario
             </button>
             <button className="flex w-full items-center gap-2 rounded-md px-2.5 py-1 text-left text-[11px] font-semibold text-slate-700 hover:bg-green-50">
@@ -349,19 +337,18 @@ export default function Home() {
               <p className="text-[9px] font-black uppercase tracking-wide text-[#14532d]">Filtros rápidos</p>
             </div>
 
-            <div className="space-y-0.5">
-              <SelectFilter label="Vivero" value={vivero} options={options.viveros} onChange={setVivero} />
-              <SelectFilter label="Especie" value={especie} options={options.especies} onChange={setEspecie} />
+            <div className="space-y-1.5">
+              <SelectFilter label="Vivero" value={vivero} options={options.viveros} onChange={<div className="space-y-1.5">
+              <SelectFilter label="Vivero"} options={options.especies} onChange={setEspecie} />
               <SelectFilter label="Contrato" value={contrato} options={options.contratos} onChange={setContrato} />
               <SelectFilter label="Empresa / EECC" value={empresa} options={options.empresas} onChange={setEmpresa} />
               <SelectFilter label="Fecha" value={fecha} options={options.fechas} onChange={setFecha} />
 
               <button
                 onClick={() => { setVivero(''); setEspecie(''); setContrato(''); setEmpresa(''); setFecha(''); }}
-                className="flex w-full items-center justify-center gap-1 rounded-md border border-green-200 px-2 py-0.5 text-[9.5px] font-bold text-[#14532d] hover:bg-green-50"
+                className="flex w-full items-center justify-center gap-1 rounded-md border border-green-200 px-2 py-1 text-[10px] font-bold text-[#14532d] hover:bg-green-50"
               >
-                <RotateCcw size={11} /> Limpiar filtros
-              </button>
+                <Rborder border-green-200 px-2 py-1 text-[10px]    </button>
             </div>
           </div>
         </aside>
@@ -393,21 +380,22 @@ export default function Home() {
                 <ResponsiveContainer>
                   <ReBarChart
                     data={stockPorVivero}
-                    margin={{ top: 10, right: 10, bottom: 36, left: 2 }}
+                    margin={{ top: 10, right: 12, bottom: 44, left: 0 }}
                     barCategoryGap="30%"
                   >
-                    <XAxis
-                      dataKey="name"
-                      tick={{ fontSize: 9 }}
+             margin={{ top: 10, right: 12, bottom: 44, left: 0 }}                     tick={{ fontSize: 8 }}
                       interval={0}
-                      height={48}
+   <XAxis
+                      dataKey="name"
+                      tick={{ fontSize: 8 }}
+                      interval={0}
+                      height={52}
                       tickLine={false}
-                    />
-                    <YAxis tick={{ fontSize: 9 }} width={44} tickLine={false} />
+                      angle={-12}
+                      textAnchor="end"
+                    />th={44} tickLine={false} />
                     <Tooltip formatter={(v: any) => fmt(v)} labelFormatter={(_, payload: any) => payload?.[0]?.payload?.fullName || ''} />
-                    <Bar dataKey="value" fill={GREEN} radius={[6, 6, 0, 0]} barSize={24} />
-                  </ReBarChart>
-                </ResponsiveContainer>
+                    <Bar dataKey="value" fill={GREEN} radius={[6, 6, 0, 0]<Bar dataKey="value" fill={GREEN} radius={[6, 6, 0, 0]} barSize={22} />ponsiveContainer>
               </div>
             </div>
 
@@ -454,10 +442,9 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="rounded-xl bg-white p-3 shadow-sm border border-slate-100 h-[290px] overflow-hidden">
+            <div className="rounded-xl bg-white p-2.5 shadow-sm bo<div className="rounded-xl bg-white p-2.5 shadow-sm border border-slate-100 h-[290px] overflow-hidden">
               <SectionHeader title="Indicadores Clave (KPI)" />
-              <div className="grid gap-1">
-                <CompactKpi title="Stock General Inicial" value={calc.stockInicial} subtitle="plantas registradas" icon={Boxes} />
+              <div className="grid gap-0.5">Inicial" value={calc.stockInicial} subtitle="plantas registradas" icon={Boxes} />
                 <CompactKpi title="Stock General Actual" value={calc.stockActual} subtitle="plantas disponibles" icon={PackageCheck} />
                 <CompactKpi title="Stock por Vivero (según filtro)" value={calc.stockViveroSeleccionado} subtitle="plantas" icon={Warehouse} />
                 <CompactKpi title="Lotes Registrados" value={lotesFiltrados.length} subtitle="registros filtrados" icon={Tag} />
@@ -555,8 +542,7 @@ export default function Home() {
             <span>SITRAP · Sistema de Inventario y Trazabilidad de Plantas</span>
             <span className="absolute right-4">Versión 3.11</span>
           </footer>
-        </section>
-      </div>
+        </Versión 3.12   </div>
     </main>
   );
 }
