@@ -61,7 +61,7 @@ const short = (v: any, max = 18) => {
 
 function SidebarTitle({ children }: any) {
   return (
-    <div className="mb-1.5 rounded-md bg-[#14532d] px-2.5 py-1.5 text-[9.5px] font-black uppercase tracking-wide text-white">
+    <div className="mb-1 rounded-md bg-[#14532d] px-2.5 py-1 text-[9px] font-black uppercase tracking-wide text-white">
       {children}
     </div>
   );
@@ -70,11 +70,11 @@ function SidebarTitle({ children }: any) {
 function SelectFilter({ label, value, options, onChange }: any) {
   return (
     <div>
-      <label className="mb-0.5 block text-[8px] font-black uppercase tracking-wide text-[#14532d]">
+      <label className="mb-0.5 block text-[7.5px] font-black uppercase tracking-wide text-[#14532d]">
         {label}
       </label>
       <select
-        className="w-full rounded-md border border-green-200 bg-white px-2 py-1.5 text-[10px] font-semibold text-slate-800 outline-none focus:border-[#166534]"
+        className="w-full rounded-md border border-green-200 bg-white px-2 py-1 text-[9.5px] font-semibold text-slate-800 outline-none focus:border-[#166534]"
         value={value}
         onChange={(e) => onChange(e.target.value)}
       >
@@ -355,7 +355,7 @@ export default function Home() {
 
     return Object.entries(data)
       .map(([name, value]) => ({
-        name: short(name, 16),
+        name: short(name, 14),
         fullName: name,
         value,
       }))
@@ -417,13 +417,13 @@ export default function Home() {
   return (
     <main className="h-screen overflow-hidden bg-[#f7f9f6] text-slate-900">
       <div className="grid h-screen grid-cols-1 lg:grid-cols-[205px_1fr]">
-        <aside className="h-screen overflow-hidden border-r border-slate-200 bg-white px-3 py-2">
-          <div className="mb-2 flex justify-center">
+        <aside className="h-screen overflow-hidden border-r border-slate-200 bg-white px-2.5 py-1.5">
+          <div className="mb-1 flex justify-center">
             <Image
               src="/sitrap-logo.png"
               alt="SITRAP"
-              width={118}
-              height={80}
+              width={106}
+              height={70}
               className="object-contain"
               priority
             />
@@ -431,57 +431,57 @@ export default function Home() {
 
           <SidebarTitle>Inicio</SidebarTitle>
 
-          <nav className="space-y-0.5 text-[11px]">
-            <button className="flex w-full items-center gap-2 rounded-md px-2.5 py-1 text-left font-bold text-[#14532d] hover:bg-green-50">
-              <HomeIcon size={13} /> Inicio
+          <nav className="space-y-0 text-[10.5px]">
+            <button className="flex w-full items-center gap-2 rounded-md px-2 py-0.5 text-left font-bold text-[#14532d] hover:bg-green-50">
+              <HomeIcon size={12} /> Inicio
             </button>
 
-            <button className="flex w-full items-center gap-2 rounded-md px-2.5 py-1 text-left font-semibold text-slate-700 hover:bg-green-50">
-              <Boxes size={13} /> Inventario
+            <button className="flex w-full items-center gap-2 rounded-md px-2 py-0.5 text-left font-semibold text-slate-700 hover:bg-green-50">
+              <Boxes size={12} /> Inventario
             </button>
 
-            <button className="flex w-full items-center gap-2 rounded-md px-2.5 py-1 text-left font-semibold text-slate-700 hover:bg-green-50">
-              <ArrowLeftRight size={13} /> Movimientos
+            <button className="flex w-full items-center gap-2 rounded-md px-2 py-0.5 text-left font-semibold text-slate-700 hover:bg-green-50">
+              <ArrowLeftRight size={12} /> Movimientos
             </button>
 
-            <button className="flex w-full items-center gap-2 rounded-md px-2.5 py-1 text-left font-semibold text-slate-700 hover:bg-green-50">
-              <ClipboardList size={13} /> Contratos
+            <button className="flex w-full items-center gap-2 rounded-md px-2 py-0.5 text-left font-semibold text-slate-700 hover:bg-green-50">
+              <ClipboardList size={12} /> Contratos
             </button>
 
-            <button className="flex w-full items-center gap-2 rounded-md px-2.5 py-1 text-left font-semibold text-slate-700 hover:bg-green-50">
-              <BarChart3 size={13} /> Dashboard
+            <button className="flex w-full items-center gap-2 rounded-md px-2 py-0.5 text-left font-semibold text-slate-700 hover:bg-green-50">
+              <BarChart3 size={12} /> Dashboard
             </button>
           </nav>
 
-          <div className="mt-2">
+          <div className="mt-1.5">
             <SidebarTitle>Acciones rápidas</SidebarTitle>
 
             <div className="space-y-1">
               <a
                 href="#"
-                className="flex items-center justify-between rounded-md border border-green-200 bg-white px-2.5 py-1.5 text-[9.5px] font-bold text-[#14532d]"
+                className="flex items-center justify-between rounded-md border border-green-200 bg-white px-2 py-1 text-[9px] font-bold text-[#14532d]"
               >
-                Codificar Lote <ExternalLink size={11} />
+                Codificar Lote <ExternalLink size={10} />
               </a>
 
               <a
                 href="#"
-                className="flex items-center justify-between rounded-md border border-green-200 bg-white px-2.5 py-1.5 text-[9.5px] font-bold text-[#14532d]"
+                className="flex items-center justify-between rounded-md border border-green-200 bg-white px-2 py-1 text-[9px] font-bold text-[#14532d]"
               >
-                Registrar Movimiento <ExternalLink size={11} />
+                Registrar Movimiento <ExternalLink size={10} />
               </a>
             </div>
           </div>
 
-          <div className="mt-2">
+          <div className="mt-1.5">
             <SidebarTitle>
               <span className="flex items-center gap-1.5">
-                <Filter size={11} />
+                <Filter size={10} />
                 Filtros rápidos
               </span>
             </SidebarTitle>
 
-            <div className="space-y-1.5">
+            <div className="space-y-1">
               <SelectFilter
                 label="Vivero"
                 value={vivero}
@@ -525,9 +525,9 @@ export default function Home() {
                   setEmpresa('');
                   setFecha('');
                 }}
-                className="flex w-full items-center justify-center gap-1 rounded-md border border-green-200 px-2 py-1.5 text-[10px] font-bold text-[#14532d] hover:bg-green-50"
+                className="flex w-full items-center justify-center gap-1 rounded-md border border-green-200 px-2 py-1 text-[9.5px] font-bold text-[#14532d] hover:bg-green-50"
               >
-                <RotateCcw size={11} />
+                <RotateCcw size={10} />
                 Limpiar filtros
               </button>
             </div>
@@ -564,12 +564,13 @@ export default function Home() {
             <div className="h-[290px] overflow-hidden rounded-xl border border-slate-100 bg-white p-3 shadow-sm">
               <SectionHeader title="Stock por Vivero" action="Stock actual" />
 
-              <div className="h-[248px]">
+              <div className="h-[248px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <ReBarChart
                     data={stockPorVivero}
-                    margin={{ top: 8, right: 14, bottom: 28, left: 54 }}
-                    barCategoryGap="18%"
+                    margin={{ top: 8, right: 4, bottom: 26, left: 26 }}
+                    barCategoryGap="4%"
+                    barGap={2}
                   >
                     <XAxis
                       dataKey="name"
@@ -582,11 +583,11 @@ export default function Home() {
                     />
 
                     <YAxis
-                      width={54}
+                      width={42}
                       tick={{ fontSize: 8 }}
                       tickLine={false}
                       axisLine={false}
-                      tickMargin={10}
+                      tickMargin={6}
                     />
 
                     <Tooltip
@@ -600,7 +601,7 @@ export default function Home() {
                       dataKey="value"
                       fill={GREEN}
                       radius={[7, 7, 0, 0]}
-                      barSize={34}
+                      maxBarSize={70}
                     />
                   </ReBarChart>
                 </ResponsiveContainer>
@@ -835,7 +836,7 @@ export default function Home() {
 
           <footer className="-mx-3 mt-2 flex h-8 items-center justify-center bg-[#14532d] px-4 text-[11px] font-semibold text-white">
             <span>SITRAP · Sistema de Inventario y Trazabilidad de Plantas</span>
-            <span className="absolute right-4">Versión 3.13</span>
+            <span className="absolute right-4">Versión 3.14</span>
           </footer>
         </section>
       </div>
