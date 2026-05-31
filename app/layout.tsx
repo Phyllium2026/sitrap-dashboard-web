@@ -4,18 +4,10 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'SITRAP',
   description: 'Sistema de Inventario y Trazabilidad de Plantas',
-
   manifest: '/manifest.json',
-
   icons: {
     icon: '/sitrap-app-icon.png.png',
     apple: '/sitrap-app-icon.png.png',
-  },
-
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: 'default',
-    title: 'SITRAP',
   },
 };
 
