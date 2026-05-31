@@ -366,7 +366,7 @@ export default function Home() {
           </div>
 
           <div className="mt-auto pt-1 text-[9px] text-slate-400">
-            SITRAP · V3.6
+            SITRAP · V3.7
           </div>
         </aside>
 
@@ -408,10 +408,10 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="mb-2 grid gap-2 xl:grid-cols-[1fr_1.08fr_0.98fr]">
-            <div className="rounded-xl bg-white p-3 shadow-sm border border-slate-100 h-[270px] overflow-hidden">
+          <div className="mb-1.5 grid gap-2 xl:grid-cols-[1fr_1.08fr_0.98fr]">
+            <div className="rounded-xl bg-white p-3 shadow-sm border border-slate-100 h-[258px] overflow-hidden">
               <SectionHeader title="Stock por Vivero" action="Stock actual" />
-              <div className="h-[222px]">
+              <div className="h-[212px]">
                 <ResponsiveContainer>
                   <ReBarChart
                     data={stockPorVivero}
@@ -433,18 +433,18 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="rounded-xl bg-white p-3 shadow-sm border border-slate-100 h-[270px] overflow-hidden">
+            <div className="rounded-xl bg-white p-3 shadow-sm border border-slate-100 h-[258px] overflow-hidden">
               <SectionHeader title="Stock por Especie" />
-              <div className="grid h-[222px] grid-cols-[0.72fr_1.28fr] items-center gap-2">
-                <div className="relative h-[178px] min-w-0">
+              <div className="grid h-[212px] grid-cols-[0.62fr_1.38fr] items-center gap-1.5">
+                <div className="relative h-[148px] min-w-0">
                   <ResponsiveContainer>
                     <PieChart margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
                       <Pie
                         data={stockPorEspecie}
                         dataKey="value"
                         nameKey="name"
-                        innerRadius={46}
-                        outerRadius={72}
+                        innerRadius={38}
+                        outerRadius={58}
                         paddingAngle={2}
                       >
                         {stockPorEspecie.map((_, i) => (
@@ -455,18 +455,18 @@ export default function Home() {
                     </PieChart>
                   </ResponsiveContainer>
                   <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center">
-                    <p className="text-base font-black text-[#14532d]">{fmt(calc.stockActual)}</p>
-                    <p className="text-[10px] text-slate-500">plantas</p>
+                    <p className="text-sm font-black text-[#14532d]">{fmt(calc.stockActual)}</p>
+                    <p className="text-[9px] text-slate-500">plantas</p>
                   </div>
                 </div>
 
-                <div className="space-y-1.5 overflow-hidden">
+                <div className="space-y-1.5 overflow-hidden pr-1">
                   {stockPorEspecie.map((e, i) => {
                     const pct = totalEspecies ? (e.value / totalEspecies) * 100 : 0;
                     return (
-                      <div key={e.name} className="grid grid-cols-[9px_minmax(0,1fr)_34px_48px] items-center gap-1.5 text-[10px]">
-                        <span className="h-2 w-2 rounded-full" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
-                        <span className="truncate text-slate-700" title={e.name}>{short(e.name, 16)}</span>
+                      <div key={e.name} className="grid grid-cols-[8px_minmax(0,1fr)_32px_44px] items-center gap-1.5 text-[9.5px]">
+                        <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
+                        <span className="truncate text-slate-700" title={e.name}>{short(e.name, 15)}</span>
                         <span className="font-semibold text-slate-700">{pct.toFixed(1)}%</span>
                         <span className="text-right font-black text-[#14532d]">{fmt(e.value)}</span>
                       </div>
@@ -476,7 +476,7 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="rounded-xl bg-white p-3 shadow-sm border border-slate-100 h-[270px] overflow-hidden">
+            <div className="rounded-xl bg-white p-3 shadow-sm border border-slate-100 h-[258px] overflow-hidden">
               <SectionHeader title="Indicadores Clave (KPI)" />
               <div className="grid gap-1.5">
                 <CompactKpi title="Stock General Inicial" value={calc.stockInicial} subtitle="plantas registradas" icon={Boxes} />
@@ -489,7 +489,7 @@ export default function Home() {
           </div>
 
           <div className="grid gap-2 xl:grid-cols-[1.2fr_0.8fr_1fr]">
-            <div className="rounded-xl bg-white p-3 shadow-sm border border-slate-100 overflow-hidden h-[225px]">
+            <div className="rounded-xl bg-white p-3 shadow-sm border border-slate-100 overflow-hidden h-[218px]">
               <SectionHeader title="Resumen por Contrato" action="Ver todos" />
               <table className="w-full text-[10px]">
                 <thead className="uppercase text-slate-500">
@@ -520,7 +520,7 @@ export default function Home() {
               </table>
             </div>
 
-            <div className="rounded-xl bg-white p-3 shadow-sm border border-slate-100 h-[225px] overflow-hidden">
+            <div className="rounded-xl bg-white p-3 shadow-sm border border-slate-100 h-[218px] overflow-hidden">
               <SectionHeader title="Alertas SITRAP" action="Ver todas" />
 
               <div className="space-y-1.5">
@@ -550,7 +550,7 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="rounded-xl bg-white p-3 shadow-sm border border-slate-100 overflow-hidden h-[225px]">
+            <div className="rounded-xl bg-white p-3 shadow-sm border border-slate-100 overflow-hidden h-[218px]">
               <SectionHeader title="Últimos Movimientos" action="Ver todos" />
 
               <div className="space-y-1.5">
