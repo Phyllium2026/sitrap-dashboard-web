@@ -3,12 +3,12 @@
 import { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import {
-  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell,
+  BarChart as ReBarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
 } from 'recharts';
 import {
-  Boxes, CalendarClock, PackageCheck, PackageMinus,
-  PackagePlus, RefreshCw, Search, Truck, Warehouse,
+  Home, Boxes, PackageCheck, PackagePlus, PackageMinus, Truck, Warehouse,
+  CalendarClock, RefreshCw, ClipboardList, ArrowLeftRight, BarChart3,
+  Filter, AlertTriangle, ExternalLink, RotateCcw, SearchCheck,
 } from 'lucide-react';
 
 type Kpis = Record<string, any>;
@@ -16,10 +16,9 @@ type Lote = Record<string, any>;
 type Movimiento = Record<string, any>;
 
 const API = '/api/sitrap';
-const GREEN = '#1f6b3a';
+const GREEN = '#166534';
 const GREEN_DARK = '#14532d';
-const PALE = '#eef7ec';
-const COLORS = ['#1f6b3a', '#4CAF50', '#86C65A', '#334155', '#9CA3AF'];
+const BG = '#f6f8f5';
 
 const n = (v: any) => {
   if (v === null || v === undefined || v === '') return 0;
@@ -30,38 +29,27 @@ const n = (v: any) => {
 const txt = (v: any) => String(v || '').trim();
 const fmt = (v: any) => new Intl.NumberFormat('es-CL').format(n(v));
 
-function KpiCard({ title, value, icon: Icon }: any) {
+function KpiCard({ title, value, subtitle, icon: Icon }: any) {
   return (
-    <div className="rounded-xl bg-white p-4 shadow-sm border border-green-100 flex items-center gap-4 min-h-[105px]">
-      <div className="text-[#1f6b3a]">
-        <Icon size={42} strokeWidth={1.7} />
+    <div className="rounded-2xl bg-white p-5 shadow-sm border border-slate-100 flex items-center gap-4 min-h-[118px]">
+      <div className="flex h-14 w-14 items-center justify-center rounded-full bg-green-50 text-[#166534]">
+        <Icon size={30} strokeWidth={1.8} />
       </div>
-      <div className="flex-1 text-center">
-        <p className="text-xs font-bold uppercase text-[#1f6b3a]">{title}</p>
-        <p className="mt-1 text-3xl font-bold text-[#1f6b3a]">{fmt(value)}</p>
-        <p className="text-xs text-slate-500">Plantas</p>
+      <div>
+        <p className="text-sm font-semibold text-slate-700">{title}</p>
+        <p className="mt-1 text-3xl font-black text-[#14532d]">{fmt(value)}</p>
+        <p className="text-sm text-slate-500">{subtitle}</p>
       </div>
-    </div>
-  );
-}
-
-function SectionTitle({ children }: any) {
-  return (
-    <div className="mb-4 flex items-center gap-4">
-      <div className="bg-white px-2 py-1 text-xl font-black uppercase text-[#1f6b3a]">
-        {children}
-      </div>
-      <div className="h-px flex-1 bg-slate-400" />
     </div>
   );
 }
 
 function SelectFilter({ label, value, options, onChange }: any) {
   return (
-    <div className="rounded-xl bg-white p-3 shadow-sm border border-green-100">
-      <label className="mb-1 block text-xs font-bold text-[#1f6b3a]">{label}</label>
+    <div>
+      <label className="mb-1 block text-xs font-semibold text-slate-600">{label}</label>
       <select
-        className="w-full rounded-lg border border-slate-200 bg-white px-2 py-2 text-xs outline-none"
+        className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none"
         value={value}
         onChange={(e) => onChange(e.target.value)}
       >
@@ -70,6 +58,15 @@ function SelectFilter({ label, value, options, onChange }: any) {
           <option key={x} value={x}>{x}</option>
         ))}
       </select>
+    </div>
+  );
+}
+
+function SectionHeader({ title, action }: any) {
+  return (
+    <div className="mb-4 flex items-center justify-between">
+      <h2 className="text-lg font-black text-[#14532d]">{title}</h2>
+      {action && <span className="text-xs font-semibold text-[#166534]">{action}</span>}
     </div>
   );
 }
@@ -85,7 +82,6 @@ export default function Home() {
   const [contrato, setContrato] = useState('');
   const [empresa, setEmpresa] = useState('');
   const [fecha, setFecha] = useState('');
-  const [query, setQuery] = useState('');
 
   useEffect(() => {
     async function load() {
@@ -129,6 +125,7 @@ export default function Home() {
 
   const movimientosFiltrados = useMemo(() => {
     const now = new Date();
+
     return movimientos.filter(m => {
       const id = txt(m.ID_Final_Lote);
       if (idsFiltrados.size && id && !idsFiltrados.has(id)) return false;
@@ -150,10 +147,12 @@ export default function Home() {
           const lim = new Date(now); lim.setDate(now.getDate() - 30);
           if (f < lim) return false;
         }
+
         if (fecha === 'Últimos 90 días') {
           const lim = new Date(now); lim.setDate(now.getDate() - 90);
           if (f < lim) return false;
         }
+
         if (fecha === 'Año 2026' && f.getFullYear() !== 2026) return false;
       }
 
@@ -242,211 +241,257 @@ export default function Home() {
 
   const stockPorVivero = useMemo(() => {
     const data: Record<string, number> = {};
-    lotes.forEach(l => {
+    lotesFiltrados.forEach(l => {
       const v = txt(l.Vivero) || 'Sin vivero';
       data[v] = (data[v] || 0) + n(l.CantidadInicialP);
     });
-    return Object.entries(data).map(([name, value]) => ({ name, value }));
-  }, [lotes]);
+    return Object.entries(data)
+      .map(([name, value]) => ({ name, value }))
+      .sort((a, b) => b.value - a.value)
+      .slice(0, 6);
+  }, [lotesFiltrados]);
 
-  const movimientosPorTipo = useMemo(() => {
-    const data: Record<string, number> = {};
+  const stockPorContrato = useMemo(() => {
+    const data: Record<string, { contrato: string; empresa: string; stock: number; movimientos: number }> = {};
+
     movimientosFiltrados.forEach(m => {
-      const tipo = txt(m.Subtipo_Movimiento) || 'Sin subtipo';
-      data[tipo] = (data[tipo] || 0) + n(m.Cantidad);
+      const c = txt(m.Contrato_Final || m.Contrato) || 'Sin contrato';
+      const e = txt(m.Empresa_EECC_Final || m.Empresa_EECC) || '-';
+      if (!data[c]) data[c] = { contrato: c, empresa: e, stock: 0, movimientos: 0 };
+      data[c].movimientos += n(m.Cantidad);
     });
-    return Object.entries(data).map(([name, value]) => ({ name, value }));
+
+    lotesFiltrados.forEach(l => {
+      const c = txt(l.Contrato_Final || l.Contrato) || 'Sin contrato';
+      if (!data[c]) data[c] = { contrato: c, empresa: '-', stock: 0, movimientos: 0 };
+      data[c].stock += n(l.CantidadInicialP);
+    });
+
+    return Object.values(data).sort((a, b) => b.movimientos - a.movimientos).slice(0, 6);
+  }, [movimientosFiltrados, lotesFiltrados]);
+
+  const ultimosMovimientos = useMemo(() => {
+    return [...movimientosFiltrados].slice(0, 6);
   }, [movimientosFiltrados]);
 
-  const busqueda = useMemo(() => {
-    const q = query.toUpperCase().trim();
-    if (!q) return [];
-    return lotes.filter(l =>
-      [l.ID_Final_Lote, l.EspecieMaterial, l.Vivero, l.OrigenMaterial]
-        .join(' ')
-        .toUpperCase()
-        .includes(q)
-    ).slice(0, 6);
-  }, [query, lotes]);
-
   if (loading || !kpis) {
-    return <main className="min-h-screen bg-[#edf6eb] p-8 text-[#1f6b3a] font-bold">Cargando SITRAP...</main>;
+    return (
+      <main className="min-h-screen bg-[#f6f8f5] p-8 text-[#14532d] font-bold">
+        Cargando SITRAP...
+      </main>
+    );
   }
 
   return (
-    <main className="min-h-screen bg-[#edf6eb]">
-      <div className="grid min-h-screen grid-cols-1 lg:grid-cols-[190px_1fr]">
-        <aside className="bg-white p-4 border-r border-green-100">
-       <Image
-  <Image
-  src="/sitrap-logo.png"
-  alt="SITRAP"
-  width={150}
-  height={150}
-  className="mx-auto mb-6 object-contain"
-/>
-  alt="SITRAP"
-  width={120}
-  height={120}
-  className="mx-auto mb-4 object-contain"
-/>
-<div className="mb-6 space-y-2">
-  <button className="w-full rounded-lg bg-[#14532d] px-3 py-2.5 text-left text-sm font-semibold text-white">
-    Inicio
-  </button>
+    <main className="min-h-screen bg-[#f6f8f5] text-slate-900">
+      <div className="grid min-h-screen grid-cols-1 lg:grid-cols-[260px_1fr]">
+        <aside className="bg-white border-r border-slate-200 p-6 flex flex-col">
+          <div className="mb-8">
+            <Image
+              src="/sitrap-logo.png"
+              alt="SITRAP"
+              width={160}
+              height={120}
+              className="object-contain"
+            />
+          </div>
 
-  <button className="w-full rounded-lg border border-green-100 bg-white px-3 py-2.5 text-left text-sm font-semibold text-[#14532d]">
-    Inventario
-  </button>
-
-  <button className="w-full rounded-lg border border-green-100 bg-white px-3 py-2.5 text-left text-sm font-semibold text-[#14532d]">
-    Movimientos
-  </button>
-
-  <button className="w-full rounded-lg border border-green-100 bg-white px-3 py-2.5 text-left text-sm font-semibold text-[#14532d]">
-    Dashboard
-  </button>
-</div>
-
-
-          <div className="space-y-4">
-            <SelectFilter label="Vivero" value={vivero} options={options.viveros} onChange={setVivero} />
-            <SelectFilter label="EspecieMaterial" value={especie} options={options.especies} onChange={setEspecie} />
-            <SelectFilter label="Contrato_Final" value={contrato} options={options.contratos} onChange={setContrato} />
-            <SelectFilter label="Empresa / EECC" value={empresa} options={options.empresas} onChange={setEmpresa} />
-            <SelectFilter label="Fecha_Registro" value={fecha} options={options.fechas} onChange={setFecha} />
-
-            <button
-              onClick={() => { setVivero(''); setEspecie(''); setContrato(''); setEmpresa(''); setFecha(''); }}
-              className="w-full rounded-xl bg-[#1f6b3a] px-3 py-2 text-xs font-bold text-white"
-            >
-              Limpiar filtros
+          <nav className="space-y-2">
+            <button className="flex w-full items-center gap-3 rounded-xl bg-[#14532d] px-4 py-3 text-left text-sm font-bold text-white">
+              <Home size={18} /> Inicio
             </button>
+            <button className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-semibold text-slate-700 hover:bg-green-50">
+              <Boxes size={18} /> Inventario
+            </button>
+            <button className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-semibold text-slate-700 hover:bg-green-50">
+              <ArrowLeftRight size={18} /> Movimientos
+            </button>
+            <button className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-semibold text-slate-700 hover:bg-green-50">
+              <ClipboardList size={18} /> Contratos
+            </button>
+            <button className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-semibold text-slate-700 hover:bg-green-50">
+              <BarChart3 size={18} /> Dashboard
+            </button>
+          </nav>
+
+          <div className="mt-8">
+            <p className="mb-3 text-xs font-black uppercase tracking-wide text-[#14532d]">Acciones rápidas</p>
+
+            <div className="space-y-3">
+              <a
+                href="#"
+                className="flex items-center justify-between rounded-xl bg-[#166534] px-4 py-3 text-sm font-bold text-white"
+              >
+                Codificar Lote <ExternalLink size={15} />
+              </a>
+
+              <a
+                href="#"
+                className="flex items-center justify-between rounded-xl border border-green-200 px-4 py-3 text-sm font-bold text-[#14532d]"
+              >
+                Registrar Movimiento <ExternalLink size={15} />
+              </a>
+            </div>
+          </div>
+
+          <div className="mt-8">
+            <div className="mb-4 flex items-center gap-2">
+              <Filter size={16} className="text-[#14532d]" />
+              <p className="text-xs font-black uppercase tracking-wide text-[#14532d]">Filtros rápidos</p>
+            </div>
+
+            <div className="space-y-4">
+              <SelectFilter label="Vivero" value={vivero} options={options.viveros} onChange={setVivero} />
+              <SelectFilter label="Especie" value={especie} options={options.especies} onChange={setEspecie} />
+              <SelectFilter label="Contrato" value={contrato} options={options.contratos} onChange={setContrato} />
+              <SelectFilter label="Empresa / EECC" value={empresa} options={options.empresas} onChange={setEmpresa} />
+              <SelectFilter label="Fecha" value={fecha} options={options.fechas} onChange={setFecha} />
+
+              <button
+                onClick={() => { setVivero(''); setEspecie(''); setContrato(''); setEmpresa(''); setFecha(''); }}
+                className="flex w-full items-center justify-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-[#14532d] hover:bg-green-50"
+              >
+                <RotateCcw size={15} /> Limpiar filtros
+              </button>
+            </div>
+          </div>
+
+          <div className="mt-auto pt-8 text-xs text-slate-400">
+            SITRAP · Versión 3.0
           </div>
         </aside>
 
-        <section className="p-5 lg:p-8">
+        <section className="p-6 lg:p-10">
           <header className="mb-8 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-  <div>
-    <h1 className="text-5xl font-black text-[#14532d]">
-      SITRAP
-    </h1>
+            <div>
+              <h1 className="text-3xl font-black text-[#14532d]">
+                Bienvenido a SITRAP
+              </h1>
+              <p className="mt-1 text-slate-600">
+                Resumen general de inventario y trazabilidad de plantas
+              </p>
+            </div>
 
-    <p className="mt-2 text-xl text-slate-600">
-      Sistema de Inventario y Trazabilidad de Plantas
-    </p>
-  </div>
+            <div className="flex items-center gap-3 rounded-2xl bg-white px-5 py-4 shadow-sm border border-slate-100 text-[#14532d]">
+              <CalendarClock size={28} />
+              <div>
+                <p className="text-xs text-slate-500">Última actualización</p>
+                <p className="font-bold">
+                  {new Date(kpis.fecha_actualizacion).toLocaleDateString('es-CL')}
+                </p>
+              </div>
+            </div>
+          </header>
 
-  <div className="rounded-xl bg-white px-5 py-4 shadow-sm flex items-center gap-3 text-[#1f6b3a]">
-    <CalendarClock />
-    <div>
-      <p className="text-xs text-slate-500">Última actualización</p>
-      <p className="font-bold">
-        {new Date(kpis.fecha_actualizacion).toLocaleDateString('es-CL')}
-      </p>
-    </div>
-  </div>
-</header>
-
-          <SectionTitle>Stock</SectionTitle>
-          <div className="grid gap-6 md:grid-cols-3 mb-8">
-            <KpiCard title="Stock general inicial" value={calc.stockInicial} icon={Boxes} />
-            <KpiCard title="Stock general actual" value={calc.stockActual} icon={PackageCheck} />
-            <KpiCard title="Stock por vivero seleccionado" value={calc.stockViveroSeleccionado} icon={Warehouse} />
+          <div className="mb-8 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+            <KpiCard title="Stock General Inicial" value={calc.stockInicial} subtitle="plantas registradas" icon={Boxes} />
+            <KpiCard title="Stock General Actual" value={calc.stockActual} subtitle="plantas disponibles" icon={PackageCheck} />
+            <KpiCard title="Stock por Vivero" value={calc.stockViveroSeleccionado} subtitle="según filtro activo" icon={Warehouse} />
+            <KpiCard title="Traslados Pendientes" value={calc.trasladosPendientes} subtitle="plantas en tránsito" icon={Truck} />
           </div>
 
-          <SectionTitle>Movimientos operacionales</SectionTitle>
-          <div className="grid gap-6 md:grid-cols-3 mb-8">
-            <KpiCard title="Entradas a VMA" value={calc.entradasVMA} icon={PackagePlus} />
-            <KpiCard title="Salidas de viveros" value={calc.salidasViveros} icon={PackageMinus} />
-            <KpiCard title="Traslados pendientes" value={calc.trasladosPendientes} icon={Truck} />
-          </div>
-
-          <SectionTitle>Movimientos del sistema</SectionTitle>
-          <div className="grid gap-6 md:grid-cols-3 mb-8">
-            <KpiCard title="Despachos a EECC" value={calc.salidasEECC} icon={Truck} />
-            <KpiCard title="Bajas / pérdidas" value={calc.bajas} icon={PackageMinus} />
-            <KpiCard title="Transformaciones lote" value={calc.transformaciones} icon={RefreshCw} />
-          </div>
-
-          <div className="grid gap-6 xl:grid-cols-2 mb-8">
-            <div className="rounded-2xl bg-white p-5 shadow-sm">
-              <h2 className="mb-4 font-black text-[#14532d]">Stock por vivero</h2>
-              <div className="h-72">
+          <div className="mb-8 grid gap-6 xl:grid-cols-[1.1fr_1fr]">
+            <div className="rounded-2xl bg-white p-6 shadow-sm border border-slate-100">
+              <SectionHeader title="Stock por Vivero" action="Stock actual" />
+              <div className="h-80">
                 <ResponsiveContainer>
-                  <BarChart data={stockPorVivero}>
+                  <ReBarChart data={stockPorVivero}>
                     <XAxis dataKey="name" tick={{ fontSize: 11 }} />
-                    <YAxis />
+                    <YAxis tick={{ fontSize: 11 }} />
                     <Tooltip formatter={(v: any) => fmt(v)} />
                     <Bar dataKey="value" fill={GREEN} radius={[8, 8, 0, 0]} />
-                  </BarChart>
+                  </ReBarChart>
                 </ResponsiveContainer>
               </div>
             </div>
 
-            <div className="rounded-2xl bg-white p-5 shadow-sm">
-              <h2 className="mb-4 font-black text-[#14532d]">Movimientos por subtipo</h2>
-              <div className="h-72">
-                <ResponsiveContainer>
-                  <PieChart>
-                    <Pie data={movimientosPorTipo} dataKey="value" nameKey="name" innerRadius={55} outerRadius={95}>
-                      {movimientosPorTipo.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
-                    </Pie>
-                    <Tooltip formatter={(v: any) => fmt(v)} />
-                  </PieChart>
-                </ResponsiveContainer>
+            <div className="rounded-2xl bg-white p-6 shadow-sm border border-slate-100">
+              <SectionHeader title="Indicadores Operacionales" />
+              <div className="grid gap-4 md:grid-cols-2">
+                <KpiCard title="Entradas a VMA" value={calc.entradasVMA} subtitle="plantas" icon={PackagePlus} />
+                <KpiCard title="Salidas de Viveros" value={calc.salidasViveros} subtitle="plantas" icon={PackageMinus} />
+                <KpiCard title="Despachos EECC" value={calc.salidasEECC} subtitle="plantas" icon={Truck} />
+                <KpiCard title="Transformaciones" value={calc.transformaciones} subtitle="plantas" icon={RefreshCw} />
               </div>
             </div>
           </div>
 
-          <div className="grid gap-6 xl:grid-cols-[360px_1fr]">
-            <div className="rounded-2xl bg-white p-5 shadow-sm">
-              <h2 className="mb-4 flex items-center gap-2 font-black text-[#14532d]"><Search size={18} /> Buscador de lote</h2>
-              <input
-                value={query}
-                onChange={e => setQuery(e.target.value)}
-                placeholder="Buscar lote, especie, vivero..."
-                className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none"
-              />
-              <div className="mt-4 space-y-2">
-                {busqueda.map(l => (
-                  <div key={l.ID_Final_Lote} className="rounded-xl bg-[#edf6eb] p-3 text-sm">
-                    <p className="font-bold text-[#14532d]">{l.ID_Final_Lote}</p>
-                    <p>{l.EspecieMaterial}</p>
-                    <p className="text-xs text-slate-500">{l.Vivero}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="rounded-2xl bg-white p-5 shadow-sm overflow-x-auto">
-              <h2 className="mb-4 font-black text-[#14532d]">Últimos movimientos</h2>
+          <div className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr_1fr]">
+            <div className="rounded-2xl bg-white p-6 shadow-sm border border-slate-100 overflow-x-auto">
+              <SectionHeader title="Resumen por Contrato" action="Ver todos" />
               <table className="w-full text-sm">
                 <thead className="text-xs uppercase text-slate-500">
                   <tr>
-                    <th className="py-2 text-left">Fecha</th>
-                    <th className="py-2 text-left">Lote</th>
-                    <th className="py-2 text-left">Movimiento</th>
-                    <th className="py-2 text-left">Origen</th>
-                    <th className="py-2 text-left">Destino</th>
-                    <th className="py-2 text-right">Cantidad</th>
+                    <th className="py-3 text-left">Contrato</th>
+                    <th className="py-3 text-left">Empresa / EECC</th>
+                    <th className="py-3 text-right">Movimientos</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {movimientosFiltrados.slice(0, 12).map((m, i) => (
-                    <tr key={i} className="border-t">
-                      <td className="py-2">{m.Fecha_Movimiento ? new Date(m.Fecha_Movimiento).toLocaleDateString('es-CL') : '-'}</td>
-                      <td className="py-2 font-semibold">{m.ID_Final_Lote}</td>
-                      <td className="py-2">{m.Subtipo_Movimiento}</td>
-                      <td className="py-2">{m.Origen}</td>
-                      <td className="py-2">{m.Destino}</td>
-                      <td className="py-2 text-right font-bold">{fmt(m.Cantidad)}</td>
+                  {stockPorContrato.map((r, i) => (
+                    <tr key={i} className="border-t border-slate-100">
+                      <td className="py-3 font-bold text-[#14532d]">{r.contrato}</td>
+                      <td className="py-3 text-slate-600">{r.empresa}</td>
+                      <td className="py-3 text-right font-black">{fmt(r.movimientos)}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
+
+            <div className="rounded-2xl bg-white p-6 shadow-sm border border-slate-100">
+              <SectionHeader title="Alertas SITRAP" action="Ver todas" />
+
+              <div className="space-y-3">
+                <div className="flex items-center gap-3 rounded-xl bg-amber-50 p-3">
+                  <AlertTriangle className="text-amber-600" size={20} />
+                  <div>
+                    <p className="text-sm font-bold">Traslados pendientes</p>
+                    <p className="text-xs text-slate-500">{fmt(calc.trasladosPendientes)} plantas</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 rounded-xl bg-red-50 p-3">
+                  <AlertTriangle className="text-red-600" size={20} />
+                  <div>
+                    <p className="text-sm font-bold">Bajas / pérdidas</p>
+                    <p className="text-xs text-slate-500">{fmt(calc.bajas)} plantas</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 rounded-xl bg-green-50 p-3">
+                  <SearchCheck className="text-[#166534]" size={20} />
+                  <div>
+                    <p className="text-sm font-bold">Lotes registrados</p>
+                    <p className="text-xs text-slate-500">{fmt(lotesFiltrados.length)} registros</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="rounded-2xl bg-white p-6 shadow-sm border border-slate-100 overflow-x-auto">
+              <SectionHeader title="Últimos Movimientos" action="Ver todos" />
+
+              <div className="space-y-4">
+                {ultimosMovimientos.map((m, i) => (
+                  <div key={i} className="flex items-start justify-between gap-4 border-b border-slate-100 pb-3 last:border-b-0">
+                    <div>
+                      <p className="text-sm font-bold text-[#14532d]">{m.Subtipo_Movimiento || 'Movimiento'}</p>
+                      <p className="text-xs text-slate-500">
+                        {m.Fecha_Movimiento ? new Date(m.Fecha_Movimiento).toLocaleDateString('es-CL') : '-'}
+                      </p>
+                      <p className="text-xs text-slate-400">{m.ID_Final_Lote}</p>
+                    </div>
+                    <p className="whitespace-nowrap text-sm font-black">{fmt(m.Cantidad)}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
+
+          <footer className="mt-8 border-t border-slate-200 pt-4 text-xs text-slate-400">
+            SITRAP · Sistema de Inventario y Trazabilidad de Plantas
+          </footer>
         </section>
       </div>
     </main>
