@@ -66,15 +66,28 @@ function SectionHeader({ title, action }: any) {
 
 function CompactKpi({ title, value, subtitle, icon: Icon }: any) {
   return (
-    <div className="flflex min-h-[31px] items-center justify-between rounded-lg border border-slate-100 bg-white px-2 py-0.5 shadow-sm
+    <div className="flex min-h-[31px] items-center justify-between rounded-lg border border-slate-100 bg-white px-2 py-0.5 shadow-sm">
       <div className="flex min-w-0 items-center gap-2">
-        <div className="fle-6 sh-5 w-5 items-center justify-center rounded-full bg-green-50 text-[#166534]">
-          <Icon keWiIcon size={12}       </div>
+        <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-green-50 text-[#166534]">
+          <Icon size={12} strokeWidth={1.8} />
+        </div>
+
         <div className="min-w-0">
-          <p className="truncate text-[9.5px] font-btle}text-[9px] font-black text-slate-800px] text-slate-500 leading-tight">{subtitle}</iv>
-  text-[8px] text-slate-500-[15px] font-black text-[#14532d] leading-none">{fmt(value)}</p>
+          <p className="truncate text-[9px] font-black text-slate-800 leading-tight">
+            {title}
+          </p>
+          <p className="text-[8px] text-slate-500 leading-tight">
+            {subtitle}
+          </p>
+        </div>
+      </div>
+
+      <p className="pl-2 text-[14px] font-black text-[#14532d] leading-none">
+        {fmt(value)}
+      </p>
     </div>
- functiotext-[14px] font-blackis, setKpis] = useState<Kpis | null>(null);
+  );
+}
   const [lotes, setLotes] = useState<Lote[]>([]);
   const [movimientos, setMovimientos] = useState<Movimiento[]>([]);
   const [loading, setLoading] = useState(true);
