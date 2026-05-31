@@ -18,7 +18,8 @@ type Movimiento = Record<string, any>;
 
 const API = '/api/sitrap';
 const GREEN = '#166534';
-const COLORS = ['#166534', '#2f7d32', '#66a867', '#a7c8aa', '#cfd8dc'];
+const DARK = '#14532d';
+const COLORS = ['#166534', '#3f7f34', '#77a86c', '#adc7a7', '#d1d8dc'];
 
 const n = (v: any) => {
   if (v === null || v === undefined || v === '') return 0;
@@ -29,12 +30,14 @@ const n = (v: any) => {
 const txt = (v: any) => String(v || '').trim();
 const fmt = (v: any) => new Intl.NumberFormat('es-CL').format(n(v));
 
-function SelectFilter({ label, value, options, onChange }: any) {
+function SelectFilter({ label, value, options, onChange, compact = false }: any) {
   return (
     <div>
-      <label className="mb-1 block text-[11px] font-semibold text-slate-700">{label}</label>
+      <label className={`${compact ? 'mb-0.5 text-[9px]' : 'mb-1 text-[10px]'} block font-black uppercase tracking-wide text-[#14532d]`}>
+        {label}
+      </label>
       <select
-        className="w-full rounded-md border border-slate-200 bg-white px-2 py-1.5 text-[11px] outline-none focus:border-[#166534]"
+        className={`${compact ? 'px-2 py-1 text-[10px]' : 'px-2.5 py-1.5 text-[11px]'} w-full rounded-md border border-green-200 bg-white/90 font-semibold text-slate-800 outline-none focus:border-[#166534]`}
         value={value}
         onChange={(e) => onChange(e.target.value)}
       >
@@ -50,25 +53,25 @@ function SelectFilter({ label, value, options, onChange }: any) {
 function SectionHeader({ title, action }: any) {
   return (
     <div className="mb-2 flex items-center justify-between">
-      <h2 className="text-sm font-black text-[#14532d]">{title}</h2>
-      {action && <span className="text-[10px] font-semibold text-[#166534]">{action}</span>}
+      <h2 className="text-[15px] font-black text-[#14532d] leading-none">{title}</h2>
+      {action && <span className="text-[10px] font-bold text-[#166534]">{action}</span>}
     </div>
   );
 }
 
 function CompactKpi({ title, value, subtitle, icon: Icon }: any) {
   return (
-    <div className="flex items-center justify-between rounded-md border border-slate-100 bg-white px-2.5 py-1.5 shadow-sm">
+    <div className="flex items-center justify-between rounded-lg border border-slate-100 bg-white px-2.5 py-1.5 shadow-sm min-h-[44px]">
       <div className="flex min-w-0 items-center gap-2">
         <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-green-50 text-[#166534]">
           <Icon size={16} strokeWidth={1.8} />
         </div>
         <div className="min-w-0">
-          <p className="truncate text-[10px] font-bold text-slate-700 leading-tight">{title}</p>
+          <p className="truncate text-[10px] font-black text-slate-800 leading-tight">{title}</p>
           <p className="text-[9px] text-slate-500 leading-tight">{subtitle}</p>
         </div>
       </div>
-      <p className="pl-2 text-base font-black text-[#14532d] leading-none">{fmt(value)}</p>
+      <p className="pl-2 text-[17px] font-black text-[#14532d] leading-none">{fmt(value)}</p>
     </div>
   );
 }
@@ -291,142 +294,144 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-[#f7f9f6] text-slate-900">
-      <div className="grid min-h-screen grid-cols-1 lg:grid-cols-[210px_1fr]">
-        <aside className="bg-white border-r border-slate-200 px-3 py-3 flex flex-col">
-          <div className="mb-2">
+    <main className="h-screen overflow-hidden bg-[#f7f9f6] text-slate-900">
+      <div className="grid h-screen grid-cols-1 lg:grid-cols-[210px_1fr]">
+        <aside className="h-screen overflow-hidden bg-white border-r border-slate-200 px-3 py-3 flex flex-col">
+          <div className="mb-2 flex justify-center">
             <Image
               src="/sitrap-logo.png"
               alt="SITRAP"
-              width={118}
-              height={84}
+              width={150}
+              height={104}
               className="object-contain"
+              priority
             />
           </div>
 
           <nav className="space-y-1">
-            <button className="flex w-full items-center gap-2 rounded-md bg-[#14532d] px-2.5 py-2 text-left text-xs font-bold text-white">
-              <HomeIcon size={14} /> Inicio
+            <button className="flex w-full items-center gap-2 rounded-md bg-[#14532d] px-2.5 py-1.5 text-left text-xs font-bold text-white">
+              <HomeIcon size={13} /> Inicio
             </button>
             <button className="flex w-full items-center gap-2 rounded-md px-2.5 py-1.5 text-left text-xs font-semibold text-slate-700 hover:bg-green-50">
-              <Boxes size={14} /> Inventario
+              <Boxes size={13} /> Inventario
             </button>
             <button className="flex w-full items-center gap-2 rounded-md px-2.5 py-1.5 text-left text-xs font-semibold text-slate-700 hover:bg-green-50">
-              <ArrowLeftRight size={14} /> Movimientos
+              <ArrowLeftRight size={13} /> Movimientos
             </button>
             <button className="flex w-full items-center gap-2 rounded-md px-2.5 py-1.5 text-left text-xs font-semibold text-slate-700 hover:bg-green-50">
-              <ClipboardList size={14} /> Contratos
+              <ClipboardList size={13} /> Contratos
             </button>
             <button className="flex w-full items-center gap-2 rounded-md px-2.5 py-1.5 text-left text-xs font-semibold text-slate-700 hover:bg-green-50">
-              <BarChart3 size={14} /> Dashboard
+              <BarChart3 size={13} /> Dashboard
             </button>
           </nav>
 
-          <div className="mt-3">
-            <p className="mb-1 text-[10px] font-black uppercase tracking-wide text-[#14532d]">Acciones rápidas</p>
-            <div className="space-y-1.5">
-              <a href="#" className="flex items-center justify-between rounded-md bg-[#166534] px-2.5 py-2 text-[11px] font-bold text-white">
-                Codificar Lote <ExternalLink size={12} />
+          <div className="mt-2">
+            <p className="mb-1 text-[9px] font-black uppercase tracking-wide text-[#14532d]">Acciones rápidas</p>
+            <div className="space-y-1">
+              <a href="#" className="flex items-center justify-between rounded-md bg-[#166534] px-2.5 py-1.5 text-[10px] font-bold text-white">
+                Codificar Lote <ExternalLink size={11} />
               </a>
-              <a href="#" className="flex items-center justify-between rounded-md border border-green-200 px-2.5 py-2 text-[11px] font-bold text-[#14532d]">
-                Registrar Movimiento <ExternalLink size={12} />
+              <a href="#" className="flex items-center justify-between rounded-md border border-green-200 px-2.5 py-1.5 text-[10px] font-bold text-[#14532d]">
+                Registrar Movimiento <ExternalLink size={11} />
               </a>
             </div>
           </div>
 
-          <div className="mt-3">
-            <div className="mb-1.5 flex items-center gap-1.5">
-              <Filter size={12} className="text-[#14532d]" />
-              <p className="text-[10px] font-black uppercase tracking-wide text-[#14532d]">Filtros rápidos</p>
+          <div className="mt-2">
+            <div className="mb-1 flex items-center gap-1.5">
+              <Filter size={11} className="text-[#14532d]" />
+              <p className="text-[9px] font-black uppercase tracking-wide text-[#14532d]">Filtros rápidos</p>
             </div>
 
-            <div className="space-y-2">
-              <SelectFilter label="Vivero" value={vivero} options={options.viveros} onChange={setVivero} />
-              <SelectFilter label="Especie" value={especie} options={options.especies} onChange={setEspecie} />
-              <SelectFilter label="Contrato" value={contrato} options={options.contratos} onChange={setContrato} />
-              <SelectFilter label="Empresa / EECC" value={empresa} options={options.empresas} onChange={setEmpresa} />
-              <SelectFilter label="Fecha" value={fecha} options={options.fechas} onChange={setFecha} />
+            <div className="space-y-1.5">
+              <SelectFilter compact label="Vivero" value={vivero} options={options.viveros} onChange={setVivero} />
+              <SelectFilter compact label="Especie" value={especie} options={options.especies} onChange={setEspecie} />
+              <SelectFilter compact label="Contrato" value={contrato} options={options.contratos} onChange={setContrato} />
+              <SelectFilter compact label="Empresa / EECC" value={empresa} options={options.empresas} onChange={setEmpresa} />
+              <SelectFilter compact label="Fecha" value={fecha} options={options.fechas} onChange={setFecha} />
 
               <button
                 onClick={() => { setVivero(''); setEspecie(''); setContrato(''); setEmpresa(''); setFecha(''); }}
-                className="flex w-full items-center justify-center gap-1.5 rounded-md border border-green-200 px-2 py-1.5 text-[11px] font-bold text-[#14532d] hover:bg-green-50"
+                className="flex w-full items-center justify-center gap-1 rounded-md border border-green-200 px-2 py-1 text-[10px] font-bold text-[#14532d] hover:bg-green-50"
               >
-                <RotateCcw size={12} /> Limpiar filtros
+                <RotateCcw size={11} /> Limpiar filtros
               </button>
             </div>
           </div>
 
-          <div className="mt-auto pt-3 text-[10px] text-slate-400">
-            SITRAP · V3.4 compacta
+          <div className="mt-auto pt-1 text-[9px] text-slate-400">
+            SITRAP · V3.5
           </div>
         </aside>
 
-        <section className="p-3 lg:p-4">
-          <header className="mb-3 flex flex-col gap-2 lg:flex-row lg:items-start lg:justify-between">
+        <section className="h-screen overflow-hidden p-3 lg:p-4">
+          <header className="mb-2 flex items-start justify-between gap-3">
             <div>
-              <h1 className="text-xl font-black text-[#14532d]">Bienvenido a SITRAP</h1>
+              <h1 className="text-xl font-black text-[#14532d] leading-tight">Bienvenido a SITRAP</h1>
               <p className="mt-0.5 text-xs text-slate-600">
                 Resumen ejecutivo de inventario y trazabilidad de plantas
               </p>
             </div>
 
-            <div className="flex items-center gap-2 rounded-lg bg-white px-3 py-2 shadow-sm border border-slate-100 text-[#14532d]">
-              <CalendarClock size={18} />
+            <div className="flex shrink-0 items-center gap-2 rounded-lg bg-white px-3 py-2 shadow-sm border border-slate-100 text-[#14532d]">
+              <CalendarClock size={17} />
               <div>
-                <p className="text-[10px] text-slate-500">Última actualización</p>
-                <p className="text-xs font-bold">
+                <p className="text-[9px] text-slate-500">Última actualización</p>
+                <p className="text-xs font-black">
                   {new Date(kpis.fecha_actualizacion).toLocaleDateString('es-CL')}
                 </p>
               </div>
             </div>
           </header>
 
-          <div className="mb-3 grid gap-2 md:grid-cols-2 xl:grid-cols-5">
-            <div className="rounded-lg bg-white p-2.5 shadow-sm border border-slate-100">
+          <div className="mb-2 grid gap-2 md:grid-cols-2 xl:grid-cols-5">
+            <div className="rounded-lg border border-green-100 bg-gradient-to-br from-green-50 to-white p-2 shadow-sm">
               <SelectFilter label="Vivero" value={vivero} options={options.viveros} onChange={setVivero} />
             </div>
-            <div className="rounded-lg bg-white p-2.5 shadow-sm border border-slate-100">
+            <div className="rounded-lg border border-green-100 bg-gradient-to-br from-green-50 to-white p-2 shadow-sm">
               <SelectFilter label="Especie" value={especie} options={options.especies} onChange={setEspecie} />
             </div>
-            <div className="rounded-lg bg-white p-2.5 shadow-sm border border-slate-100">
+            <div className="rounded-lg border border-green-100 bg-gradient-to-br from-green-50 to-white p-2 shadow-sm">
               <SelectFilter label="Contrato" value={contrato} options={options.contratos} onChange={setContrato} />
             </div>
-            <div className="rounded-lg bg-white p-2.5 shadow-sm border border-slate-100">
+            <div className="rounded-lg border border-green-100 bg-gradient-to-br from-green-50 to-white p-2 shadow-sm">
               <SelectFilter label="Empresa / EECC" value={empresa} options={options.empresas} onChange={setEmpresa} />
             </div>
-            <div className="rounded-lg bg-white p-2.5 shadow-sm border border-slate-100">
+            <div className="rounded-lg border border-green-100 bg-gradient-to-br from-green-50 to-white p-2 shadow-sm">
               <SelectFilter label="Fecha" value={fecha} options={options.fechas} onChange={setFecha} />
             </div>
           </div>
 
-          <div className="mb-3 grid gap-2 xl:grid-cols-[1fr_1.05fr_1fr]">
-            <div className="rounded-lg bg-white p-3 shadow-sm border border-slate-100">
+          <div className="mb-2 grid gap-2 xl:grid-cols-[1fr_1.08fr_0.98fr]">
+            <div className="rounded-xl bg-white p-3 shadow-sm border border-slate-100 h-[300px]">
               <SectionHeader title="Stock por Vivero" action="Stock actual" />
-              <div className="h-[260px]">
+              <div className="h-[250px]">
                 <ResponsiveContainer>
                   <ReBarChart
                     data={stockPorVivero}
-                    margin={{ top: 12, right: 8, bottom: 20, left: 0 }}
-                    barCategoryGap="32%"
+                    margin={{ top: 14, right: 8, bottom: 28, left: -8 }}
+                    barCategoryGap="34%"
                   >
                     <XAxis
                       dataKey="name"
-                      tick={{ fontSize: 10 }}
+                      tick={{ fontSize: 9 }}
                       interval={0}
-                      height={44}
+                      height={46}
+                      tickLine={false}
                     />
-                    <YAxis tick={{ fontSize: 10 }} width={48} />
+                    <YAxis tick={{ fontSize: 9 }} width={42} tickLine={false} axisLine={false} />
                     <Tooltip formatter={(v: any) => fmt(v)} />
-                    <Bar dataKey="value" fill={GREEN} radius={[5, 5, 0, 0]} barSize={24} />
+                    <Bar dataKey="value" fill={GREEN} radius={[6, 6, 0, 0]} barSize={24} />
                   </ReBarChart>
                 </ResponsiveContainer>
               </div>
             </div>
 
-            <div className="rounded-lg bg-white p-3 shadow-sm border border-slate-100">
+            <div className="rounded-xl bg-white p-3 shadow-sm border border-slate-100 h-[300px] overflow-hidden">
               <SectionHeader title="Stock por Especie" />
-              <div className="grid h-[260px] grid-cols-[0.82fr_1.18fr] items-center gap-2">
-                <div className="relative h-[210px]">
+              <div className="grid h-[250px] grid-cols-[0.82fr_1.18fr] items-center gap-2">
+                <div className="relative h-[205px]">
                   <ResponsiveContainer>
                     <PieChart>
                       <Pie
@@ -450,15 +455,15 @@ export default function Home() {
                   </div>
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-2 overflow-hidden">
                   {stockPorEspecie.map((e, i) => {
                     const pct = totalEspecies ? (e.value / totalEspecies) * 100 : 0;
                     return (
-                      <div key={e.name} className="grid grid-cols-[10px_1fr_auto_auto] items-center gap-2 text-[11px]">
+                      <div key={e.name} className="grid grid-cols-[10px_minmax(0,1fr)_36px_50px] items-center gap-2 text-[11px]">
                         <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
                         <span className="truncate text-slate-700">{e.name}</span>
                         <span className="font-semibold text-slate-700">{pct.toFixed(1)}%</span>
-                        <span className="font-black text-[#14532d]">{fmt(e.value)}</span>
+                        <span className="text-right font-black text-[#14532d]">{fmt(e.value)}</span>
                       </div>
                     );
                   })}
@@ -466,7 +471,7 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="rounded-lg bg-white p-3 shadow-sm border border-slate-100">
+            <div className="rounded-xl bg-white p-3 shadow-sm border border-slate-100 h-[300px] overflow-hidden">
               <SectionHeader title="Indicadores Clave (KPI)" />
               <div className="grid gap-1.5">
                 <CompactKpi title="Stock General Inicial" value={calc.stockInicial} subtitle="plantas registradas" icon={Boxes} />
@@ -475,22 +480,20 @@ export default function Home() {
                 <CompactKpi title="Lotes Registrados" value={lotesFiltrados.length} subtitle="registros filtrados" icon={Tag} />
                 <CompactKpi title="Entradas VMA" value={calc.entradasVMA} subtitle="plantas" icon={PackagePlus} />
                 <CompactKpi title="Salidas Viveros" value={calc.salidasViveros} subtitle="plantas" icon={PackageMinus} />
-                <CompactKpi title="Despachos EECC" value={calc.salidasEECC} subtitle="plantas" icon={Truck} />
-                <CompactKpi title="Transformaciones" value={calc.transformaciones} subtitle="plantas" icon={RefreshCw} />
               </div>
             </div>
           </div>
 
           <div className="grid gap-2 xl:grid-cols-[1.2fr_0.8fr_1fr]">
-            <div className="rounded-lg bg-white p-3 shadow-sm border border-slate-100 overflow-x-auto">
+            <div className="rounded-xl bg-white p-3 shadow-sm border border-slate-100 overflow-hidden h-[245px]">
               <SectionHeader title="Resumen por Contrato" action="Ver todos" />
               <table className="w-full text-[11px]">
                 <thead className="uppercase text-slate-500">
                   <tr>
-                    <th className="py-1.5 text-left">Contrato</th>
-                    <th className="py-1.5 text-left">Empresa / EECC</th>
-                    <th className="py-1.5 text-left">Avance</th>
-                    <th className="py-1.5 text-right">Mov.</th>
+                    <th className="py-1 text-left">Contrato</th>
+                    <th className="py-1 text-left">Empresa / EECC</th>
+                    <th className="py-1 text-left">Avance</th>
+                    <th className="py-1 text-right">Mov.</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -498,7 +501,7 @@ export default function Home() {
                     const pct = Math.round((r.movimientos / maxContrato) * 100);
                     return (
                       <tr key={i} className="border-t border-slate-100">
-                        <td className="py-1.5 font-bold text-[#14532d]">{r.contrato}</td>
+                        <td className="py-1.5 font-black text-[#14532d]">{r.contrato}</td>
                         <td className="py-1.5 text-slate-600">{r.empresa}</td>
                         <td className="py-1.5 min-w-[100px]">
                           <div className="h-2 rounded-full bg-slate-100">
@@ -516,14 +519,14 @@ export default function Home() {
               </table>
             </div>
 
-            <div className="rounded-lg bg-white p-3 shadow-sm border border-slate-100">
+            <div className="rounded-xl bg-white p-3 shadow-sm border border-slate-100 h-[245px]">
               <SectionHeader title="Alertas SITRAP" action="Ver todas" />
 
               <div className="space-y-2">
                 <div className="flex items-center gap-2 rounded-md bg-amber-50 p-2">
                   <AlertTriangle className="text-amber-600" size={15} />
                   <div>
-                    <p className="text-[11px] font-bold">Traslados pendientes</p>
+                    <p className="text-[11px] font-black">Traslados pendientes</p>
                     <p className="text-[10px] text-slate-500">{fmt(calc.trasladosPendientes)} plantas</p>
                   </div>
                 </div>
@@ -531,7 +534,7 @@ export default function Home() {
                 <div className="flex items-center gap-2 rounded-md bg-red-50 p-2">
                   <AlertTriangle className="text-red-600" size={15} />
                   <div>
-                    <p className="text-[11px] font-bold">Bajas / pérdidas</p>
+                    <p className="text-[11px] font-black">Bajas / pérdidas</p>
                     <p className="text-[10px] text-slate-500">{fmt(calc.bajas)} plantas</p>
                   </div>
                 </div>
@@ -539,21 +542,21 @@ export default function Home() {
                 <div className="flex items-center gap-2 rounded-md bg-green-50 p-2">
                   <SearchCheck className="text-[#166534]" size={15} />
                   <div>
-                    <p className="text-[11px] font-bold">Lotes registrados</p>
+                    <p className="text-[11px] font-black">Lotes registrados</p>
                     <p className="text-[10px] text-slate-500">{fmt(lotesFiltrados.length)} registros</p>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="rounded-lg bg-white p-3 shadow-sm border border-slate-100 overflow-x-auto">
+            <div className="rounded-xl bg-white p-3 shadow-sm border border-slate-100 overflow-hidden h-[245px]">
               <SectionHeader title="Últimos Movimientos" action="Ver todos" />
 
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 {ultimosMovimientos.map((m, i) => (
                   <div key={i} className="flex items-start justify-between gap-2 border-b border-slate-100 pb-1.5 last:border-b-0">
                     <div>
-                      <p className="text-[11px] font-bold text-[#14532d]">{m.Subtipo_Movimiento || 'Movimiento'}</p>
+                      <p className="text-[11px] font-black text-[#14532d]">{m.Subtipo_Movimiento || 'Movimiento'}</p>
                       <p className="text-[10px] text-slate-500">
                         {m.Fecha_Movimiento ? new Date(m.Fecha_Movimiento).toLocaleDateString('es-CL') : '-'}
                       </p>
