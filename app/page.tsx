@@ -307,52 +307,54 @@ export default function Home() {
   return (
     <main className="h-screen overflow-hidden bg-[#f7f9f6] text-slate-900">
       <div className="grid h-[calc(100vh-2rem)] grid-cols-1 lg:grid-cols-[205px_1fr]">
-        <aside className="h-[calc(100vh-2rem)] overflow-hidden border-r border-slate-200 bg-white px-2.5 py-1">
-          <div className="mb-0.5 flex justify-center">
-            <Image
-              src="/sitrap-logo.png"
-              alt="SITRAP"
-              width={98}
-              height={64}
-              className="object-contain"
-              priority
-            />
-          </div>
+        <aside className="flex h-[calc(100vh-2rem)] flex-col overflow-hidden border-r border-slate-200 bg-white px-2.5 py-1">
+          <div>
+            <div className="mb-0.5 flex justify-center">
+              <Image
+                src="/sitrap-logo.png"
+                alt="SITRAP"
+                width={98}
+                height={64}
+                className="object-contain"
+                priority
+              />
+            </div>
 
-          <SidebarTitle>Inicio</SidebarTitle>
+            <SidebarTitle>Inicio</SidebarTitle>
 
-          <nav className="space-y-0 text-[10px]">
-            <button className="flex w-full items-center gap-2 rounded-md px-2 py-0.5 text-left font-bold text-[#14532d] hover:bg-green-50">
-              <HomeIcon size={11} /> Inicio
-            </button>
-            <button className="flex w-full items-center gap-2 rounded-md px-2 py-0.5 text-left font-semibold text-slate-700 hover:bg-green-50">
-              <Boxes size={11} /> Inventario
-            </button>
-            <button className="flex w-full items-center gap-2 rounded-md px-2 py-0.5 text-left font-semibold text-slate-700 hover:bg-green-50">
-              <ArrowLeftRight size={11} /> Movimientos
-            </button>
-            <button className="flex w-full items-center gap-2 rounded-md px-2 py-0.5 text-left font-semibold text-slate-700 hover:bg-green-50">
-              <ClipboardList size={11} /> Contratos
-            </button>
-            <button className="flex w-full items-center gap-2 rounded-md px-2 py-0.5 text-left font-semibold text-slate-700 hover:bg-green-50">
-              <BarChart3 size={11} /> Dashboard
-            </button>
-          </nav>
+            <nav className="space-y-0 text-[10px]">
+              <button className="flex w-full items-center gap-2 rounded-md px-2 py-0.5 text-left font-bold text-[#14532d] hover:bg-green-50">
+                <HomeIcon size={11} /> Inicio
+              </button>
+              <button className="flex w-full items-center gap-2 rounded-md px-2 py-0.5 text-left font-semibold text-slate-700 hover:bg-green-50">
+                <Boxes size={11} /> Inventario
+              </button>
+              <button className="flex w-full items-center gap-2 rounded-md px-2 py-0.5 text-left font-semibold text-slate-700 hover:bg-green-50">
+                <ArrowLeftRight size={11} /> Movimientos
+              </button>
+              <button className="flex w-full items-center gap-2 rounded-md px-2 py-0.5 text-left font-semibold text-slate-700 hover:bg-green-50">
+                <ClipboardList size={11} /> Contratos
+              </button>
+              <button className="flex w-full items-center gap-2 rounded-md px-2 py-0.5 text-left font-semibold text-slate-700 hover:bg-green-50">
+                <BarChart3 size={11} /> Dashboard
+              </button>
+            </nav>
 
-          <div className="mt-1">
-            <SidebarTitle>Acciones rápidas</SidebarTitle>
+            <div className="mt-1">
+              <SidebarTitle>Acciones rápidas</SidebarTitle>
 
-            <div className="space-y-0.5">
-              <a href="#" className="flex items-center justify-between rounded-md border border-green-200 bg-white px-2 py-0.5 text-[8.5px] font-bold text-[#14532d]">
-                Codificar Lote <ExternalLink size={9} />
-              </a>
-              <a href="#" className="flex items-center justify-between rounded-md border border-green-200 bg-white px-2 py-0.5 text-[8.5px] font-bold text-[#14532d]">
-                Registrar Movimiento <ExternalLink size={9} />
-              </a>
+              <div className="space-y-0.5">
+                <a href="#" className="flex items-center justify-between rounded-md border border-green-200 bg-white px-2 py-0.5 text-[8.5px] font-bold text-[#14532d]">
+                  Codificar Lote <ExternalLink size={9} />
+                </a>
+                <a href="#" className="flex items-center justify-between rounded-md border border-green-200 bg-white px-2 py-0.5 text-[8.5px] font-bold text-[#14532d]">
+                  Registrar Movimiento <ExternalLink size={9} />
+                </a>
+              </div>
             </div>
           </div>
 
-          <div className="mt-1">
+          <div className="mt-auto pb-1">
             <SidebarTitle>
               <span className="flex items-center gap-1.5">
                 <Filter size={9} />
@@ -416,28 +418,9 @@ export default function Home() {
                     barCategoryGap="4%"
                     barGap={2}
                   >
-                    <XAxis
-                      dataKey="name"
-                      tick={{ fontSize: 8 }}
-                      interval={0}
-                      height={34}
-                      tickLine={false}
-                      angle={0}
-                      textAnchor="middle"
-                    />
-                    <YAxis
-                      width={42}
-                      tick={{ fontSize: 8 }}
-                      tickLine={false}
-                      axisLine={false}
-                      tickMargin={6}
-                    />
-                    <Tooltip
-                      formatter={(v: any) => fmt(v)}
-                      labelFormatter={(_, payload: any) =>
-                        payload?.[0]?.payload?.fullName || ''
-                      }
-                    />
+                    <XAxis dataKey="name" tick={{ fontSize: 8 }} interval={0} height={34} tickLine={false} angle={0} textAnchor="middle" />
+                    <YAxis width={42} tick={{ fontSize: 8 }} tickLine={false} axisLine={false} tickMargin={6} />
+                    <Tooltip formatter={(v: any) => fmt(v)} labelFormatter={(_, payload: any) => payload?.[0]?.payload?.fullName || ''} />
                     <Bar dataKey="value" fill={GREEN} radius={[7, 7, 0, 0]} maxBarSize={70} />
                   </ReBarChart>
                 </ResponsiveContainer>
@@ -451,14 +434,7 @@ export default function Home() {
                 <div className="relative h-[145px] w-[145px] min-w-[145px] overflow-visible">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart margin={{ top: 14, right: 14, bottom: 14, left: 14 }}>
-                      <Pie
-                        data={stockPorEspecie}
-                        dataKey="value"
-                        nameKey="name"
-                        innerRadius={36}
-                        outerRadius={52}
-                        paddingAngle={2}
-                      >
+                      <Pie data={stockPorEspecie} dataKey="value" nameKey="name" innerRadius={36} outerRadius={52} paddingAngle={2}>
                         {stockPorEspecie.map((_, i) => (
                           <Cell key={i} fill={COLORS[i % COLORS.length]} />
                         ))}
@@ -582,7 +558,7 @@ export default function Home() {
 
       <footer className="flex h-8 w-full items-center justify-center bg-[#14532d] px-4 text-[11px] font-semibold text-white">
         <span>SITRAP · Sistema de Inventario y Trazabilidad de Plantas</span>
-        <span className="absolute right-4">Versión 3.15</span>
+        <span className="absolute right-4">Versión 3.16</span>
       </footer>
     </main>
   );
