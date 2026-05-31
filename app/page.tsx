@@ -18,7 +18,6 @@ type Movimiento = Record<string, any>;
 
 const API = '/api/sitrap';
 const GREEN = '#166534';
-const GREEN_DARK = '#14532d';
 const COLORS = ['#166534', '#2f7d32', '#66a867', '#a7c8aa', '#cfd8dc'];
 
 const n = (v: any) => {
@@ -32,14 +31,14 @@ const fmt = (v: any) => new Intl.NumberFormat('es-CL').format(n(v));
 
 function KpiCard({ title, value, subtitle, icon: Icon }: any) {
   return (
-    <div className="rounded-xl bg-white p-4 shadow-sm border border-slate-100 flex items-center gap-3 min-h-[92px]">
-      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-green-50 text-[#166534]">
-        <Icon size={24} strokeWidth={1.8} />
+    <div className="rounded-xl bg-white p-3 shadow-sm border border-slate-100 flex items-center gap-3 min-h-[78px]">
+      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-green-50 text-[#166534]">
+        <Icon size={21} strokeWidth={1.8} />
       </div>
       <div className="min-w-0">
-        <p className="text-xs font-semibold text-slate-700 leading-tight">{title}</p>
-        <p className="mt-1 text-2xl font-black text-[#14532d] leading-none">{fmt(value)}</p>
-        <p className="mt-1 text-xs text-slate-500">{subtitle}</p>
+        <p className="text-[11px] font-semibold text-slate-700 leading-tight">{title}</p>
+        <p className="mt-0.5 text-xl font-black text-[#14532d] leading-none">{fmt(value)}</p>
+        <p className="mt-0.5 text-[11px] text-slate-500">{subtitle}</p>
       </div>
     </div>
   );
@@ -47,13 +46,13 @@ function KpiCard({ title, value, subtitle, icon: Icon }: any) {
 
 function MiniKpi({ title, value, icon: Icon }: any) {
   return (
-    <div className="rounded-xl border border-slate-100 bg-white p-3 flex items-center gap-3">
-      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-green-50 text-[#166534]">
-        <Icon size={20} />
+    <div className="rounded-lg border border-slate-100 bg-white p-2.5 flex items-center gap-2.5">
+      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-50 text-[#166534]">
+        <Icon size={17} />
       </div>
       <div>
-        <p className="text-xs font-semibold text-slate-600">{title}</p>
-        <p className="text-xl font-black text-[#14532d]">{fmt(value)}</p>
+        <p className="text-[11px] font-semibold text-slate-600">{title}</p>
+        <p className="text-lg font-black text-[#14532d] leading-none">{fmt(value)}</p>
       </div>
     </div>
   );
@@ -62,9 +61,9 @@ function MiniKpi({ title, value, icon: Icon }: any) {
 function SelectFilter({ label, value, options, onChange }: any) {
   return (
     <div>
-      <label className="mb-1 block text-[11px] font-semibold text-slate-600">{label}</label>
+      <label className="mb-1 block text-[10px] font-semibold text-slate-600">{label}</label>
       <select
-        className="w-full rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-xs outline-none"
+        className="w-full rounded-md border border-slate-200 bg-white px-2 py-1.5 text-[11px] outline-none"
         value={value}
         onChange={(e) => onChange(e.target.value)}
       >
@@ -79,9 +78,9 @@ function SelectFilter({ label, value, options, onChange }: any) {
 
 function SectionHeader({ title, action }: any) {
   return (
-    <div className="mb-3 flex items-center justify-between">
-      <h2 className="text-base font-black text-[#14532d]">{title}</h2>
-      {action && <span className="text-[11px] font-semibold text-[#166534]">{action}</span>}
+    <div className="mb-2 flex items-center justify-between">
+      <h2 className="text-sm font-black text-[#14532d]">{title}</h2>
+      {action && <span className="text-[10px] font-semibold text-[#166534]">{action}</span>}
     </div>
   );
 }
@@ -279,22 +278,20 @@ export default function Home() {
   }, [lotesFiltrados]);
 
   const stockPorContrato = useMemo(() => {
-    const data: Record<string, { contrato: string; empresa: string; stock: number; movimientos: number }> = {};
+    const data: Record<string, { contrato: string; empresa: string; movimientos: number }> = {};
 
     movimientosFiltrados.forEach(m => {
       const c = txt(m.Contrato_Final || m.Contrato) || 'Sin contrato';
       const e = txt(m.Empresa_EECC_Final || m.Empresa_EECC) || '-';
-      if (!data[c]) data[c] = { contrato: c, empresa: e, stock: 0, movimientos: 0 };
+      if (!data[c]) data[c] = { contrato: c, empresa: e, movimientos: 0 };
       data[c].movimientos += n(m.Cantidad);
     });
 
     return Object.values(data).sort((a, b) => b.movimientos - a.movimientos).slice(0, 5);
   }, [movimientosFiltrados]);
 
-  const ultimosMovimientos = useMemo(() => {
-    return [...movimientosFiltrados].slice(0, 5);
-  }, [movimientosFiltrados]);
-
+  const maxContrato = Math.max(...stockPorContrato.map(x => x.movimientos), 1);
+  const ultimosMovimientos = useMemo(() => [...movimientosFiltrados].slice(0, 4), [movimientosFiltrados]);
   const totalEspecies = stockPorEspecie.reduce((s, x) => s + x.value, 0);
 
   if (loading || !kpis) {
@@ -307,57 +304,55 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-[#f7f9f6] text-slate-900">
-      <div className="grid min-h-screen grid-cols-1 lg:grid-cols-[220px_1fr]">
-        <aside className="bg-white border-r border-slate-200 px-5 py-4 flex flex-col">
-          <div className="mb-5">
+      <div className="grid min-h-screen grid-cols-1 lg:grid-cols-[200px_1fr]">
+        <aside className="bg-white border-r border-slate-200 px-4 py-3 flex flex-col">
+          <div className="mb-3">
             <Image
               src="/sitrap-logo.png"
               alt="SITRAP"
-              width={130}
-              height={90}
+              width={112}
+              height={78}
               className="object-contain"
             />
           </div>
 
-          <nav className="space-y-1.5">
-            <button className="flex w-full items-center gap-3 rounded-lg bg-[#14532d] px-3 py-2.5 text-left text-sm font-bold text-white">
-              <HomeIcon size={16} /> Inicio
+          <nav className="space-y-1">
+            <button className="flex w-full items-center gap-2 rounded-md bg-[#14532d] px-2.5 py-2 text-left text-xs font-bold text-white">
+              <HomeIcon size={14} /> Inicio
             </button>
-            <button className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-semibold text-slate-700 hover:bg-green-50">
-              <Boxes size={16} /> Inventario
+            <button className="flex w-full items-center gap-2 rounded-md px-2.5 py-1.5 text-left text-xs font-semibold text-slate-700 hover:bg-green-50">
+              <Boxes size={14} /> Inventario
             </button>
-            <button className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-semibold text-slate-700 hover:bg-green-50">
-              <ArrowLeftRight size={16} /> Movimientos
+            <button className="flex w-full items-center gap-2 rounded-md px-2.5 py-1.5 text-left text-xs font-semibold text-slate-700 hover:bg-green-50">
+              <ArrowLeftRight size={14} /> Movimientos
             </button>
-            <button className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-semibold text-slate-700 hover:bg-green-50">
-              <ClipboardList size={16} /> Contratos
+            <button className="flex w-full items-center gap-2 rounded-md px-2.5 py-1.5 text-left text-xs font-semibold text-slate-700 hover:bg-green-50">
+              <ClipboardList size={14} /> Contratos
             </button>
-            <button className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-semibold text-slate-700 hover:bg-green-50">
-              <BarChart3 size={16} /> Dashboard
+            <button className="flex w-full items-center gap-2 rounded-md px-2.5 py-1.5 text-left text-xs font-semibold text-slate-700 hover:bg-green-50">
+              <BarChart3 size={14} /> Dashboard
             </button>
           </nav>
 
-          <div className="mt-5">
-            <p className="mb-2 text-[11px] font-black uppercase tracking-wide text-[#14532d]">Acciones rápidas</p>
-
-            <div className="space-y-2">
-              <a href="#" className="flex items-center justify-between rounded-lg bg-[#166534] px-3 py-2.5 text-xs font-bold text-white">
-                Codificar Lote <ExternalLink size={13} />
+          <div className="mt-3">
+            <p className="mb-1.5 text-[10px] font-black uppercase tracking-wide text-[#14532d]">Acciones rápidas</p>
+            <div className="space-y-1.5">
+              <a href="#" className="flex items-center justify-between rounded-md bg-[#166534] px-2.5 py-2 text-[11px] font-bold text-white">
+                Codificar Lote <ExternalLink size={12} />
               </a>
-
-              <a href="#" className="flex items-center justify-between rounded-lg border border-green-200 px-3 py-2.5 text-xs font-bold text-[#14532d]">
-                Registrar Movimiento <ExternalLink size={13} />
+              <a href="#" className="flex items-center justify-between rounded-md border border-green-200 px-2.5 py-2 text-[11px] font-bold text-[#14532d]">
+                Registrar Movimiento <ExternalLink size={12} />
               </a>
             </div>
           </div>
 
-          <div className="mt-5">
-            <div className="mb-3 flex items-center gap-2">
-              <Filter size={14} className="text-[#14532d]" />
-              <p className="text-[11px] font-black uppercase tracking-wide text-[#14532d]">Filtros rápidos</p>
+          <div className="mt-3">
+            <div className="mb-2 flex items-center gap-1.5">
+              <Filter size={12} className="text-[#14532d]" />
+              <p className="text-[10px] font-black uppercase tracking-wide text-[#14532d]">Filtros rápidos</p>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-2">
               <SelectFilter label="Vivero" value={vivero} options={options.viveros} onChange={setVivero} />
               <SelectFilter label="Especie" value={especie} options={options.especies} onChange={setEspecie} />
               <SelectFilter label="Contrato" value={contrato} options={options.contratos} onChange={setContrato} />
@@ -366,74 +361,72 @@ export default function Home() {
 
               <button
                 onClick={() => { setVivero(''); setEspecie(''); setContrato(''); setEmpresa(''); setFecha(''); }}
-                className="flex w-full items-center justify-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold text-[#14532d] hover:bg-green-50"
+                className="flex w-full items-center justify-center gap-1.5 rounded-md px-2 py-1.5 text-[11px] font-semibold text-[#14532d] hover:bg-green-50"
               >
-                <RotateCcw size={13} /> Limpiar filtros
+                <RotateCcw size={12} /> Limpiar filtros
               </button>
             </div>
           </div>
 
-          <div className="mt-auto pt-5 text-[11px] text-slate-400">
-            SITRAP · Versión 3.1
+          <div className="mt-auto pt-2 text-[10px] text-slate-400">
+            SITRAP · V3.2
           </div>
         </aside>
 
-        <section className="p-5 lg:p-7">
-          <header className="mb-5 flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+        <section className="p-4 lg:p-5">
+          <header className="mb-3 flex flex-col gap-2 lg:flex-row lg:items-start lg:justify-between">
             <div>
-              <h1 className="text-2xl font-black text-[#14532d]">
-                Bienvenido a SITRAP
-              </h1>
-              <p className="mt-1 text-sm text-slate-600">
-                Resumen general de inventario y trazabilidad de plantas
+              <h1 className="text-xl font-black text-[#14532d]">Bienvenido a SITRAP</h1>
+              <p className="mt-0.5 text-xs text-slate-600">
+                Resumen ejecutivo de inventario y trazabilidad de plantas
               </p>
             </div>
 
-            <div className="flex items-center gap-3 rounded-xl bg-white px-4 py-3 shadow-sm border border-slate-100 text-[#14532d]">
-              <CalendarClock size={23} />
+            <div className="flex items-center gap-2 rounded-lg bg-white px-3 py-2 shadow-sm border border-slate-100 text-[#14532d]">
+              <CalendarClock size={19} />
               <div>
-                <p className="text-[11px] text-slate-500">Última actualización</p>
-                <p className="text-sm font-bold">
+                <p className="text-[10px] text-slate-500">Última actualización</p>
+                <p className="text-xs font-bold">
                   {new Date(kpis.fecha_actualizacion).toLocaleDateString('es-CL')}
                 </p>
               </div>
             </div>
           </header>
 
-          <div className="mb-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <div className="mb-3 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
             <KpiCard title="Stock General Inicial" value={calc.stockInicial} subtitle="plantas registradas" icon={Boxes} />
             <KpiCard title="Stock General Actual" value={calc.stockActual} subtitle="plantas disponibles" icon={PackageCheck} />
             <KpiCard title="Stock por Vivero" value={calc.stockViveroSeleccionado} subtitle="según filtro activo" icon={Warehouse} />
             <KpiCard title="Lotes Registrados" value={lotesFiltrados.length} subtitle="registros filtrados" icon={Tag} />
           </div>
 
-          <div className="mb-5 grid gap-5 xl:grid-cols-[1.05fr_1fr]">
-            <div className="rounded-xl bg-white p-5 shadow-sm border border-slate-100">
+          <div className="mb-3 grid gap-3 xl:grid-cols-[1.05fr_1fr]">
+            <div className="rounded-lg bg-white p-3 shadow-sm border border-slate-100">
               <SectionHeader title="Stock por Vivero" action="Stock actual" />
-              <div className="h-60">
+              <div className="h-44">
                 <ResponsiveContainer>
-                  <ReBarChart data={stockPorVivero}>
-                    <XAxis dataKey="name" tick={{ fontSize: 10 }} />
-                    <YAxis tick={{ fontSize: 10 }} />
+                  <ReBarChart data={stockPorVivero} margin={{ top: 5, right: 8, bottom: 0, left: -14 }}>
+                    <XAxis dataKey="name" tick={{ fontSize: 9 }} interval={0} />
+                    <YAxis tick={{ fontSize: 9 }} width={42} />
                     <Tooltip formatter={(v: any) => fmt(v)} />
-                    <Bar dataKey="value" fill={GREEN} radius={[7, 7, 0, 0]} />
+                    <Bar dataKey="value" fill={GREEN} radius={[6, 6, 0, 0]} barSize={32} />
                   </ReBarChart>
                 </ResponsiveContainer>
               </div>
             </div>
 
-            <div className="rounded-xl bg-white p-5 shadow-sm border border-slate-100">
+            <div className="rounded-lg bg-white p-3 shadow-sm border border-slate-100">
               <SectionHeader title="Stock por Especie" />
-              <div className="grid grid-cols-[0.9fr_1.1fr] items-center gap-4">
-                <div className="relative h-56">
+              <div className="grid grid-cols-[0.8fr_1.2fr] items-center gap-2">
+                <div className="relative h-44">
                   <ResponsiveContainer>
                     <PieChart>
                       <Pie
                         data={stockPorEspecie}
                         dataKey="value"
                         nameKey="name"
-                        innerRadius={56}
-                        outerRadius={86}
+                        innerRadius={45}
+                        outerRadius={68}
                         paddingAngle={2}
                       >
                         {stockPorEspecie.map((_, i) => (
@@ -444,17 +437,17 @@ export default function Home() {
                     </PieChart>
                   </ResponsiveContainer>
                   <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center">
-                    <p className="text-xl font-black text-[#14532d]">{fmt(calc.stockActual)}</p>
-                    <p className="text-xs text-slate-500">plantas</p>
+                    <p className="text-base font-black text-[#14532d]">{fmt(calc.stockActual)}</p>
+                    <p className="text-[10px] text-slate-500">plantas</p>
                   </div>
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-1.5">
                   {stockPorEspecie.map((e, i) => {
                     const pct = totalEspecies ? (e.value / totalEspecies) * 100 : 0;
                     return (
-                      <div key={e.name} className="grid grid-cols-[12px_1fr_auto_auto] items-center gap-2 text-xs">
-                        <span className="h-3 w-3 rounded-full" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
+                      <div key={e.name} className="grid grid-cols-[10px_1fr_auto_auto] items-center gap-1.5 text-[10px]">
+                        <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
                         <span className="truncate text-slate-700">{e.name}</span>
                         <span className="font-semibold text-slate-700">{pct.toFixed(1)}%</span>
                         <span className="font-bold text-[#14532d]">{fmt(e.value)}</span>
@@ -466,89 +459,97 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="mb-5 grid gap-4 xl:grid-cols-4">
+          <div className="mb-3 grid gap-3 xl:grid-cols-4">
             <MiniKpi title="Entradas VMA" value={calc.entradasVMA} icon={PackagePlus} />
             <MiniKpi title="Salidas Viveros" value={calc.salidasViveros} icon={PackageMinus} />
             <MiniKpi title="Despachos EECC" value={calc.salidasEECC} icon={Truck} />
             <MiniKpi title="Transformaciones" value={calc.transformaciones} icon={RefreshCw} />
           </div>
 
-          <div className="grid gap-5 xl:grid-cols-[1.25fr_0.8fr_1fr]">
-            <div className="rounded-xl bg-white p-5 shadow-sm border border-slate-100 overflow-x-auto">
+          <div className="grid gap-3 xl:grid-cols-[1.25fr_0.75fr_1fr]">
+            <div className="rounded-lg bg-white p-3 shadow-sm border border-slate-100 overflow-x-auto">
               <SectionHeader title="Resumen por Contrato" action="Ver todos" />
-              <table className="w-full text-xs">
+              <table className="w-full text-[11px]">
                 <thead className="uppercase text-slate-500">
                   <tr>
-                    <th className="py-2 text-left">Contrato</th>
-                    <th className="py-2 text-left">Empresa / EECC</th>
-                    <th className="py-2 text-right">Movimientos</th>
+                    <th className="py-1.5 text-left">Contrato</th>
+                    <th className="py-1.5 text-left">Empresa / EECC</th>
+                    <th className="py-1.5 text-left">Avance</th>
+                    <th className="py-1.5 text-right">Mov.</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {stockPorContrato.map((r, i) => (
-                    <tr key={i} className="border-t border-slate-100">
-                      <td className="py-2.5 font-bold text-[#14532d]">{r.contrato}</td>
-                      <td className="py-2.5 text-slate-600">{r.empresa}</td>
-                      <td className="py-2.5 text-right font-black">{fmt(r.movimientos)}</td>
-                    </tr>
-                  ))}
+                  {stockPorContrato.map((r, i) => {
+                    const pct = Math.round((r.movimientos / maxContrato) * 100);
+                    return (
+                      <tr key={i} className="border-t border-slate-100">
+                        <td className="py-1.5 font-bold text-[#14532d]">{r.contrato}</td>
+                        <td className="py-1.5 text-slate-600">{r.empresa}</td>
+                        <td className="py-1.5 min-w-[100px]">
+                          <div className="h-2 rounded-full bg-slate-100">
+                            <div
+                              className="h-2 rounded-full bg-[#166534]"
+                              style={{ width: `${Math.max(pct, 5)}%` }}
+                            />
+                          </div>
+                        </td>
+                        <td className="py-1.5 text-right font-black">{fmt(r.movimientos)}</td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
 
-            <div className="rounded-xl bg-white p-5 shadow-sm border border-slate-100">
+            <div className="rounded-lg bg-white p-3 shadow-sm border border-slate-100">
               <SectionHeader title="Alertas SITRAP" action="Ver todas" />
 
-              <div className="space-y-2.5">
-                <div className="flex items-center gap-3 rounded-lg bg-amber-50 p-3">
-                  <AlertTriangle className="text-amber-600" size={18} />
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 rounded-md bg-amber-50 p-2">
+                  <AlertTriangle className="text-amber-600" size={15} />
                   <div>
-                    <p className="text-xs font-bold">Traslados pendientes</p>
-                    <p className="text-xs text-slate-500">{fmt(calc.trasladosPendientes)} plantas</p>
+                    <p className="text-[11px] font-bold">Traslados pendientes</p>
+                    <p className="text-[10px] text-slate-500">{fmt(calc.trasladosPendientes)} plantas</p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 rounded-lg bg-red-50 p-3">
-                  <AlertTriangle className="text-red-600" size={18} />
+                <div className="flex items-center gap-2 rounded-md bg-red-50 p-2">
+                  <AlertTriangle className="text-red-600" size={15} />
                   <div>
-                    <p className="text-xs font-bold">Bajas / pérdidas</p>
-                    <p className="text-xs text-slate-500">{fmt(calc.bajas)} plantas</p>
+                    <p className="text-[11px] font-bold">Bajas / pérdidas</p>
+                    <p className="text-[10px] text-slate-500">{fmt(calc.bajas)} plantas</p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 rounded-lg bg-green-50 p-3">
-                  <SearchCheck className="text-[#166534]" size={18} />
+                <div className="flex items-center gap-2 rounded-md bg-green-50 p-2">
+                  <SearchCheck className="text-[#166534]" size={15} />
                   <div>
-                    <p className="text-xs font-bold">Lotes registrados</p>
-                    <p className="text-xs text-slate-500">{fmt(lotesFiltrados.length)} registros</p>
+                    <p className="text-[11px] font-bold">Lotes registrados</p>
+                    <p className="text-[10px] text-slate-500">{fmt(lotesFiltrados.length)} registros</p>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="rounded-xl bg-white p-5 shadow-sm border border-slate-100 overflow-x-auto">
+            <div className="rounded-lg bg-white p-3 shadow-sm border border-slate-100 overflow-x-auto">
               <SectionHeader title="Últimos Movimientos" action="Ver todos" />
 
-              <div className="space-y-3">
+              <div className="space-y-2">
                 {ultimosMovimientos.map((m, i) => (
-                  <div key={i} className="flex items-start justify-between gap-4 border-b border-slate-100 pb-2.5 last:border-b-0">
+                  <div key={i} className="flex items-start justify-between gap-2 border-b border-slate-100 pb-1.5 last:border-b-0">
                     <div>
-                      <p className="text-xs font-bold text-[#14532d]">{m.Subtipo_Movimiento || 'Movimiento'}</p>
-                      <p className="text-[11px] text-slate-500">
+                      <p className="text-[11px] font-bold text-[#14532d]">{m.Subtipo_Movimiento || 'Movimiento'}</p>
+                      <p className="text-[10px] text-slate-500">
                         {m.Fecha_Movimiento ? new Date(m.Fecha_Movimiento).toLocaleDateString('es-CL') : '-'}
                       </p>
-                      <p className="text-[11px] text-slate-400">{m.ID_Final_Lote}</p>
+                      <p className="text-[10px] text-slate-400 truncate max-w-[160px]">{m.ID_Final_Lote}</p>
                     </div>
-                    <p className="whitespace-nowrap text-xs font-black">{fmt(m.Cantidad)}</p>
+                    <p className="whitespace-nowrap text-[11px] font-black">{fmt(m.Cantidad)}</p>
                   </div>
                 ))}
               </div>
             </div>
           </div>
-
-          <footer className="mt-5 border-t border-slate-200 pt-3 text-[11px] text-slate-400">
-            SITRAP · Sistema de Inventario y Trazabilidad de Plantas
-          </footer>
         </section>
       </div>
     </main>
