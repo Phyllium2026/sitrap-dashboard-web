@@ -395,10 +395,10 @@ export default function Home() {
               onClick={() => alert('Escaneo QR reservado para Sprint 2.')}
             />
             <MobileAction
-              title="Registrar movimiento"
-              subtitle="Abrir formulario E2 de movimientos"
-              icon={ClipboardList}
-              href={FORM_E2_MOVIMIENTOS}
+              title="Codificar lote"
+              subtitle="Abrir formulario E1 de alta de lote"
+              icon={Tag}
+              href={FORM_E1_LOTES}
             />
             <MobileAction
               title="Consultar lote"
@@ -419,7 +419,7 @@ export default function Home() {
           <section className="mb-4">
             <div className="mb-2 flex items-center justify-between">
               <h2 className="text-[16px] font-black text-[#14532d]">KPIs rápidos</h2>
-              <span className="text-[11px] font-bold text-slate-400">V5 Mobile</span>
+              <span className="text-[11px] font-bold text-slate-400">V5.2 Mobile</span>
             </div>
             <div className="grid grid-cols-2 gap-2.5">
               <MobileMiniKpi label="Entradas VMA" value={calc.entradasVMA} />
@@ -487,7 +487,7 @@ export default function Home() {
                   target="_blank"
                   rel="noopener noreferrer"
                   title="Abrir Formulario E1: Codificación de lotes"
-                  className="flex items-center justify-between rounded-md border border-[#166534] bg-[#166534] px-2 py-0.5 text-[8.5px] font-bold text-white"
+                  className="flex items-center justify-between rounded-md border border-green-200 bg-white px-2 py-0.5 text-[8.5px] font-bold text-[#14532d]"
                 >
                   Codificar Lote <ExternalLink size={9} />
                 </a>
@@ -708,7 +708,7 @@ export default function Home() {
 
       <footer className="flex h-8 w-full items-center justify-center bg-[#14532d] px-4 text-[11px] font-semibold text-white">
         <span>SITRAP · Sistema de Inventario y Trazabilidad de Plantas</span>
-        <span className="absolute right-4">Versión 5.0</span>
+        <span className="absolute right-4">Versión 5.2</span>
       </footer>
       </main>
     </>
