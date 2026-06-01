@@ -1,6 +1,5 @@
 'use client';
 
-import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 type Lote = {
@@ -9,30 +8,35 @@ type Lote = {
   Vivero?: string;
   CantidadInicialP?: number | string;
   StockActual?: number | string;
+  Stock?: number | string;
   Calidad?: string;
   CalidadInicial?: string;
 };
 
 export default function LotePage() {
-  const searchParams = useSearchParams();
-  const id = searchParams.get('id');
-
+  const [id, setId] = useState('');
   const [lote, setLote] = useState<Lote | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    if (!id) {
+    const params = new URLSearchParams(window.location.search);
+    const loteId = params.get('id') || '';
+
+    if (!loteId) {
       setError('No se recibió ID_Lote_SITRAP.');
       setLoading(false);
       return;
     }
 
+    setId(loteId);
+
     async function fetchLote() {
       try {
-        const res = await fetch(`/api/sitrap?view=lote&id=${encodeURIComponent(id!)}`, {
-          cache: 'no-store',
-        });
+        const res = await fetch(
+          `/api/sitrap?view=lote&id=${encodeURIComponent(loteId)}`,
+          { cache: 'no-store' }
+        );
 
         const data = await res.json();
 
@@ -41,7 +45,7 @@ export default function LotePage() {
         }
 
         setLote(data.lote);
-      } catch (err) {
+      } catch {
         setError('No fue posible cargar la ficha del lote.');
       } finally {
         setLoading(false);
@@ -49,7 +53,7 @@ export default function LotePage() {
     }
 
     fetchLote();
-  }, [id]);
+  }, []);
 
   if (loading) {
     return (
@@ -70,7 +74,8 @@ export default function LotePage() {
     );
   }
 
-  const stock = lote.StockActual ?? lote.CantidadInicialP ?? 'Sin dato';
+  const loteId = lote.ID_Lote_SITRAP || id;
+  const stock = lote.StockActual ?? lote.Stock ?? lote.CantidadInicialP ?? 'Sin dato';
   const calidad = lote.Calidad ?? lote.CalidadInicial ?? 'Sin dato';
 
   return (
@@ -80,6 +85,7 @@ export default function LotePage() {
           <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">
             SITRAP · Ficha rápida de lote
           </p>
+
           <h1 className="mt-2 text-2xl font-bold text-slate-900">
             {lote.EspecieMaterial || 'Especie sin dato'}
           </h1>
@@ -90,19 +96,19 @@ export default function LotePage() {
           <Info label="Vivero" value={lote.Vivero || 'Sin dato'} />
           <Info label="Stock" value={String(stock)} />
           <Info label="Calidad" value={String(calidad)} />
-          <Info label="ID_Lote_SITRAP" value={lote.ID_Lote_SITRAP || id || 'Sin dato'} />
+          <Info label="ID_Lote_SITRAP" value={loteId || 'Sin dato'} />
         </div>
 
         <div className="mt-6 space-y-3">
           <a
-            href={`/movimiento?id=${encodeURIComponent(lote.ID_Lote_SITRAP || id || '')}`}
+            href={`/movimiento?id=${encodeURIComponent(loteId)}`}
             className="block w-full rounded-2xl bg-emerald-700 px-4 py-3 text-center font-semibold text-white shadow-sm"
           >
             Registrar movimiento
           </a>
 
           <a
-            href={`/ficha-lote?id=${encodeURIComponent(lote.ID_Lote_SITRAP || id || '')}`}
+            href={`/ficha-lote?id=${encodeURIComponent(loteId)}`}
             className="block w-full rounded-2xl border border-emerald-700 px-4 py-3 text-center font-semibold text-emerald-800"
           >
             Ver ficha del lote
