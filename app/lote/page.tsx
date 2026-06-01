@@ -9,8 +9,8 @@ type Lote = {
   CantidadInicialP?: number | string;
   StockActual?: number | string;
   Stock?: number | string;
-  Calidad?: string;
-  CalidadInicial?: string;
+  TipoContenedorInicial?: string;
+  Categoria_Lote?: string;
 };
 
 export default function LotePage() {
@@ -76,7 +76,6 @@ export default function LotePage() {
 
   const loteId = lote.ID_Lote_SITRAP || id;
   const stock = lote.StockActual ?? lote.Stock ?? lote.CantidadInicialP ?? 'Sin dato';
-  const calidad = lote.Calidad ?? lote.CalidadInicial ?? 'Sin dato';
 
   return (
     <main className="min-h-screen bg-slate-50 p-5">
@@ -95,7 +94,8 @@ export default function LotePage() {
           <Info label="Especie" value={lote.EspecieMaterial || 'Sin dato'} />
           <Info label="Vivero" value={lote.Vivero || 'Sin dato'} />
           <Info label="Stock" value={String(stock)} />
-          <Info label="Calidad" value={String(calidad)} />
+          <Info label="Tipo contenedor" value={lote.TipoContenedorInicial || 'Sin dato'} />
+          <Info label="Tipo de lote" value={lote.Categoria_Lote || 'Sin dato'} />
           <Info label="ID_Lote_SITRAP" value={loteId || 'Sin dato'} />
         </div>
 
