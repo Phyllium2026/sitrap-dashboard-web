@@ -77,6 +77,10 @@ export default function LotePage() {
   const loteId = lote.ID_Lote_SITRAP || id;
   const stock = lote.StockActual ?? lote.Stock ?? lote.CantidadInicialP ?? 'Sin dato';
 
+  const movimientoFormUrl = `https://docs.google.com/forms/d/e/1FAIpQLSfQ3yuIk_Z2I_jvzhBX33sr8rNf_iF-vNwiqujYJRaZFU8YKw/viewform?usp=pp_url&entry.999239179=${encodeURIComponent(
+    loteId
+  )}`;
+
   return (
     <main className="min-h-screen bg-slate-50 p-5">
       <section className="mx-auto max-w-md rounded-3xl bg-white p-6 shadow-sm">
@@ -101,7 +105,9 @@ export default function LotePage() {
 
         <div className="mt-6 space-y-3">
           <a
-            href={`/movimiento?id=${encodeURIComponent(loteId)}`}
+            href={movimientoFormUrl}
+            target="_blank"
+            rel="noopener noreferrer"
             className="block w-full rounded-2xl bg-emerald-700 px-4 py-3 text-center font-semibold text-white shadow-sm"
           >
             Registrar movimiento
