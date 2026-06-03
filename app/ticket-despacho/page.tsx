@@ -6,6 +6,7 @@ export default function TicketDespachoPage() {
   const [ticket, setTicket] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [copied, setCopied] = useState('');
 
   useEffect(() => {
     const id = new URLSearchParams(window.location.search).get('id');
@@ -29,17 +30,31 @@ export default function TicketDespachoPage() {
       .finally(() => setLoading(false));
   }, []);
 
+  const copiar = async (texto: string, tipo: string) => {
+    await navigator.clipboard.writeText(texto);
+    setCopied(tipo);
+    setTimeout(() => setCopied(''), 2500);
+  };
+
   if (loading) return <div style={{ padding: 20 }}>Cargando ticket...</div>;
   if (error) return <div style={{ padding: 20, color: 'red' }}>{error}</div>;
 
   const detalle = ticket.detalle || [];
-  const total = ticket.Total_Plantas || 0;
+  const textoPOS = construirTextoPOS(ticket);
 
   return (
     <main className="screen">
-      <button className="printButton" onClick={() => window.print()}>
-        Imprimir ticket
-      </button>
+      <div className="actions">
+        <button onClick={() => copiar(textoPOS, 'ticket')}>
+          Copiar ticket POS
+        </button>
+
+        <button onClick={() => copiar(ticket.URL_Ticket || window.location.href, 'qr')}>
+          Copiar URL QR
+        </button>
+
+        {copied && <div className="ok">Copiado: {copied}</div>}
+      </div>
 
       <section className="ticket">
         <div className="center bold">SITRAP - TRIPAN S.A.</div>
@@ -47,32 +62,23 @@ export default function TicketDespachoPage() {
         <div className="sep">==============================</div>
 
         <div className="center ticketTitle">TICKET DESPACHO A EECC</div>
-
         <div className="idBox">ID Despacho: {ticket.ID_Despacho}</div>
 
-        <div className="row">▣ Fecha: {formatDate(ticket.Fecha_Movimiento)}</div>
-        <div className="row">● Origen: {ticket.Origen}</div>
-        <div className="row">▸ Destino: {ticket.Destino}</div>
-        <div className="row">● Responsable: {ticket.Responsable}</div>
+        <div>Fecha: {formatDate(ticket.Fecha_Movimiento)}</div>
+        <div>Origen: {ticket.Origen}</div>
+        <div>Destino: {ticket.Destino}</div>
+        <div>Responsable: {ticket.Responsable}</div>
 
         <div className="dash">------------------------------</div>
-        <div className="center bold">🌱 DETALLE DE DESPACHO 🌱</div>
+        <div className="center bold">DETALLE DE DESPACHO</div>
 
-        <div className="detailHeader">
-          <span>Especie</span>
-          <span>Cant.</span>
-        </div>
-        <div className="dash">------------------------------</div>
-
-        {detalle.map((item: any, index: number) => (
-          <div key={index} className="item">
+        {detalle.map((item: any, i: number) => (
+          <div key={i} className="item">
             <div className="itemTop">
               <strong>{item.EspecieMaterial || item.Especie || 'Sin especie'}</strong>
               <strong>{formatNumber(item.Cantidad)}</strong>
             </div>
-            <div className="lote">
-              {item.ID_Lote_SITRAP || item.ID_Final_Lote || 'Sin ID lote'}
-            </div>
+            <div className="lote">{item.ID_Lote_SITRAP || item.ID_Final_Lote}</div>
           </div>
         ))}
 
@@ -80,68 +86,57 @@ export default function TicketDespachoPage() {
 
         <div className="total">
           <span>TOTAL GENERAL</span>
-          <span>{formatNumber(total)}</span>
+          <span>{formatNumber(ticket.Total_Plantas)}</span>
         </div>
         <div className="plantas">plantas</div>
 
         <div className="dash">------------------------------</div>
-        <div className="center bold">🚚 DATOS TRANSPORTE</div>
-        <div>Chofer : {ticket.Chofer || '________________'}</div>
-        <div>Patente: {ticket.Patente || '________________'}</div>
+        <div className="center bold">DATOS TRANSPORTE</div>
+        <div>Chofer : {ticket.Chofer || ''}</div>
+        <div>Patente: {ticket.Patente || ''}</div>
 
         <div className="dash">------------------------------</div>
-        <div className="center bold">✎ FIRMAS</div>
-
-        <div className="firmas">
-          <div>
-            <div>Entrega (VMA)</div>
-            <br />
-            <div>____________</div>
-            <div>Nombre:</div>
-            <div>Cargo:</div>
-          </div>
-
-          <div>
-            <div>Recibe (EECC)</div>
-            <br />
-            <div>____________</div>
-            <div>Nombre: {ticket.Recibe || ''}</div>
-            <div>Cargo: {ticket.Cargo_Recibe || ''}</div>
-          </div>
-        </div>
+        <div className="center bold">FIRMAS</div>
+        <br />
+        <div>Entrega VMA: __________________</div>
+        <br />
+        <div>Recibe EECC: __________________</div>
+        <div>Nombre: {ticket.Recibe || ''}</div>
+        <div>Cargo : {ticket.Cargo_Recibe || ''}</div>
 
         <div className="dash">------------------------------</div>
-
-        <div className="center bold">ID Despacho: {ticket.ID_Despacho}</div>
-
-        {ticket.QR_Ticket_URL && (
-          <div className="center">
-            <img className="qr" src={ticket.QR_Ticket_URL} alt="QR Ticket" />
-          </div>
-        )}
-
-        <div className="center small">Ver trazabilidad completa</div>
+        <div className="center bold">QR TRAZABILIDAD</div>
         <div className="url">{ticket.URL_Ticket}</div>
-
-        <div className="sep">==============================</div>
       </section>
 
       <style jsx>{`
         .screen {
           background: #f3f4f6;
           min-height: 100vh;
-          padding: 20px 0;
+          padding: 18px 0;
         }
 
-        .printButton {
-          display: block;
+        .actions {
+          width: 58mm;
           margin: 0 auto 12px auto;
-          padding: 10px 16px;
+          display: grid;
+          gap: 8px;
+        }
+
+        button {
+          padding: 10px;
           border: none;
           border-radius: 8px;
           background: #111827;
           color: white;
+          font-weight: 800;
+          font-size: 14px;
+        }
+
+        .ok {
+          text-align: center;
           font-weight: 700;
+          color: #166534;
         }
 
         .ticket {
@@ -155,32 +150,11 @@ export default function TicketDespachoPage() {
           line-height: 1.25;
         }
 
-        .center {
-          text-align: center;
-        }
-
-        .bold {
-          font-weight: 800;
-        }
-
-        .title {
-          font-size: 13px;
-          font-weight: 900;
-        }
-
-        .ticketTitle {
-          font-size: 13px;
-          font-weight: 900;
-          margin: 6px 0;
-        }
-
-        .sep,
-        .dash {
-          text-align: center;
-          font-weight: 700;
-          white-space: nowrap;
-          overflow: hidden;
-        }
+        .center { text-align: center; }
+        .bold { font-weight: 900; }
+        .title { font-size: 13px; font-weight: 900; }
+        .ticketTitle { font-size: 13px; font-weight: 900; margin: 6px 0; }
+        .sep, .dash { text-align: center; font-weight: 700; white-space: nowrap; overflow: hidden; }
 
         .idBox {
           background: black;
@@ -192,20 +166,11 @@ export default function TicketDespachoPage() {
           margin: 5px 0 8px 0;
         }
 
-        .row {
-          margin: 3px 0;
-        }
-
-        .detailHeader,
-        .itemTop,
-        .total {
+        .item { margin: 6px 0; }
+        .itemTop, .total {
           display: flex;
           justify-content: space-between;
           gap: 6px;
-        }
-
-        .item {
-          margin: 5px 0;
         }
 
         .lote {
@@ -216,7 +181,6 @@ export default function TicketDespachoPage() {
         .total {
           font-size: 14px;
           font-weight: 900;
-          margin-top: 5px;
         }
 
         .plantas {
@@ -225,55 +189,65 @@ export default function TicketDespachoPage() {
           font-weight: 700;
         }
 
-        .firmas {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 8px;
-          font-size: 9px;
-          margin-top: 6px;
-        }
-
-        .qr {
-          width: 34mm;
-          height: 34mm;
-          margin-top: 6px;
-        }
-
-        .small {
-          font-size: 9px;
-          font-weight: 700;
-        }
-
         .url {
           font-size: 8px;
           text-align: center;
           word-break: break-all;
         }
-
-        @media print {
-          .screen {
-            background: white;
-            padding: 0;
-          }
-
-          .printButton {
-            display: none;
-          }
-
-          .ticket {
-            margin: 0;
-            width: 58mm;
-            padding: 2mm;
-          }
-
-          @page {
-            size: 58mm auto;
-            margin: 0;
-          }
-        }
       `}</style>
     </main>
   );
+}
+
+function construirTextoPOS(ticket: any) {
+  const detalle = ticket.detalle || [];
+  const lineas: string[] = [];
+
+  lineas.push('SITRAP - TRIPAN S.A.');
+  lineas.push('VIVERO MONTE ARANDA (VMA)');
+  lineas.push('==============================');
+  lineas.push('TICKET DESPACHO A EECC');
+  lineas.push('');
+  lineas.push('ID Despacho:');
+  lineas.push(ticket.ID_Despacho || '');
+  lineas.push('');
+  lineas.push('Fecha: ' + formatDate(ticket.Fecha_Movimiento));
+  lineas.push('Origen: ' + (ticket.Origen || ''));
+  lineas.push('Destino: ' + (ticket.Destino || ''));
+  lineas.push('Responsable: ' + (ticket.Responsable || ''));
+  lineas.push('------------------------------');
+  lineas.push('DETALLE DE DESPACHO');
+  lineas.push('');
+
+  detalle.forEach((item: any) => {
+    lineas.push(item.EspecieMaterial || item.Especie || 'Sin especie');
+    lineas.push(item.ID_Lote_SITRAP || item.ID_Final_Lote || 'Sin ID lote');
+    lineas.push('Cantidad: ' + formatNumber(item.Cantidad) + ' plantas');
+    lineas.push('------------------------------');
+  });
+
+  lineas.push('TOTAL GENERAL: ' + formatNumber(ticket.Total_Plantas));
+  lineas.push('plantas');
+  lineas.push('------------------------------');
+  lineas.push('DATOS TRANSPORTE');
+  lineas.push('Chofer : ' + (ticket.Chofer || ''));
+  lineas.push('Patente: ' + (ticket.Patente || ''));
+  lineas.push('------------------------------');
+  lineas.push('FIRMAS');
+  lineas.push('');
+  lineas.push('Entrega VMA:');
+  lineas.push('______________________________');
+  lineas.push('');
+  lineas.push('Recibe EECC:');
+  lineas.push('______________________________');
+  lineas.push('Nombre: ' + (ticket.Recibe || ''));
+  lineas.push('Cargo : ' + (ticket.Cargo_Recibe || ''));
+  lineas.push('------------------------------');
+  lineas.push('QR TRAZABILIDAD');
+  lineas.push(ticket.URL_Ticket || '');
+  lineas.push('==============================');
+
+  return lineas.join('\n');
 }
 
 function formatDate(value: string) {
