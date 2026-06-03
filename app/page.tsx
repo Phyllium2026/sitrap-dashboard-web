@@ -10,7 +10,7 @@ import {
   Home as HomeIcon, Boxes, PackageCheck, PackagePlus, PackageMinus, Truck,
   Warehouse, CalendarClock, RefreshCw, ClipboardList, ArrowLeftRight, BarChart3,
   Filter, AlertTriangle, ExternalLink, RotateCcw, SearchCheck, Tag,
-  QrCode, FileText, ChevronRight, ScanLine,
+  FileText, ChevronRight, ScanLine,
 } from 'lucide-react';
 
 type Kpis = Record<string, any>;
@@ -96,7 +96,6 @@ function CompactKpi({ title, value, subtitle, icon: Icon }: any) {
     </div>
   );
 }
-
 
 function MobileAction({ title, subtitle, icon: Icon, href, onClick, badge }: any) {
   const content = (
@@ -240,8 +239,6 @@ export default function Home() {
   }, [movimientos, idsFiltrados, contrato, empresa, fecha, vivero]);
 
   const calc = useMemo(() => {
-    // KPIs oficiales desde la API SITRAP.
-    // La API ya consolida STOCK_VIVERO, STOCK_LOTES y BD_MOVIMIENTOS_LOTES.
     const stockInicial = n(kpis?.stockGeneralInicial ?? kpis?.stockInicial ?? kpis?.stock_inicial);
     const stockActual = n(kpis?.stockGeneralActual ?? kpis?.stockActual ?? kpis?.stock_actual);
     const totalLotes = n(kpis?.totalLotes ?? kpis?.total_lotes ?? kpis?.lotesRegistrados);
@@ -252,8 +249,6 @@ export default function Home() {
     const bajas = n(kpis?.bajasPerdidas ?? kpis?.bajas_perdidas ?? kpis?.bajas);
     const transformaciones = n(kpis?.transformaciones ?? kpis?.transformacionesLote ?? kpis?.transformaciones_lote);
 
-    // Stock actual por vivero seleccionado, calculado con la misma lógica validada en STOCK_VIVERO:
-    // Stock Actual Vivero = Stock Inicial - Salidas + Ingresos.
     const stockViveroSeleccionado = vivero
       ? (() => {
           const inicial = lotes
@@ -389,37 +384,53 @@ export default function Home() {
           <section className="mb-4 space-y-2.5">
             <MobileAction
               title="Escanear QR"
-              subtitle="Leer código de lote en terreno"
+              subtitle="Abrir lector QR del celular"
               icon={ScanLine}
-              badge="Sprint 2"
-              onClick={() => alert('Escaneo QR reservado para Sprint 2.')}
+              onClick={() => {
+                window.location.href = '/lote';
+              }}
             />
+
             <MobileAction
               title="Codificar lote"
               subtitle="Abrir formulario E1 de alta de lote"
               icon={Tag}
               href={FORM_E1_LOTES}
             />
+
             <MobileAction
               title="Consultar lote"
-              subtitle="Ver ficha rápida del lote"
+              subtitle="Buscar ficha rápida del lote"
               icon={PackageCheck}
-              badge="Sprint 2"
-              onClick={() => alert('Consulta de lote reservada para Sprint 2.')}
+              onClick={() => {
+                const id = prompt('Ingrese ID_Lote_SITRAP');
+
+                if (!id) return;
+
+                window.location.href =
+                  `/ficha-lote?id=${encodeURIComponent(id)}`;
+              }}
             />
+
             <MobileAction
               title="Ticket despacho"
-              subtitle="Generar comprobante para impresora térmica"
+              subtitle="Imprimir ticket térmico"
               icon={FileText}
-              badge="Sprint 3"
-              onClick={() => alert('Ticket de despacho reservado para Sprint 3.')}
+              onClick={() => {
+                const id = prompt('Ingrese ID_Despacho');
+
+                if (!id) return;
+
+                window.location.href =
+                  `/ticket-despacho?id=${encodeURIComponent(id)}`;
+              }}
             />
           </section>
 
           <section className="mb-4">
             <div className="mb-2 flex items-center justify-between">
               <h2 className="text-[16px] font-black text-[#14532d]">KPIs rápidos</h2>
-              <span className="text-[11px] font-bold text-slate-400">V5.2 Mobile</span>
+              <span className="text-[11px] font-bold text-slate-400">V5.3 Mobile</span>
             </div>
             <div className="grid grid-cols-2 gap-2.5">
               <MobileMiniKpi label="Entradas VMA" value={calc.entradasVMA} />
@@ -444,272 +455,272 @@ export default function Home() {
       </main>
 
       <main className="hidden h-screen overflow-hidden bg-[#f7f9f6] text-slate-900 lg:block">
-      <div className="grid h-[calc(100vh-2rem)] grid-cols-1 lg:grid-cols-[205px_1fr]">
-        <aside className="flex h-[calc(100vh-2rem)] flex-col overflow-hidden border-r border-slate-200 bg-white px-2.5 py-1">
-          <div className="h-[178px] flex items-start justify-center pt-2">
-            <Image
-              src="/sitrap-logo.png"
-              alt="SITRAP"
-              width={145}
-              height={105}
-              className="object-contain"
-              priority
-            />
-          </div>
-
-          <div>
-            <SidebarTitle>Inicio</SidebarTitle>
-
-            <nav className="space-y-0 text-[10px]">
-              <button className="flex w-full items-center gap-2 rounded-md px-2 py-0.5 text-left font-bold text-[#14532d] hover:bg-green-50">
-                <HomeIcon size={11} /> Inicio
-              </button>
-              <button className="flex w-full items-center gap-2 rounded-md px-2 py-0.5 text-left font-semibold text-slate-700 hover:bg-green-50">
-                <Boxes size={11} /> Inventario
-              </button>
-              <button className="flex w-full items-center gap-2 rounded-md px-2 py-0.5 text-left font-semibold text-slate-700 hover:bg-green-50">
-                <ArrowLeftRight size={11} /> Movimientos
-              </button>
-              <button className="flex w-full items-center gap-2 rounded-md px-2 py-0.5 text-left font-semibold text-slate-700 hover:bg-green-50">
-                <ClipboardList size={11} /> Contratos
-              </button>
-              <button className="flex w-full items-center gap-2 rounded-md px-2 py-0.5 text-left font-semibold text-slate-700 hover:bg-green-50">
-                <BarChart3 size={11} /> Dashboard
-              </button>
-            </nav>
-
-            <div className="mt-1">
-              <SidebarTitle>Acciones rápidas</SidebarTitle>
-
-              <div className="space-y-0.5">
-                <a
-                  href={FORM_E1_LOTES}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  title="Abrir Formulario E1: Codificación de lotes"
-                  className="flex items-center justify-between rounded-md border border-green-200 bg-white px-2 py-0.5 text-[8.5px] font-bold text-[#14532d]"
-                >
-                  Codificar Lote <ExternalLink size={9} />
-                </a>
-                <a
-                  href={FORM_E2_MOVIMIENTOS}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  title="Abrir Formulario E2: Movimientos de lotes"
-                  className="flex items-center justify-between rounded-md border border-green-200 bg-white px-2 py-0.5 text-[8.5px] font-bold text-[#14532d]"
-                >
-                  Registrar Movimiento <ExternalLink size={9} />
-                </a>
-              </div>
+        <div className="grid h-[calc(100vh-2rem)] grid-cols-1 lg:grid-cols-[205px_1fr]">
+          <aside className="flex h-[calc(100vh-2rem)] flex-col overflow-hidden border-r border-slate-200 bg-white px-2.5 py-1">
+            <div className="h-[178px] flex items-start justify-center pt-2">
+              <Image
+                src="/sitrap-logo.png"
+                alt="SITRAP"
+                width={145}
+                height={105}
+                className="object-contain"
+                priority
+              />
             </div>
 
-            <div className="mt-1">
-              <SidebarTitle>
-                <span className="flex items-center gap-1.5">
-                  <Filter size={9} />
-                  Filtros rápidos
-                </span>
-              </SidebarTitle>
-
-              <div className="space-y-0.5">
-                <SelectFilter label="Vivero" value={vivero} options={options.viveros} onChange={setVivero} />
-                <SelectFilter label="Especie" value={especie} options={options.especies} onChange={setEspecie} />
-                <SelectFilter label="Contrato" value={contrato} options={options.contratos} onChange={setContrato} />
-                <SelectFilter label="Empresa / EECC" value={empresa} options={options.empresas} onChange={setEmpresa} />
-                <SelectFilter label="Fecha" value={fecha} options={options.fechas} onChange={setFecha} />
-
-                <button
-                  onClick={() => {
-                    setVivero('');
-                    setEspecie('');
-                    setContrato('');
-                    setEmpresa('');
-                    setFecha('');
-                  }}
-                  className="flex w-full items-center justify-center gap-1 rounded-md border border-green-200 px-2 py-0.5 text-[9px] font-bold text-[#14532d] hover:bg-green-50"
-                >
-                  <RotateCcw size={9} />
-                  Limpiar filtros
-                </button>
-              </div>
-            </div>
-          </div>
-        </aside>
-
-        <section className="flex h-[calc(100vh-2rem)] flex-col overflow-hidden p-3 pb-0">
-          <header className="mb-2 flex items-start justify-between gap-3">
             <div>
-              <h1 className="text-xl font-black leading-tight text-[#14532d]">Bienvenido a SITRAP</h1>
-              <p className="mt-0.5 text-xs text-slate-600">
-                Resumen ejecutivo de inventario y trazabilidad de plantas
-              </p>
-            </div>
+              <SidebarTitle>Inicio</SidebarTitle>
 
-            <div className="flex shrink-0 items-center gap-2 rounded-lg border border-slate-100 bg-white px-3 py-1.5 text-[#14532d] shadow-sm">
-              <CalendarClock size={16} />
+              <nav className="space-y-0 text-[10px]">
+                <button className="flex w-full items-center gap-2 rounded-md px-2 py-0.5 text-left font-bold text-[#14532d] hover:bg-green-50">
+                  <HomeIcon size={11} /> Inicio
+                </button>
+                <button className="flex w-full items-center gap-2 rounded-md px-2 py-0.5 text-left font-semibold text-slate-700 hover:bg-green-50">
+                  <Boxes size={11} /> Inventario
+                </button>
+                <button className="flex w-full items-center gap-2 rounded-md px-2 py-0.5 text-left font-semibold text-slate-700 hover:bg-green-50">
+                  <ArrowLeftRight size={11} /> Movimientos
+                </button>
+                <button className="flex w-full items-center gap-2 rounded-md px-2 py-0.5 text-left font-semibold text-slate-700 hover:bg-green-50">
+                  <ClipboardList size={11} /> Contratos
+                </button>
+                <button className="flex w-full items-center gap-2 rounded-md px-2 py-0.5 text-left font-semibold text-slate-700 hover:bg-green-50">
+                  <BarChart3 size={11} /> Dashboard
+                </button>
+              </nav>
+
+              <div className="mt-1">
+                <SidebarTitle>Acciones rápidas</SidebarTitle>
+
+                <div className="space-y-0.5">
+                  <a
+                    href={FORM_E1_LOTES}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title="Abrir Formulario E1: Codificación de lotes"
+                    className="flex items-center justify-between rounded-md border border-green-200 bg-white px-2 py-0.5 text-[8.5px] font-bold text-[#14532d]"
+                  >
+                    Codificar Lote <ExternalLink size={9} />
+                  </a>
+                  <a
+                    href={FORM_E2_MOVIMIENTOS}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title="Abrir Formulario E2: Movimientos de lotes"
+                    className="flex items-center justify-between rounded-md border border-green-200 bg-white px-2 py-0.5 text-[8.5px] font-bold text-[#14532d]"
+                  >
+                    Registrar Movimiento <ExternalLink size={9} />
+                  </a>
+                </div>
+              </div>
+
+              <div className="mt-1">
+                <SidebarTitle>
+                  <span className="flex items-center gap-1.5">
+                    <Filter size={9} />
+                    Filtros rápidos
+                  </span>
+                </SidebarTitle>
+
+                <div className="space-y-0.5">
+                  <SelectFilter label="Vivero" value={vivero} options={options.viveros} onChange={setVivero} />
+                  <SelectFilter label="Especie" value={especie} options={options.especies} onChange={setEspecie} />
+                  <SelectFilter label="Contrato" value={contrato} options={options.contratos} onChange={setContrato} />
+                  <SelectFilter label="Empresa / EECC" value={empresa} options={options.empresas} onChange={setEmpresa} />
+                  <SelectFilter label="Fecha" value={fecha} options={options.fechas} onChange={setFecha} />
+
+                  <button
+                    onClick={() => {
+                      setVivero('');
+                      setEspecie('');
+                      setContrato('');
+                      setEmpresa('');
+                      setFecha('');
+                    }}
+                    className="flex w-full items-center justify-center gap-1 rounded-md border border-green-200 px-2 py-0.5 text-[9px] font-bold text-[#14532d] hover:bg-green-50"
+                  >
+                    <RotateCcw size={9} />
+                    Limpiar filtros
+                  </button>
+                </div>
+              </div>
+            </div>
+          </aside>
+
+          <section className="flex h-[calc(100vh-2rem)] flex-col overflow-hidden p-3 pb-0">
+            <header className="mb-2 flex items-start justify-between gap-3">
               <div>
-                <p className="text-[9px] text-slate-500">Última actualización</p>
-                <p className="text-xs font-black">
-                  {fmtDate(kpis.fechaActualizacion || kpis.fecha_actualizacion)}
+                <h1 className="text-xl font-black leading-tight text-[#14532d]">Bienvenido a SITRAP</h1>
+                <p className="mt-0.5 text-xs text-slate-600">
+                  Resumen ejecutivo de inventario y trazabilidad de plantas
                 </p>
               </div>
-            </div>
-          </header>
 
-          <div className="mb-2 grid gap-2 xl:grid-cols-[1fr_1.08fr_0.98fr]">
-            <div className="h-[290px] overflow-hidden rounded-xl border border-slate-100 bg-white p-3 shadow-sm">
-              <SectionHeader title="Stock por Vivero" action="Stock actual" />
-
-              <div className="h-[248px] w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <ReBarChart
-                    data={stockPorVivero}
-                    margin={{ top: 8, right: 2, bottom: 26, left: 18 }}
-                    barCategoryGap="4%"
-                    barGap={2}
-                  >
-                    <XAxis dataKey="name" tick={{ fontSize: 8 }} interval={0} height={34} tickLine={false} angle={0} textAnchor="middle" />
-                    <YAxis width={42} tick={{ fontSize: 8 }} tickLine={false} axisLine={false} tickMargin={4} />
-                    <Tooltip formatter={(v: any) => fmt(v)} labelFormatter={(_, payload: any) => payload?.[0]?.payload?.fullName || ''} />
-                    <Bar dataKey="value" fill={GREEN} radius={[7, 7, 0, 0]} maxBarSize={72} />
-                  </ReBarChart>
-                </ResponsiveContainer>
+              <div className="flex shrink-0 items-center gap-2 rounded-lg border border-slate-100 bg-white px-3 py-1.5 text-[#14532d] shadow-sm">
+                <CalendarClock size={16} />
+                <div>
+                  <p className="text-[9px] text-slate-500">Última actualización</p>
+                  <p className="text-xs font-black">
+                    {fmtDate(kpis.fechaActualizacion || kpis.fecha_actualizacion)}
+                  </p>
+                </div>
               </div>
-            </div>
+            </header>
 
-            <div className="h-[290px] overflow-hidden rounded-xl border border-slate-100 bg-white p-3 shadow-sm">
-              <SectionHeader title="Stock por Especie" />
+            <div className="mb-2 grid gap-2 xl:grid-cols-[1fr_1.08fr_0.98fr]">
+              <div className="h-[290px] overflow-hidden rounded-xl border border-slate-100 bg-white p-3 shadow-sm">
+                <SectionHeader title="Stock por Vivero" action="Stock actual" />
 
-              <div className="grid h-[245px] grid-cols-[150px_minmax(0,1fr)] items-center gap-2">
-                <div className="relative h-[145px] w-[145px] min-w-[145px] overflow-visible">
+                <div className="h-[248px] w-full">
                   <ResponsiveContainer width="100%" height="100%">
-                    <PieChart margin={{ top: 14, right: 14, bottom: 14, left: 14 }}>
-                      <Pie data={stockPorEspecie} dataKey="value" nameKey="name" innerRadius={36} outerRadius={52} paddingAngle={2}>
-                        {stockPorEspecie.map((_, i) => (
-                          <Cell key={i} fill={COLORS[i % COLORS.length]} />
-                        ))}
-                      </Pie>
-                      <Tooltip formatter={(v: any) => fmt(v)} />
-                    </PieChart>
+                    <ReBarChart
+                      data={stockPorVivero}
+                      margin={{ top: 8, right: 2, bottom: 26, left: 18 }}
+                      barCategoryGap="4%"
+                      barGap={2}
+                    >
+                      <XAxis dataKey="name" tick={{ fontSize: 8 }} interval={0} height={34} tickLine={false} angle={0} textAnchor="middle" />
+                      <YAxis width={42} tick={{ fontSize: 8 }} tickLine={false} axisLine={false} tickMargin={4} />
+                      <Tooltip formatter={(v: any) => fmt(v)} labelFormatter={(_, payload: any) => payload?.[0]?.payload?.fullName || ''} />
+                      <Bar dataKey="value" fill={GREEN} radius={[7, 7, 0, 0]} maxBarSize={72} />
+                    </ReBarChart>
                   </ResponsiveContainer>
+                </div>
+              </div>
 
-                  <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center">
-                    <p className="text-sm font-black text-[#14532d]">{fmt(calc.stockActual)}</p>
-                    <p className="text-[9px] text-slate-500">plantas</p>
+              <div className="h-[290px] overflow-hidden rounded-xl border border-slate-100 bg-white p-3 shadow-sm">
+                <SectionHeader title="Stock por Especie" />
+
+                <div className="grid h-[245px] grid-cols-[150px_minmax(0,1fr)] items-center gap-2">
+                  <div className="relative h-[145px] w-[145px] min-w-[145px] overflow-visible">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart margin={{ top: 14, right: 14, bottom: 14, left: 14 }}>
+                        <Pie data={stockPorEspecie} dataKey="value" nameKey="name" innerRadius={36} outerRadius={52} paddingAngle={2}>
+                          {stockPorEspecie.map((_, i) => (
+                            <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                          ))}
+                        </Pie>
+                        <Tooltip formatter={(v: any) => fmt(v)} />
+                      </PieChart>
+                    </ResponsiveContainer>
+
+                    <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center">
+                      <p className="text-sm font-black text-[#14532d]">{fmt(calc.stockActual)}</p>
+                      <p className="text-[9px] text-slate-500">plantas</p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5 overflow-hidden pr-1">
+                    {stockPorEspecie.map((e, i) => {
+                      const pct = totalEspecies ? (e.value / totalEspecies) * 100 : 0;
+
+                      return (
+                        <div key={e.name} className="grid grid-cols-[8px_minmax(0,1fr)_32px_46px] items-center gap-1.5 text-[9.3px]">
+                          <span className="h-2 w-2 rounded-full" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
+                          <span className="truncate text-slate-700" title={e.name}>{short(e.name, 15)}</span>
+                          <span className="font-semibold text-slate-700">{pct.toFixed(1)}%</span>
+                          <span className="text-right font-black text-[#14532d]">{fmt(e.value)}</span>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
+              </div>
 
-                <div className="space-y-1.5 overflow-hidden pr-1">
-                  {stockPorEspecie.map((e, i) => {
-                    const pct = totalEspecies ? (e.value / totalEspecies) * 100 : 0;
+              <div className="h-[290px] overflow-hidden rounded-xl border border-slate-100 bg-white p-3 shadow-sm">
+                <SectionHeader title="Indicadores Clave (KPI)" />
 
-                    return (
-                      <div key={e.name} className="grid grid-cols-[8px_minmax(0,1fr)_32px_46px] items-center gap-1.5 text-[9.3px]">
-                        <span className="h-2 w-2 rounded-full" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
-                        <span className="truncate text-slate-700" title={e.name}>{short(e.name, 15)}</span>
-                        <span className="font-semibold text-slate-700">{pct.toFixed(1)}%</span>
-                        <span className="text-right font-black text-[#14532d]">{fmt(e.value)}</span>
-                      </div>
-                    );
-                  })}
+                <div className="grid gap-1.5">
+                  <CompactKpi title="Stock General Inicial" value={calc.stockInicial} subtitle="plantas registradas" icon={Boxes} />
+                  <CompactKpi title="Stock General Actual" value={calc.stockActual} subtitle="plantas disponibles" icon={PackageCheck} />
+                  <CompactKpi title="Stock por Vivero (según filtro)" value={calc.stockViveroSeleccionado} subtitle="plantas" icon={Warehouse} />
+                  <CompactKpi title="Lotes Registrados" value={calc.totalLotes} subtitle="registros filtrados" icon={Tag} />
+                  <CompactKpi title="Entradas VMA" value={calc.entradasVMA} subtitle="plantas" icon={PackagePlus} />
                 </div>
               </div>
             </div>
 
-            <div className="h-[290px] overflow-hidden rounded-xl border border-slate-100 bg-white p-3 shadow-sm">
-              <SectionHeader title="Indicadores Clave (KPI)" />
+            <div className="grid flex-1 gap-2 xl:grid-cols-[1fr_1.08fr_0.98fr]">
+              <div className="h-[230px] overflow-hidden rounded-xl border border-slate-100 bg-white p-3 shadow-sm">
+                <SectionHeader title="Resumen por Contrato" action="Ver todos" />
 
-              <div className="grid gap-1.5">
-                <CompactKpi title="Stock General Inicial" value={calc.stockInicial} subtitle="plantas registradas" icon={Boxes} />
-                <CompactKpi title="Stock General Actual" value={calc.stockActual} subtitle="plantas disponibles" icon={PackageCheck} />
-                <CompactKpi title="Stock por Vivero (según filtro)" value={calc.stockViveroSeleccionado} subtitle="plantas" icon={Warehouse} />
-                <CompactKpi title="Lotes Registrados" value={calc.totalLotes} subtitle="registros filtrados" icon={Tag} />
-                <CompactKpi title="Entradas VMA" value={calc.entradasVMA} subtitle="plantas" icon={PackagePlus} />
+                <table className="w-full text-[10px]">
+                  <thead className="uppercase text-slate-500">
+                    <tr>
+                      <th className="py-1 text-left">Contrato</th>
+                      <th className="py-1 text-left">Empresa / EECC</th>
+                      <th className="py-1 text-left">Avance</th>
+                      <th className="py-1 text-right">Mov.</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {stockPorContrato.map((r, i) => {
+                      const pct = Math.round((r.movimientos / maxContrato) * 100);
+                      return (
+                        <tr key={i} className="border-t border-slate-100">
+                          <td className="py-1 font-black text-[#14532d]">{r.contrato}</td>
+                          <td className="py-1 text-slate-600">{r.empresa}</td>
+                          <td className="min-w-[100px] py-1">
+                            <div className="h-2 rounded-full bg-slate-100">
+                              <div className="h-2 rounded-full bg-[#166534]" style={{ width: `${Math.max(pct, 5)}%` }} />
+                            </div>
+                          </td>
+                          <td className="py-1 text-right font-black">{fmt(r.movimientos)}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
               </div>
-            </div>
-          </div>
 
-          <div className="grid flex-1 gap-2 xl:grid-cols-[1fr_1.08fr_0.98fr]">
-            <div className="h-[230px] overflow-hidden rounded-xl border border-slate-100 bg-white p-3 shadow-sm">
-              <SectionHeader title="Resumen por Contrato" action="Ver todos" />
+              <div className="h-[230px] overflow-hidden rounded-xl border border-slate-100 bg-white p-3 shadow-sm">
+                <SectionHeader title="Alertas SITRAP" action="Ver todas" />
 
-              <table className="w-full text-[10px]">
-                <thead className="uppercase text-slate-500">
-                  <tr>
-                    <th className="py-1 text-left">Contrato</th>
-                    <th className="py-1 text-left">Empresa / EECC</th>
-                    <th className="py-1 text-left">Avance</th>
-                    <th className="py-1 text-right">Mov.</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {stockPorContrato.map((r, i) => {
-                    const pct = Math.round((r.movimientos / maxContrato) * 100);
-                    return (
-                      <tr key={i} className="border-t border-slate-100">
-                        <td className="py-1 font-black text-[#14532d]">{r.contrato}</td>
-                        <td className="py-1 text-slate-600">{r.empresa}</td>
-                        <td className="min-w-[100px] py-1">
-                          <div className="h-2 rounded-full bg-slate-100">
-                            <div className="h-2 rounded-full bg-[#166534]" style={{ width: `${Math.max(pct, 5)}%` }} />
-                          </div>
-                        </td>
-                        <td className="py-1 text-right font-black">{fmt(r.movimientos)}</td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-
-            <div className="h-[230px] overflow-hidden rounded-xl border border-slate-100 bg-white p-3 shadow-sm">
-              <SectionHeader title="Alertas SITRAP" action="Ver todas" />
-
-              <div className="space-y-2">
-                <div className="flex items-center gap-2 rounded-md bg-amber-50 p-2.5">
-                  <AlertTriangle className="text-amber-600" size={14} />
-                  <div>
-                    <p className="text-[10px] font-black">Traslados pendientes</p>
-                    <p className="text-[9px] text-slate-500">{fmt(calc.trasladosPendientes)} plantas</p>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 rounded-md bg-amber-50 p-2.5">
+                    <AlertTriangle className="text-amber-600" size={14} />
+                    <div>
+                      <p className="text-[10px] font-black">Traslados pendientes</p>
+                      <p className="text-[9px] text-slate-500">{fmt(calc.trasladosPendientes)} plantas</p>
+                    </div>
                   </div>
-                </div>
 
-                <div className="flex items-center gap-2 rounded-md bg-red-50 p-2.5">
-                  <AlertTriangle className="text-red-600" size={14} />
-                  <div>
-                    <p className="text-[10px] font-black">Bajas / pérdidas</p>
-                    <p className="text-[9px] text-slate-500">{fmt(calc.bajas)} plantas</p>
+                  <div className="flex items-center gap-2 rounded-md bg-red-50 p-2.5">
+                    <AlertTriangle className="text-red-600" size={14} />
+                    <div>
+                      <p className="text-[10px] font-black">Bajas / pérdidas</p>
+                      <p className="text-[9px] text-slate-500">{fmt(calc.bajas)} plantas</p>
+                    </div>
                   </div>
-                </div>
 
-                <div className="flex items-center gap-2 rounded-md bg-green-50 p-2.5">
-                  <SearchCheck className="text-[#166534]" size={14} />
-                  <div>
-                    <p className="text-[10px] font-black">Lotes registrados</p>
-                    <p className="text-[9px] text-slate-500">{fmt(calc.totalLotes)} registros</p>
+                  <div className="flex items-center gap-2 rounded-md bg-green-50 p-2.5">
+                    <SearchCheck className="text-[#166534]" size={14} />
+                    <div>
+                      <p className="text-[10px] font-black">Lotes registrados</p>
+                      <p className="text-[9px] text-slate-500">{fmt(calc.totalLotes)} registros</p>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
 
-            <div className="h-[230px] overflow-hidden rounded-xl border border-slate-100 bg-white p-3 shadow-sm">
-              <SectionHeader title="Indicadores Operacionales" />
+              <div className="h-[230px] overflow-hidden rounded-xl border border-slate-100 bg-white p-3 shadow-sm">
+                <SectionHeader title="Indicadores Operacionales" />
 
-              <div className="grid gap-1.5">
-                <CompactKpi title="Salidas Viveros" value={calc.salidasViveros} subtitle="plantas" icon={PackageMinus} />
-                <CompactKpi title="Despachos EECC" value={calc.salidasEECC} subtitle="plantas" icon={Truck} />
-                <CompactKpi title="Transformaciones" value={calc.transformaciones} subtitle="plantas" icon={RefreshCw} />
-                <CompactKpi title="Traslados Pendientes" value={calc.trasladosPendientes} subtitle="plantas" icon={Warehouse} />
+                <div className="grid gap-1.5">
+                  <CompactKpi title="Salidas Viveros" value={calc.salidasViveros} subtitle="plantas" icon={PackageMinus} />
+                  <CompactKpi title="Despachos EECC" value={calc.salidasEECC} subtitle="plantas" icon={Truck} />
+                  <CompactKpi title="Transformaciones" value={calc.transformaciones} subtitle="plantas" icon={RefreshCw} />
+                  <CompactKpi title="Traslados Pendientes" value={calc.trasladosPendientes} subtitle="plantas" icon={Warehouse} />
+                </div>
               </div>
             </div>
-          </div>
-        </section>
-      </div>
+          </section>
+        </div>
 
-      <footer className="flex h-8 w-full items-center justify-center bg-[#14532d] px-4 text-[11px] font-semibold text-white">
-        <span>SITRAP · Sistema de Inventario y Trazabilidad de Plantas</span>
-        <span className="absolute right-4">Versión 5.2</span>
-      </footer>
+        <footer className="flex h-8 w-full items-center justify-center bg-[#14532d] px-4 text-[11px] font-semibold text-white">
+          <span>SITRAP · Sistema de Inventario y Trazabilidad de Plantas</span>
+          <span className="absolute right-4">Versión 5.3</span>
+        </footer>
       </main>
     </>
   );
