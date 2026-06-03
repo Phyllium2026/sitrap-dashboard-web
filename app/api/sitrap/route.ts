@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 const SITRAP_API_URL =
+  process.env.SITRAP_API_URL ||
   'https://script.google.com/macros/s/AKfycbwTySuquG82pxNqmPSPEW7YfVtFMAFvgLBZfglIz21KbfxmVN80dLGlcIyUd5vdItr0/exec';
 
 export async function GET(request: NextRequest) {
@@ -10,43 +11,23 @@ export async function GET(request: NextRequest) {
 
   const url = new URL(SITRAP_API_URL);
   url.searchParams.set('view', view);
-
-  if (id) {
-    url.searchParams.set('id', id);
-  }
+  if (id) url.searchParams.set('id', id);
 
   try {
-    const response = await fetch(url.toString(), {
-      cache: 'no-store',
-    });
-
+    const response = await fetch(url.toString(), { cache: 'no-store' });
     const text = await response.text();
+    const data = JSON.parse(text);
 
-    try {
-      const data = JSON.parse(text);
-
-      return NextResponse.json(data, {
-        headers: {
-          'Cache-Control': 'no-store',
-        },
-      });
-    } catch {
-      return NextResponse.json(
-        {
-          ok: false,
-          error: 'La API SITRAP no devolvió JSON válido',
-          detail: text.slice(0, 300),
-          api_url: url.toString(),
-        },
-        { status: 500 }
-      );
-    }
+    return NextResponse.json(data, {
+      headers: { 'Cache-Control': 'no-store' },
+    });
   } catch (error) {
     return NextResponse.json(
       {
         ok: false,
         error: 'No se pudo conectar con la API SITRAP',
         detail: String(error),
+        api_url: url.toString(),
       },
       { status: 500 }
     );
