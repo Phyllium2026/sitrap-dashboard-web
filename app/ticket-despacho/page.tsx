@@ -4,55 +4,75 @@ import { useEffect, useState } from 'react';
 
 export default function TicketDespachoPage() {
   const [ticket, setTicket] = useState<any>(null);
+  const [idUsado, setIdUsado] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [copied, setCopied] = useState('');
 
   useEffect(() => {
-    const id = new URLSearchParams(window.location.search).get('id');
+    async function cargarTicket() {
+      try {
+        setLoading(true);
 
-    if (!id) {
-      setError('No se indicó ID de despacho');
-      setLoading(false);
-      return;
-    }
+        const params = new URLSearchParams(window.location.search);
+        let id = params.get('id');
 
-    fetch(`/api/sitrap?view=ticket&id=${encodeURIComponent(id)}`)
-      .then((r) => r.json())
-      .then((data) => {
+        if (!id) {
+          const ultimo = await fetch('/api/sitrap?view=ultimo-ticket', { cache: 'no-store' }).then((r) => r.json());
+
+          if (!ultimo.ok || !ultimo.id) {
+            setError(ultimo.error || 'No se encontró último ticket generado');
+            return;
+          }
+
+          id = ultimo.id;
+        }
+
+        setIdUsado(id);
+
+        const data = await fetch(`/api/sitrap?view=ticket&id=${encodeURIComponent(id)}`, {
+          cache: 'no-store',
+        }).then((r) => r.json());
+
         if (!data.ok || !data.ticket_encontrado) {
           setError(data.error || 'Ticket no encontrado');
           return;
         }
+
         setTicket(data.ticket);
-      })
-      .catch((err) => setError(String(err)))
-      .finally(() => setLoading(false));
+      } catch (err) {
+        setError(String(err));
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    cargarTicket();
   }, []);
 
   const copiar = async (texto: string, tipo: string) => {
-    await navigator.clipboard.writeText(texto);
+    await navigator.clipboard.writeText(texto || '');
     setCopied(tipo);
     setTimeout(() => setCopied(''), 2500);
   };
 
-  if (loading) return <div style={{ padding: 20 }}>Cargando ticket...</div>;
-  if (error) return <div style={{ padding: 20, color: 'red' }}>{error}</div>;
+  if (loading) {
+    return <main className="screen">Cargando último ticket...</main>;
+  }
 
-  const detalle = ticket.detalle || [];
+  if (error) {
+    return <main className="screen error">{error}</main>;
+  }
+
+  const detalle = ticket?.detalle || [];
   const textoPOS = construirTextoPOS(ticket);
+  const urlQr = ticket?.URL_Ticket || `https://sitrap-dashboard-web-73p9.vercel.app/ticket-despacho?id=${idUsado}`;
 
   return (
     <main className="screen">
       <div className="actions">
-        <button onClick={() => copiar(textoPOS, 'ticket')}>
-          Copiar ticket POS
-        </button>
-
-        <button onClick={() => copiar(ticket.URL_Ticket || window.location.href, 'qr')}>
-          Copiar URL QR
-        </button>
-
+        <button onClick={() => copiar(textoPOS, 'ticket POS')}>Copiar ticket POS</button>
+        <button onClick={() => copiar(urlQr, 'URL QR')}>Copiar URL QR</button>
         {copied && <div className="ok">Copiado: {copied}</div>}
       </div>
 
@@ -67,6 +87,8 @@ export default function TicketDespachoPage() {
         <div>Fecha: {formatDate(ticket.Fecha_Movimiento)}</div>
         <div>Origen: {ticket.Origen}</div>
         <div>Destino: {ticket.Destino}</div>
+        <div>Empresa: {ticket.Empresa_EECC}</div>
+        <div>Contrato: {ticket.Contrato}</div>
         <div>Responsable: {ticket.Responsable}</div>
 
         <div className="dash">------------------------------</div>
@@ -106,7 +128,7 @@ export default function TicketDespachoPage() {
 
         <div className="dash">------------------------------</div>
         <div className="center bold">QR TRAZABILIDAD</div>
-        <div className="url">{ticket.URL_Ticket}</div>
+        <div className="url">{urlQr}</div>
       </section>
 
       <style jsx>{`
@@ -114,6 +136,13 @@ export default function TicketDespachoPage() {
           background: #f3f4f6;
           min-height: 100vh;
           padding: 18px 0;
+          font-family: Arial, sans-serif;
+        }
+
+        .error {
+          color: red;
+          padding: 20px;
+          font-weight: 700;
         }
 
         .actions {
@@ -167,6 +196,7 @@ export default function TicketDespachoPage() {
         }
 
         .item { margin: 6px 0; }
+
         .itemTop, .total {
           display: flex;
           justify-content: space-between;
@@ -200,7 +230,7 @@ export default function TicketDespachoPage() {
 }
 
 function construirTextoPOS(ticket: any) {
-  const detalle = ticket.detalle || [];
+  const detalle = ticket?.detalle || [];
   const lineas: string[] = [];
 
   lineas.push('SITRAP - TRIPAN S.A.');
@@ -214,6 +244,8 @@ function construirTextoPOS(ticket: any) {
   lineas.push('Fecha: ' + formatDate(ticket.Fecha_Movimiento));
   lineas.push('Origen: ' + (ticket.Origen || ''));
   lineas.push('Destino: ' + (ticket.Destino || ''));
+  lineas.push('Empresa: ' + (ticket.Empresa_EECC || ''));
+  lineas.push('Contrato: ' + (ticket.Contrato || ''));
   lineas.push('Responsable: ' + (ticket.Responsable || ''));
   lineas.push('------------------------------');
   lineas.push('DETALLE DE DESPACHO');
@@ -258,6 +290,6 @@ function formatDate(value: string) {
 }
 
 function formatNumber(value: any) {
-  const n = Number(value || 0);
-  return n.toLocaleString('es-CL');
+  const num = Number(value || 0);
+  return num.toLocaleString('es-CL');
 }
