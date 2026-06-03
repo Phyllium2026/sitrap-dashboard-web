@@ -197,9 +197,9 @@ export default function Home() {
   }, [lotes, vivero, especie]);
 
   const idsFiltrados = useMemo(
-    () => new Set(lotesFiltrados.map((l) => txt(l.ID_Final_Lote))),
-    [lotesFiltrados]
-  );
+  () => new Set(lotesFiltrados.map((l) => txt(l.ID_Final_Lote || l.ID_Lote_SITRAP || l.ID_Lote_SITRAP_Base))),
+  [lotesFiltrados]
+);
 
   const movimientosFiltrados = useMemo(() => {
     const now = new Date();
