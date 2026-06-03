@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import {
   BarChart as ReBarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell,
@@ -462,22 +463,48 @@ export default function Home() {
               <SidebarTitle>Inicio</SidebarTitle>
 
               <nav className="space-y-0 text-[10px]">
-                <button className="flex w-full items-center gap-2 rounded-md px-2 py-0.5 text-left font-bold text-[#14532d] hover:bg-green-50">
-                  <HomeIcon size={11} /> Inicio
-                </button>
-                <button className="flex w-full items-center gap-2 rounded-md px-2 py-0.5 text-left font-semibold text-slate-700 hover:bg-green-50">
-                  <Boxes size={11} /> Inventario
-                </button>
-                <button className="flex w-full items-center gap-2 rounded-md px-2 py-0.5 text-left font-semibold text-slate-700 hover:bg-green-50">
-                  <ArrowLeftRight size={11} /> Movimientos
-                </button>
-                <button className="flex w-full items-center gap-2 rounded-md px-2 py-0.5 text-left font-semibold text-slate-700 hover:bg-green-50">
-                  <ClipboardList size={11} /> Contratos
-                </button>
-                <button className="flex w-full items-center gap-2 rounded-md px-2 py-0.5 text-left font-semibold text-slate-700 hover:bg-green-50">
-                  <BarChart3 size={11} /> Dashboard
-                </button>
-              </nav>
+
+  <Link
+    href="/"
+    className="flex w-full items-center gap-2 rounded-md px-2 py-0.5 font-bold text-[#14532d]"
+  >
+    <HomeIcon size={11} />
+    Inicio
+  </Link>
+
+  <Link
+    href="/inventario"
+    className="flex w-full items-center gap-2 rounded-md px-2 py-0.5 font-semibold text-slate-700 hover:text-[#14532d]"
+  >
+    <Boxes size={11} />
+    Inventario
+  </Link>
+
+  <Link
+    href="/movimientos"
+    className="flex w-full items-center gap-2 rounded-md px-2 py-0.5 font-semibold text-slate-700 hover:text-[#14532d]"
+  >
+    <ArrowLeftRight size={11} />
+    Movimientos
+  </Link>
+
+  <Link
+    href="/contratos"
+    className="flex w-full items-center gap-2 rounded-md px-2 py-0.5 font-semibold text-slate-700 hover:text-[#14532d]"
+  >
+    <ClipboardList size={11} />
+    Contratos
+  </Link>
+
+  <Link
+    href="/dashboard"
+    className="flex w-full items-center gap-2 rounded-md px-2 py-0.5 font-semibold text-slate-700 hover:text-[#14532d]"
+  >
+    <BarChart3 size={11} />
+    Dashboard
+  </Link>
+
+</nav>
 
               <div className="mt-1">
                 <SidebarTitle>Acciones rápidas</SidebarTitle>
