@@ -384,7 +384,7 @@ export default function Home() {
           <section className="mb-4 space-y-2.5">
             <MobileAction
               title="Escanear QR"
-              subtitle="Abrir lector QR del celular"
+              subtitle="Escanear lote y abrir Form E2 prellenado"
               icon={ScanLine}
               onClick={() => {
                 window.location.href = '/lote';
@@ -400,29 +400,19 @@ export default function Home() {
 
             <MobileAction
               title="Consultar lote"
-              subtitle="Buscar ficha rápida del lote"
+              subtitle="Abrir ficha corta/larga del lote"
               icon={PackageCheck}
               onClick={() => {
-                const id = prompt('Ingrese ID_Lote_SITRAP');
-
-                if (!id) return;
-
-                window.location.href =
-                  `/ficha-lote?id=${encodeURIComponent(id)}`;
+                window.location.href = '/lote';
               }}
             />
 
             <MobileAction
               title="Ticket despacho"
-              subtitle="Imprimir ticket térmico"
+              subtitle="Abrir último ticket generado"
               icon={FileText}
               onClick={() => {
-                const id = prompt('Ingrese ID_Despacho');
-
-                if (!id) return;
-
-                window.location.href =
-                  `/ticket-despacho?id=${encodeURIComponent(id)}`;
+                window.location.href = '/ticket-despacho';
               }}
             />
           </section>
@@ -570,15 +560,9 @@ export default function Home() {
             <div className="mb-2 grid gap-2 xl:grid-cols-[1fr_1.08fr_0.98fr]">
               <div className="h-[290px] overflow-hidden rounded-xl border border-slate-100 bg-white p-3 shadow-sm">
                 <SectionHeader title="Stock por Vivero" action="Stock actual" />
-
                 <div className="h-[248px] w-full">
                   <ResponsiveContainer width="100%" height="100%">
-                    <ReBarChart
-                      data={stockPorVivero}
-                      margin={{ top: 8, right: 2, bottom: 26, left: 18 }}
-                      barCategoryGap="4%"
-                      barGap={2}
-                    >
+                    <ReBarChart data={stockPorVivero} margin={{ top: 8, right: 2, bottom: 26, left: 18 }} barCategoryGap="4%" barGap={2}>
                       <XAxis dataKey="name" tick={{ fontSize: 8 }} interval={0} height={34} tickLine={false} angle={0} textAnchor="middle" />
                       <YAxis width={42} tick={{ fontSize: 8 }} tickLine={false} axisLine={false} tickMargin={4} />
                       <Tooltip formatter={(v: any) => fmt(v)} labelFormatter={(_, payload: any) => payload?.[0]?.payload?.fullName || ''} />
@@ -590,7 +574,6 @@ export default function Home() {
 
               <div className="h-[290px] overflow-hidden rounded-xl border border-slate-100 bg-white p-3 shadow-sm">
                 <SectionHeader title="Stock por Especie" />
-
                 <div className="grid h-[245px] grid-cols-[150px_minmax(0,1fr)] items-center gap-2">
                   <div className="relative h-[145px] w-[145px] min-w-[145px] overflow-visible">
                     <ResponsiveContainer width="100%" height="100%">
@@ -613,7 +596,6 @@ export default function Home() {
                   <div className="space-y-1.5 overflow-hidden pr-1">
                     {stockPorEspecie.map((e, i) => {
                       const pct = totalEspecies ? (e.value / totalEspecies) * 100 : 0;
-
                       return (
                         <div key={e.name} className="grid grid-cols-[8px_minmax(0,1fr)_32px_46px] items-center gap-1.5 text-[9.3px]">
                           <span className="h-2 w-2 rounded-full" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
@@ -629,7 +611,6 @@ export default function Home() {
 
               <div className="h-[290px] overflow-hidden rounded-xl border border-slate-100 bg-white p-3 shadow-sm">
                 <SectionHeader title="Indicadores Clave (KPI)" />
-
                 <div className="grid gap-1.5">
                   <CompactKpi title="Stock General Inicial" value={calc.stockInicial} subtitle="plantas registradas" icon={Boxes} />
                   <CompactKpi title="Stock General Actual" value={calc.stockActual} subtitle="plantas disponibles" icon={PackageCheck} />
@@ -643,7 +624,6 @@ export default function Home() {
             <div className="grid flex-1 gap-2 xl:grid-cols-[1fr_1.08fr_0.98fr]">
               <div className="h-[230px] overflow-hidden rounded-xl border border-slate-100 bg-white p-3 shadow-sm">
                 <SectionHeader title="Resumen por Contrato" action="Ver todos" />
-
                 <table className="w-full text-[10px]">
                   <thead className="uppercase text-slate-500">
                     <tr>
@@ -675,7 +655,6 @@ export default function Home() {
 
               <div className="h-[230px] overflow-hidden rounded-xl border border-slate-100 bg-white p-3 shadow-sm">
                 <SectionHeader title="Alertas SITRAP" action="Ver todas" />
-
                 <div className="space-y-2">
                   <div className="flex items-center gap-2 rounded-md bg-amber-50 p-2.5">
                     <AlertTriangle className="text-amber-600" size={14} />
@@ -705,7 +684,6 @@ export default function Home() {
 
               <div className="h-[230px] overflow-hidden rounded-xl border border-slate-100 bg-white p-3 shadow-sm">
                 <SectionHeader title="Indicadores Operacionales" />
-
                 <div className="grid gap-1.5">
                   <CompactKpi title="Salidas Viveros" value={calc.salidasViveros} subtitle="plantas" icon={PackageMinus} />
                   <CompactKpi title="Despachos EECC" value={calc.salidasEECC} subtitle="plantas" icon={Truck} />
