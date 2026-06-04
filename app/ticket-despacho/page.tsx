@@ -76,7 +76,7 @@ export default function TicketDespachoPage() {
 
 <div className="actions">
         <button onClick={() => copiar(textoPOS, 'ticket POS')}>Copiar ticket POS</button>
-        <button onClick={() => copiar(urlQr, 'URL QR')}>Copiar URL QR</button>
+        <button onClick={() => window.print()}>Generar PDF / Imprimir</button>
         {copied && <div className="ok">Copiado: {copied}</div>}
       </div>
 
@@ -272,55 +272,56 @@ function construirTextoPOS(ticket: any) {
   const detalle = ticket?.detalle || [];
   const lineas: string[] = [];
 
-  lineas.push('SITRAP - TRIPAN S.A.');
-  lineas.push('VIVERO MONTE ARANDA (VMA)');
-  lineas.push('==============================');
-  lineas.push('TICKET DESPACHO A EECC');
+  lineas.push('     SITRAP - TRIPAN S.A.');
+  lineas.push('   VIVERO MONTE ARANDA');
+  lineas.push('------------------------------');
+  lineas.push('   TICKET DESPACHO A EECC');
   lineas.push('');
-  lineas.push('ID Despacho:');
+  lineas.push('        ID DESPACHO');
   lineas.push(ticket.ID_Despacho || '');
   lineas.push('');
+
   lineas.push('Fecha: ' + formatDate(ticket.Fecha_Movimiento));
   lineas.push('Origen:');
-  lineas.push(ticket.Origen || '');
-  lineas.push('Destino: ' + (ticket.Destino || ''));
-  lineas.push('Empresa: ' + (ticket.Empresa_EECC || ''));
-  lineas.push('Contrato: ' + (ticket.Contrato || ''));
+  lineas.push(safeText(ticket.Origen || ''));
+  lineas.push('Destino: ' + safeText(ticket.Destino || ''));
+  lineas.push('Empresa: ' + safeText(ticket.Empresa_EECC || ''));
+  lineas.push('Contrato: ' + safeText(ticket.Contrato || ''));
   lineas.push('Responsable:');
-  lineas.push(ticket.Responsable || '');
+  lineas.push(safeText(ticket.Responsable || ''));
   lineas.push('------------------------------');
-  lineas.push('DETALLE DE DESPACHO');
+  lineas.push('      DETALLE DESPACHO');
   lineas.push('');
+  lineas.push('Especie / Lote       Cant.');
+  lineas.push('------------------------------');
 
   detalle.forEach((item: any) => {
-    lineas.push(item.EspecieMaterial || item.Especie || 'Sin especie');
-    lineas.push(item.ID_Lote_SITRAP || item.ID_Final_Lote || 'Sin ID lote');
-    lineas.push('Cantidad: ' + formatNumber(item.Cantidad) + ' plantas');
-    lineas.push('------------------------------');
+    const especie = safeText(item.EspecieMaterial || item.Especie || 'Sin especie');
+    const lote = safeText(item.ID_Lote_SITRAP || item.ID_Final_Lote || 'Sin ID lote');
+    const cantidad = formatNumber(item.Cantidad);
+
+    lineas.push(formatRow(especie, cantidad));
+    lineas.push(formatRow(lote, ''));
+    lineas.push('');
   });
 
-  lineas.push('TOTAL GENERAL: ' + formatNumber(ticket.Total_Plantas));
-  lineas.push('plantas');
   lineas.push('------------------------------');
-  lineas.push('DATOS TRANSPORTE');
-  lineas.push('Chofer : ' + (ticket.Chofer || ''));
-  lineas.push('Patente: ' + (ticket.Patente || ''));
+  lineas.push(formatRow('TOTAL GENERAL', formatNumber(ticket.Total_Plantas)));
   lineas.push('------------------------------');
-  lineas.push('FIRMAS RECEPCION');
+  lineas.push('      DATOS TRANSPORTE');
+  lineas.push('Chofer : ' + safeText(ticket.Chofer || ''));
+  lineas.push('Patente: ' + safeText(ticket.Patente || ''));
+  lineas.push('------------------------------');
+  lineas.push('      FIRMAS RECEPCION');
   lineas.push('');
   lineas.push('Entrega VMA:');
   lineas.push('______________________________');
   lineas.push('');
   lineas.push('Recibe EECC:');
   lineas.push('______________________________');
-  lineas.push('Nombre: ' + (ticket.Recibe || ''));
-  lineas.push('Cargo : ' + (ticket.Cargo_Recibe || ''));
+  lineas.push('Nombre: ' + safeText(ticket.Recibe || ''));
+  lineas.push('Cargo : ' + safeText(ticket.Cargo_Recibe || ''));
   lineas.push('------------------------------');
-  lineas.push('QR DESPACHO');
-  lineas.push('Ver ticket en SITRAP:');
-  lineas.push('sitrap.app/ticket');
-  lineas.push(ticket.ID_Despacho || '');
-  lineas.push('==============================');
 
   return lineas.join('\n');
 }
@@ -335,4 +336,21 @@ function formatDate(value: string) {
 function formatNumber(value: any) {
   const num = Number(value || 0);
   return num.toLocaleString('es-CL');
+}
+function formatRow(left: string, right: string) {
+  const width = 30;
+  const rightText = String(right || '');
+  const maxLeft = width - rightText.length - 1;
+  const cleanLeft = String(left || '').slice(0, maxLeft);
+  return cleanLeft.padEnd(maxLeft + 1, ' ') + rightText;
+}
+
+function safeText(value: any) {
+  return String(value || '')
+    .replace(/[áàäâ]/gi, 'a')
+    .replace(/[éèëê]/gi, 'e')
+    .replace(/[íìïî]/gi, 'i')
+    .replace(/[óòöô]/gi, 'o')
+    .replace(/[úùüû]/gi, 'u')
+    .replace(/ñ/gi, 'n');
 }
