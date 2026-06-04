@@ -37,7 +37,7 @@ export default function ScanPage() {
 
         setStatus('Apunta la cámara al QR de la bandeja');
 
-        async function scanLoop() {
+        const scanLoop = async () => {
           if (stopped || !videoRef.current) return;
 
           try {
@@ -67,7 +67,7 @@ export default function ScanPage() {
           }
 
           requestAnimationFrame(scanLoop);
-        }
+        };
 
         scanLoop();
       } catch {
