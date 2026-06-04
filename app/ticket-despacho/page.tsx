@@ -118,7 +118,7 @@ export default function TicketDespachoPage() {
         <div>Patente: {ticket.Patente || ''}</div>
 
         <div className="dash">------------------------------</div>
-        <div className="center bold">FIRMAS</div>
+        <div className="center bold">FIRMAS RECEPCIÓN</div>
         <br />
         <div>Entrega VMA: __________________</div>
         <br />
@@ -132,6 +132,8 @@ export default function TicketDespachoPage() {
   <img src={qrImage} alt="QR trazabilidad despacho" />
 </div>
 <div className="center small">Ver trazabilidad completa</div>
+<div className="center small">{ticket.ID_Despacho}</div>
+<div className="center small">sitrap-dashboard-web-73p9.vercel.app</div>
       </section>
 
       <style jsx>{`
@@ -234,8 +236,8 @@ export default function TicketDespachoPage() {
 }
 
 .qrBox img {
-  width: 32mm;
-  height: 32mm;
+  width: 40mm;
+  height: 40mm;
 }
 
 .small {
@@ -283,7 +285,7 @@ function construirTextoPOS(ticket: any) {
   lineas.push('Chofer : ' + (ticket.Chofer || ''));
   lineas.push('Patente: ' + (ticket.Patente || ''));
   lineas.push('------------------------------');
-  lineas.push('FIRMAS');
+  lineas.push('FIRMAS RECEPCIÓN');
   lineas.push('');
   lineas.push('Entrega VMA:');
   lineas.push('______________________________');
