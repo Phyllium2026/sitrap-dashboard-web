@@ -87,6 +87,14 @@ export default function FichaLotePage() {
   if (loading) {
     return (
       <main className="min-h-screen bg-slate-50 p-6">
+        <div className="mx-auto mb-4 max-w-6xl">
+  <a
+    href="/"
+    className="inline-block rounded-xl bg-emerald-700 px-4 py-3 text-sm font-bold text-white"
+  >
+    ← Volver al menú principal
+  </a>
+</div>
         <p className="text-slate-600">Cargando ficha del lote...</p>
       </main>
     );
