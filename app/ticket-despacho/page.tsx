@@ -306,7 +306,7 @@ function construirTextoPOS(ticket: any) {
   lineas.push('Chofer : ' + (ticket.Chofer || ''));
   lineas.push('Patente: ' + (ticket.Patente || ''));
   lineas.push('------------------------------');
-  lineas.push('FIRMAS);
+  lineas.push('FIRMAS RECEPCION');
   lineas.push('');
   lineas.push('Entrega VMA:');
   lineas.push('______________________________');
