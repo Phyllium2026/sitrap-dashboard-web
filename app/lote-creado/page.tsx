@@ -2,9 +2,8 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { ArrowLeft, Printer, Download, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Printer, Download, CheckCircle, ImageDown } from 'lucide-react';
 
-const API = '/api/sitrap';
 const BASE_URL = 'https://sitrap-dashboard-web-73p9.vercel.app';
 
 export default function LoteCreadoPage() {
@@ -48,6 +47,24 @@ export default function LoteCreadoPage() {
     load();
   }, []);
 
+  async function descargarPNG() {
+    const etiqueta = document.querySelector('#etiqueta-zebra') as HTMLElement;
+    if (!etiqueta) return;
+
+    const { toPng } = await import('html-to-image');
+
+    const dataUrl = await toPng(etiqueta, {
+      cacheBust: true,
+      pixelRatio: 3,
+      backgroundColor: '#ffffff',
+    });
+
+    const link = document.createElement('a');
+    link.download = `Etiqueta-${id}.png`;
+    link.href = dataUrl;
+    link.click();
+  }
+
   if (loading) {
     return (
       <main className="min-h-screen bg-slate-50 p-5">
@@ -90,29 +107,21 @@ export default function LoteCreadoPage() {
   return (
     <main className="min-h-screen bg-slate-50 p-5">
       <div className="mx-auto max-w-md">
-
         <div className="mb-5 flex items-center justify-between">
           <div>
             <div className="mb-2 flex items-center gap-2 text-[#14532d]">
               <CheckCircle size={22} />
-              <span className="text-sm font-black uppercase">
-                Lote creado
-              </span>
+              <span className="text-sm font-black uppercase">Lote creado</span>
             </div>
 
-            <h1 className="text-2xl font-black text-[#14532d]">
-              QR del lote
-            </h1>
+            <h1 className="text-2xl font-black text-[#14532d]">QR del lote</h1>
 
             <p className="text-sm text-slate-500">
               Etiqueta lista para imprimir y pegar en bandeja
             </p>
           </div>
 
-          <Link
-            href="/"
-            className="rounded-xl border bg-white px-4 py-2 text-sm font-bold"
-          >
+          <Link href="/" className="rounded-xl border bg-white px-4 py-2 text-sm font-bold">
             <ArrowLeft size={16} className="inline" /> Inicio
           </Link>
         </div>
@@ -130,7 +139,10 @@ export default function LoteCreadoPage() {
           <div className="mb-4 grid grid-cols-1 gap-3 text-sm">
             <Info label="Especie" value={especie} />
             <Info label="Vivero" value={vivero} />
-            <Info label="Cantidad" value={`${Number(cantidad || 0).toLocaleString('es-CL')} plantas`} />
+            <Info
+              label="Cantidad"
+              value={`${Number(cantidad || 0).toLocaleString('es-CL')} plantas`}
+            />
           </div>
 
           <div className="mb-5 flex justify-center">
@@ -141,7 +153,7 @@ export default function LoteCreadoPage() {
             />
           </div>
 
-          <div className="label">
+          <div id="etiqueta-zebra" className="label">
             <div className="qrBox">
               <img src={qrImage} alt="QR etiqueta" className="qr" />
             </div>
@@ -171,6 +183,14 @@ export default function LoteCreadoPage() {
             >
               <Download size={18} />
               Descargar PDF etiqueta
+            </button>
+
+            <button
+              onClick={descargarPNG}
+              className="flex items-center justify-center gap-2 rounded-2xl border border-blue-600 px-4 py-3 font-bold text-blue-600"
+            >
+              <ImageDown size={18} />
+              Descargar PNG Zebra
             </button>
 
             <Link
