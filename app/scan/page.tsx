@@ -3,90 +3,80 @@
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { ArrowLeft, Camera, AlertTriangle } from 'lucide-react';
+import { Html5Qrcode } from 'html5-qrcode';
 
 export default function ScanPage() {
-  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const scannerRef = useRef<Html5Qrcode | null>(null);
   const [error, setError] = useState('');
   const [status, setStatus] = useState('Iniciando cámara...');
 
   useEffect(() => {
-    let stream: MediaStream | null = null;
-    let stopped = false;
-    let detector: any = null;
+    let mounted = true;
 
-    async function start() {
+    async function startScanner() {
       try {
-        if (!('BarcodeDetector' in window)) {
-          setError('Este navegador no soporta lectura QR directa. Usa Chrome o la cámara del iPhone.');
-          return;
-        }
+        const scanner = new Html5Qrcode('qr-reader');
+        scannerRef.current = scanner;
 
-        detector = new (window as any).BarcodeDetector({
-          formats: ['qr_code'],
-        });
+        await scanner.start(
+          { facingMode: 'environment' },
+          {
+            fps: 10,
+            qrbox: { width: 260, height: 260 },
+            aspectRatio: 1.0,
+          },
+          async (decodedText) => {
+            if (!mounted) return;
 
-        stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: 'environment' },
-          audio: false,
-        });
+            setStatus('QR leído. Abriendo lote...');
 
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-          await videoRef.current.play();
-        }
+            try {
+              await scanner.stop();
+              await scanner.clear();
+            } catch {}
 
-        setStatus('Apunta la cámara al QR de la bandeja');
-
-        const scanLoop = async () => {
-          if (stopped || !videoRef.current) return;
-
-          try {
-            const codes = await detector.detect(videoRef.current);
-
-            if (codes.length > 0) {
-              const value = codes[0].rawValue;
-
-              stopped = true;
-              stream?.getTracks().forEach((t) => t.stop());
-
-              if (value.includes('/lote?id=')) {
-                window.location.href = value;
-                return;
-              }
-
-              if (value.includes('ID_Lote_SITRAP=')) {
-                window.location.href = value;
-                return;
-              }
-
-              setError('QR leído, pero no corresponde a un lote SITRAP.');
+            if (decodedText.includes('/lote?id=')) {
+              window.location.href = decodedText;
               return;
             }
-          } catch {
-            // sigue escaneando
+
+            const loteId = extractLoteId(decodedText);
+
+            if (loteId) {
+              window.location.href = `/lote?id=${encodeURIComponent(loteId)}`;
+              return;
+            }
+
+            setError('QR leído, pero no corresponde a un lote SITRAP.');
+          },
+          () => {
+            // lectura fallida normal, no mostrar error
           }
+        );
 
-          requestAnimationFrame(scanLoop);
-        };
-
-        scanLoop();
-      } catch {
+        setStatus('Apunta la cámara al QR de la bandeja');
+      } catch (err) {
         setError('No fue posible abrir la cámara. Revisa permisos del navegador.');
       }
     }
 
-    start();
+    startScanner();
 
     return () => {
-      stopped = true;
-      stream?.getTracks().forEach((t) => t.stop());
+      mounted = false;
+
+      if (scannerRef.current) {
+        scannerRef.current
+          .stop()
+          .then(() => scannerRef.current?.clear())
+          .catch(() => {});
+      }
     };
   }, []);
 
   return (
     <main className="min-h-screen bg-slate-950 p-5 text-white">
       <div className="mx-auto max-w-md">
-
         <div className="mb-5 flex items-center justify-between">
           <div>
             <h1 className="text-xl font-black">Escanear QR</h1>
@@ -101,13 +91,8 @@ export default function ScanPage() {
           </Link>
         </div>
 
-        <div className="overflow-hidden rounded-3xl border border-white/20 bg-black">
-          <video
-            ref={videoRef}
-            className="h-[420px] w-full object-cover"
-            playsInline
-            muted
-          />
+        <div className="overflow-hidden rounded-3xl border border-white/20 bg-black p-2">
+          <div id="qr-reader" className="w-full" />
         </div>
 
         <div className="mt-5 rounded-2xl bg-white/10 p-4">
@@ -122,10 +107,26 @@ export default function ScanPage() {
         </div>
 
         <p className="mt-4 text-xs text-slate-400">
-          Si no abre la cámara, usa la cámara nativa del iPhone para escanear el QR.
+          Permite acceso a la cámara cuando el navegador lo solicite.
         </p>
-
       </div>
     </main>
   );
+}
+
+function extractLoteId(value: string) {
+  try {
+    const url = new URL(value);
+    return url.searchParams.get('id') || '';
+  } catch {}
+
+  if (value.includes('ID_Lote_SITRAP=')) {
+    return value.split('ID_Lote_SITRAP=')[1]?.split('&')[0] || '';
+  }
+
+  if (value.includes('id=')) {
+    return value.split('id=')[1]?.split('&')[0] || '';
+  }
+
+  return '';
 }
