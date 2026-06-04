@@ -70,7 +70,11 @@ export default function TicketDespachoPage() {
   const qrImage = `https://quickchart.io/qr?size=220&text=${encodeURIComponent(urlQr)}`;
   return (
     <main className="screen">
-      <div className="actions">
+      <div className="topNav">
+  <a href="/" className="homeBtn">← Volver al menú</a>
+</div>
+
+<div className="actions">
         <button onClick={() => copiar(textoPOS, 'ticket POS')}>Copiar ticket POS</button>
         <button onClick={() => copiar(urlQr, 'URL QR')}>Copiar URL QR</button>
         {copied && <div className="ok">Copiado: {copied}</div>}
@@ -149,7 +153,22 @@ export default function TicketDespachoPage() {
           padding: 20px;
           font-weight: 700;
         }
+.topNav {
+  width: 58mm;
+  margin: 0 auto 10px auto;
+}
 
+.homeBtn {
+  display: block;
+  background: #14532d;
+  color: white;
+  text-align: center;
+  padding: 10px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 800;
+  text-decoration: none;
+}
         .actions {
           width: 58mm;
           margin: 0 auto 12px auto;
@@ -262,11 +281,13 @@ function construirTextoPOS(ticket: any) {
   lineas.push(ticket.ID_Despacho || '');
   lineas.push('');
   lineas.push('Fecha: ' + formatDate(ticket.Fecha_Movimiento));
-  lineas.push('Origen: ' + (ticket.Origen || ''));
+  lineas.push('Origen:');
+  lineas.push(ticket.Origen || '');
   lineas.push('Destino: ' + (ticket.Destino || ''));
   lineas.push('Empresa: ' + (ticket.Empresa_EECC || ''));
   lineas.push('Contrato: ' + (ticket.Contrato || ''));
-  lineas.push('Responsable: ' + (ticket.Responsable || ''));
+  lineas.push('Responsable:');
+  lineas.push(ticket.Responsable || '');
   lineas.push('------------------------------');
   lineas.push('DETALLE DE DESPACHO');
   lineas.push('');
@@ -285,7 +306,7 @@ function construirTextoPOS(ticket: any) {
   lineas.push('Chofer : ' + (ticket.Chofer || ''));
   lineas.push('Patente: ' + (ticket.Patente || ''));
   lineas.push('------------------------------');
-  lineas.push('FIRMAS RECEPCIÓN');
+  lineas.push('FIRMAS);
   lineas.push('');
   lineas.push('Entrega VMA:');
   lineas.push('______________________________');
@@ -295,8 +316,10 @@ function construirTextoPOS(ticket: any) {
   lineas.push('Nombre: ' + (ticket.Recibe || ''));
   lineas.push('Cargo : ' + (ticket.Cargo_Recibe || ''));
   lineas.push('------------------------------');
-  lineas.push('QR TRAZABILIDAD');
-  lineas.push(ticket.URL_Ticket || '');
+  lineas.push('QR DESPACHO');
+  lineas.push('Ver ticket en SITRAP:');
+  lineas.push('sitrap.app/ticket');
+  lineas.push(ticket.ID_Despacho || '');
   lineas.push('==============================');
 
   return lineas.join('\n');
