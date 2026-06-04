@@ -401,10 +401,10 @@ export default function Home() {
 
             <MobileAction
   title="Consultar lote"
-  subtitle="Ver inventario y buscar lotes"
+  subtitle="Buscar lote y abrir ficha corta/larga"
   icon={PackageCheck}
   onClick={() => {
-    window.location.href = '/inventario';
+    window.location.href = '/consultar-lote';
   }}
 />
 
