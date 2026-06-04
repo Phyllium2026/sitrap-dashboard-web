@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
 type Lote = {
@@ -83,7 +84,16 @@ export default function LotePage() {
 
   return (
     <main className="min-h-screen bg-slate-50 p-5">
-      <section className="mx-auto max-w-md rounded-3xl bg-white p-6 shadow-sm">
+  <div className="mx-auto mb-4 max-w-md">
+    <Link
+      href="/"
+      className="inline-block rounded-2xl bg-emerald-700 px-4 py-3 text-sm font-bold text-white shadow-sm"
+    >
+      ← Volver al menú principal
+    </Link>
+  </div>
+
+  <section className="mx-auto max-w-md rounded-3xl bg-white p-6 shadow-sm">
         <div className="mb-5">
           <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">
             SITRAP · Ficha rápida de lote
