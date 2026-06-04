@@ -67,7 +67,7 @@ export default function TicketDespachoPage() {
   const detalle = ticket?.detalle || [];
   const textoPOS = construirTextoPOS(ticket);
   const urlQr = ticket?.URL_Ticket || `https://sitrap-dashboard-web-73p9.vercel.app/ticket-despacho?id=${idUsado}`;
-
+  const qrImage = `https://quickchart.io/qr?size=220&text=${encodeURIComponent(urlQr)}`;
   return (
     <main className="screen">
       <div className="actions">
@@ -127,8 +127,11 @@ export default function TicketDespachoPage() {
         <div>Cargo : {ticket.Cargo_Recibe || ''}</div>
 
         <div className="dash">------------------------------</div>
-        <div className="center bold">QR TRAZABILIDAD</div>
-        <div className="url">{urlQr}</div>
+        <div className="center bold">QR TRAZABILIDAD DEL DESPACHO</div>
+<div className="qrBox">
+  <img src={qrImage} alt="QR trazabilidad despacho" />
+</div>
+<div className="center small">Ver trazabilidad completa</div>
       </section>
 
       <style jsx>{`
@@ -224,6 +227,21 @@ export default function TicketDespachoPage() {
           text-align: center;
           word-break: break-all;
         }
+        .qrBox {
+  display: flex;
+  justify-content: center;
+  margin-top: 6px;
+}
+
+.qrBox img {
+  width: 32mm;
+  height: 32mm;
+}
+
+.small {
+  font-size: 9px;
+  font-weight: 700;
+}
       `}</style>
     </main>
   );
