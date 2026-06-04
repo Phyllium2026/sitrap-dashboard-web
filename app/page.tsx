@@ -384,13 +384,13 @@ export default function Home() {
 
           <section className="mb-4 space-y-2.5">
             <MobileAction
-              title="Escanear QR"
-              subtitle="Escanear lote y abrir Form E2 prellenado"
-              icon={ScanLine}
-              onClick={() => {
-                window.location.href = '/lote';
-              }}
-            />
+  title="Escanear QR"
+  subtitle="Abrir cámara y leer QR de bandeja"
+  icon={ScanLine}
+  onClick={() => {
+    window.location.href = '/scan';
+  }}
+/>
 
             <MobileAction
               title="Codificar lote"
