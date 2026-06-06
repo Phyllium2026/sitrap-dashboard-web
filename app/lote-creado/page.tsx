@@ -2,7 +2,14 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { ArrowLeft, Printer, Download, CheckCircle, ImageDown } from 'lucide-react';
+import {
+  ArrowLeft,
+  Printer,
+  Download,
+  CheckCircle,
+  ImageDown,
+  Share2,
+} from 'lucide-react';
 
 const BASE_URL = 'https://sitrap-dashboard-web-73p9.vercel.app';
 
@@ -48,6 +55,56 @@ export default function LoteCreadoPage() {
   }, []);
 
   async function descargarPNG() {
+    async function compartirEtiqueta() {
+  try {
+    const etiqueta = document.querySelector('#etiqueta-zebra') as HTMLElement;
+    if (!etiqueta) return;
+
+    const { toPng } = await import('html-to-image');
+
+    const dataUrl = await toPng(etiqueta, {
+      cacheBust: true,
+      pixelRatio: 3,
+      backgroundColor: '#ffffff',
+    });
+
+    const response = await fetch(dataUrl);
+    const blob = await response.blob();
+
+    const file = new File(
+      [blob],
+      `Etiqueta-${id}.png`,
+      { type: 'image/png' }
+    );
+
+    if (
+      navigator.share &&
+      navigator.canShare &&
+      navigator.canShare({ files: [file] })
+    ) {
+      await navigator.share({
+        files: [file],
+        title: `Etiqueta SITRAP ${id}`,
+        text: `Etiqueta QR del lote ${id}`,
+      });
+
+      return;
+    }
+
+    // Respaldo si compartir no está disponible
+    const link = document.createElement('a');
+    link.download = `Etiqueta-${id}.png`;
+    link.href = dataUrl;
+    link.click();
+
+    alert(
+      'Tu dispositivo no permite compartir directamente. Se descargó el PNG para que puedas enviarlo manualmente.'
+    );
+  } catch (error) {
+    console.error(error);
+    alert('No fue posible compartir la etiqueta.');
+  }
+}
     const etiqueta = document.querySelector('#etiqueta-zebra') as HTMLElement;
     if (!etiqueta) return;
 
@@ -192,7 +249,13 @@ export default function LoteCreadoPage() {
               <ImageDown size={18} />
               Descargar PNG Zebra
             </button>
-
+<button
+  onClick={compartirEtiqueta}
+  className="flex items-center justify-center gap-2 rounded-2xl border border-emerald-600 px-4 py-3 font-bold text-emerald-600"
+>
+  <Share2 size={18} />
+  Compartir etiqueta
+</button>
             <Link
               href="/"
               className="rounded-2xl bg-slate-100 px-4 py-3 text-center font-bold text-slate-700"
