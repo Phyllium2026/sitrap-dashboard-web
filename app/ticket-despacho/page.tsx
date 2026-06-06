@@ -263,6 +263,45 @@ export default function TicketDespachoPage() {
   font-size: 9px;
   font-weight: 700;
 }
+@media print {
+
+  @page {
+    size: 58mm auto;
+    margin: 0;
+  }
+
+  .screen {
+    background: white !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    min-height: auto !important;
+  }
+
+  .topNav,
+  .actions {
+    display: none !important;
+  }
+
+  .ticket {
+    width: 58mm !important;
+    margin: 0 auto !important;
+    padding: 2mm !important;
+    background: white !important;
+    box-shadow: none !important;
+    page-break-inside: avoid;
+  }
+
+  .qrBox img {
+    width: 40mm !important;
+    height: 40mm !important;
+  }
+
+  body {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: white !important;
+  }
+}
       `}</style>
     </main>
   );
