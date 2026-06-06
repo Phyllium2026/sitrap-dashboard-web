@@ -54,72 +54,69 @@ export default function LoteCreadoPage() {
     load();
   }, []);
 
-  async function descargarPNG() {
-    async function compartirEtiqueta() {
-  try {
+  async function generarPNGDataUrl() {
     const etiqueta = document.querySelector('#etiqueta-zebra') as HTMLElement;
-    if (!etiqueta) return;
+    if (!etiqueta) return null;
 
     const { toPng } = await import('html-to-image');
 
-    const dataUrl = await toPng(etiqueta, {
+    return await toPng(etiqueta, {
       cacheBust: true,
       pixelRatio: 3,
       backgroundColor: '#ffffff',
     });
+  }
 
-    const response = await fetch(dataUrl);
-    const blob = await response.blob();
+  async function descargarPNG() {
+    const dataUrl = await generarPNGDataUrl();
+    if (!dataUrl) return;
 
-    const file = new File(
-      [blob],
-      `Etiqueta-${id}.png`,
-      { type: 'image/png' }
-    );
+    const link = document.createElement('a');
+    link.download = `Etiqueta-${id}.png`;
+    link.href = dataUrl;
+    link.click();
+  }
 
-    if (
-      navigator.share &&
-      navigator.canShare &&
-      navigator.canShare({ files: [file] })
-    ) {
-      await navigator.share({
-        files: [file],
-        title: `Etiqueta SITRAP ${id}`,
-        text: `Etiqueta QR del lote ${id}`,
+  async function compartirEtiqueta() {
+    try {
+      const dataUrl = await generarPNGDataUrl();
+      if (!dataUrl) return;
+
+      const response = await fetch(dataUrl);
+      const blob = await response.blob();
+
+      const file = new File([blob], `Etiqueta-${id}.png`, {
+        type: 'image/png',
       });
 
-      return;
+      const nav = navigator as Navigator & {
+        canShare?: (data: { files?: File[] }) => boolean;
+        share?: (data: {
+          files?: File[];
+          title?: string;
+          text?: string;
+        }) => Promise<void>;
+      };
+
+      if (nav.share && nav.canShare && nav.canShare({ files: [file] })) {
+        await nav.share({
+          files: [file],
+          title: `Etiqueta SITRAP ${id}`,
+          text: `Etiqueta QR del lote ${id}`,
+        });
+        return;
+      }
+
+      const link = document.createElement('a');
+      link.download = `Etiqueta-${id}.png`;
+      link.href = dataUrl;
+      link.click();
+
+      alert('Este dispositivo no permite compartir directamente. Se descargó el PNG.');
+    } catch (error) {
+      console.error(error);
+      alert('No fue posible compartir la etiqueta.');
     }
-
-    // Respaldo si compartir no está disponible
-    const link = document.createElement('a');
-    link.download = `Etiqueta-${id}.png`;
-    link.href = dataUrl;
-    link.click();
-
-    alert(
-      'Tu dispositivo no permite compartir directamente. Se descargó el PNG para que puedas enviarlo manualmente.'
-    );
-  } catch (error) {
-    console.error(error);
-    alert('No fue posible compartir la etiqueta.');
-  }
-}
-    const etiqueta = document.querySelector('#etiqueta-zebra') as HTMLElement;
-    if (!etiqueta) return;
-
-    const { toPng } = await import('html-to-image');
-
-    const dataUrl = await toPng(etiqueta, {
-      cacheBust: true,
-      pixelRatio: 3,
-      backgroundColor: '#ffffff',
-    });
-
-    const link = document.createElement('a');
-    link.download = `Etiqueta-${id}.png`;
-    link.href = dataUrl;
-    link.click();
   }
 
   if (loading) {
@@ -249,13 +246,15 @@ export default function LoteCreadoPage() {
               <ImageDown size={18} />
               Descargar PNG Zebra
             </button>
-<button
-  onClick={compartirEtiqueta}
-  className="flex items-center justify-center gap-2 rounded-2xl border border-emerald-600 px-4 py-3 font-bold text-emerald-600"
->
-  <Share2 size={18} />
-  Compartir etiqueta
-</button>
+
+            <button
+              onClick={compartirEtiqueta}
+              className="flex items-center justify-center gap-2 rounded-2xl border border-emerald-600 px-4 py-3 font-bold text-emerald-600"
+            >
+              <Share2 size={18} />
+              Compartir etiqueta
+            </button>
+
             <Link
               href="/"
               className="rounded-2xl bg-slate-100 px-4 py-3 text-center font-bold text-slate-700"
