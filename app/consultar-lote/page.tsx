@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
-import { ArrowLeft, Search, PackageCheck } from 'lucide-react';
+import { ArrowLeft, Search, PackageCheck, Tag } from 'lucide-react';
 
 const API = '/api/sitrap';
 
@@ -41,14 +41,13 @@ export default function ConsultarLotePage() {
   return (
     <main className="min-h-screen bg-slate-50 p-5">
       <div className="mx-auto max-w-md">
-
         <div className="mb-5 flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-black text-[#14532d]">
               Consultar lote
             </h1>
             <p className="text-sm text-slate-500">
-              Buscar lote y abrir ficha rápida o completa
+              Buscar lote, consultar ficha o reimprimir etiqueta QR
             </p>
           </div>
 
@@ -108,7 +107,7 @@ export default function ConsultarLotePage() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-1 gap-2">
                     <Link
                       href={`/lote?id=${encodeURIComponent(id)}`}
                       className="rounded-2xl bg-[#14532d] px-3 py-3 text-center text-sm font-bold text-white"
@@ -121,6 +120,14 @@ export default function ConsultarLotePage() {
                       className="rounded-2xl border border-[#14532d] px-3 py-3 text-center text-sm font-bold text-[#14532d]"
                     >
                       Ficha completa
+                    </Link>
+
+                    <Link
+                      href={`/lote-creado?id=${encodeURIComponent(id)}`}
+                      className="flex items-center justify-center gap-2 rounded-2xl border border-emerald-600 bg-emerald-50 px-3 py-3 text-center text-sm font-bold text-emerald-700"
+                    >
+                      <Tag size={16} />
+                      Reimprimir etiqueta
                     </Link>
                   </div>
                 </div>
