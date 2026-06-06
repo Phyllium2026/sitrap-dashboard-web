@@ -407,7 +407,14 @@ export default function Home() {
     window.location.href = '/consultar-lote';
   }}
 />
-
+<MobileAction
+  title="Reimprimir etiqueta"
+  subtitle="Buscar lote y volver a imprimir QR"
+  icon={Tag}
+  onClick={() => {
+    window.location.href = '/consultar-lote';
+  }}
+/>
             <MobileAction
               title="Ticket despacho"
               subtitle="Abrir último ticket generado"
@@ -528,6 +535,13 @@ export default function Home() {
                   >
                     Registrar Movimiento <ExternalLink size={9} />
                   </a>
+                  <Link
+  href="/qr-lotes"
+  title="Buscar lote existente para reimprimir etiqueta QR"
+  className="flex items-center justify-between rounded-md border border-green-200 bg-white px-2 py-0.5 text-[8.5px] font-bold text-[#14532d]"
+>
+  Reimprimir etiqueta <Tag size={9} />
+</Link>
                 </div>
               </div>
 
