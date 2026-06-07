@@ -78,11 +78,15 @@ export default function ConsultarLotePage() {
               const especie = l.EspecieMaterial || 'Sin especie';
               const vivero = l.Vivero || 'Sin vivero';
               const stock =
-                l.StockActual ||
-                l.Stock ||
-                l.CantidadInicialP_Corregida ||
-                l.CantidadInicialP ||
-                0;
+  l.Stock_Actual_General ||
+  l.Cantidad_Stock_Actual ||
+  l.stockActual ||
+  l.StockActual ||
+  l.Stock ||
+  l.cantidadInicialP ||
+  l.CantidadInicialP ||
+  l.CantidadInicialP_Corregida ||
+  0;
 
               return (
                 <div
