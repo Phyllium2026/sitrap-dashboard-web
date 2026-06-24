@@ -1,96 +1,36 @@
 'use client';
 
-import { Suspense, useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
+import { Printer } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 
-const API = '/api/sitrap';
-const BASE_URL = 'https://sitrap-dashboard-web-73p9.vercel.app';
-
-export default function PrintQrLotePage() {
-  return (
-    <Suspense fallback={<div className="loading">Preparando hoja A4...</div>}>
-      <PrintQrLoteContent />
-    </Suspense>
-  );
-}
-
-function PrintQrLoteContent() {
+export default function PrintQrLotesPage() {
   const searchParams = useSearchParams();
-  const loteIdParam = searchParams.get('id') || '';
+  const [qrOk, setQrOk] = useState(false);
 
-  const [lotes, setLotes] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [qrLoaded, setQrLoaded] = useState(false);
-  const [printed, setPrinted] = useState(false);
+  const id = searchParams.get('id') || '';
+  const especie = searchParams.get('especie') || 'Sin especie';
+  const vivero = searchParams.get('vivero') || '-';
+  const cantidad = searchParams.get('cantidad') || '0';
+  const contenedor = searchParams.get('contenedor') || 'Contenedor s/i';
+  const url = searchParams.get('url') || '';
 
-  useEffect(() => {
-    async function load() {
-      try {
-        const r = await fetch(`${API}?view=altas`, { cache: 'no-store' });
-        const data = await r.json();
-        setLotes(Array.isArray(data) ? data : []);
-      } catch {
-        setLotes([]);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    load();
-  }, []);
-
-  const lote = useMemo(() => {
-    if (!lotes.length) return null;
-
-    return (
-      lotes.find((l) => String(l.ID_Lote_SITRAP || '') === loteIdParam) ||
-      lotes[0] ||
-      null
-    );
-  }, [lotes, loteIdParam]);
-
-  const loteId = lote?.ID_Lote_SITRAP || loteIdParam || '';
-  const qrUrl = loteId ? `${BASE_URL}/lote?id=${encodeURIComponent(loteId)}` : '';
-  const qrImage = loteId
-    ? `https://quickchart.io/qr?size=900&margin=1&text=${encodeURIComponent(qrUrl)}`
-    : '';
-
-  const especie = lote?.EspecieMaterial || lote?.Especie || 'Sin especie';
-  const vivero = shortVivero(lote?.Vivero);
-  const cantidad = fmt(
-    lote?.CantidadInicialP_Corregida ||
-    lote?.CantidadInicialP ||
-    lote?.StockActual ||
-    0
-  );
-  const contenedor = lote?.Contenedor || lote?.TipoContenedor || 'Contenedor s/i';
-
-  useEffect(() => {
-    if (!loading && lote && qrLoaded && !printed) {
-      setPrinted(true);
-      const timer = window.setTimeout(() => window.print(), 500);
-      return () => window.clearTimeout(timer);
-    }
-  }, [loading, lote, qrLoaded, printed]);
+  const qrImage = useMemo(() => {
+    if (!url) return '';
+    return `https://quickchart.io/qr?size=520&margin=1&text=${encodeURIComponent(url)}`;
+  }, [url]);
 
   const etiquetas = Array.from({ length: 6 });
 
-  if (loading) {
-    return <div className="loading">Preparando hoja A4...</div>;
-  }
-
-  if (!lote) {
-    return (
-      <div className="loading">
-        No se encontró el lote solicitado.
-      </div>
-    );
+  function imprimir() {
+    window.print();
   }
 
   return (
-    <>
-      <div className="screenToolbar">
-        <button onClick={() => window.print()}>
+    <main className="printRoot">
+      <div className="toolbar">
+        <button type="button" onClick={imprimir} disabled={!qrOk}>
+          <Printer size={18} />
           Imprimir hoja A4
         </button>
         <span>
@@ -98,405 +38,288 @@ function PrintQrLoteContent() {
         </span>
       </div>
 
-      <main className="pageWrap">
-        <section className="sheet">
-          <div className="sheetBorder">
-            <div className="labelGrid">
-              {etiquetas.map((_, i) => (
-                <article className="labelCard" key={i}>
-                  <div className="qrArea">
-                    {qrImage && (
-                      <img
-                        src={qrImage}
-                        alt="QR Lote SITRAP"
-                        onLoad={() => setQrLoaded(true)}
-                      />
-                    )}
-                  </div>
-
-                  <div className="divider" />
-
-                  <div className="labelText">
-                    <div className="brand">SITRAP</div>
-                    <div className="id">{loteId}</div>
-                    <div className="species">{especie}</div>
-                    <div className="meta">{vivero} - {cantidad} pl.</div>
-                    <div className="container">{contenedor}</div>
-                  </div>
-                </article>
-              ))}
-            </div>
-
-            <section className="instructions">
-              <div className="leftIcon" aria-hidden="true">▣</div>
-
-              <div className="instructionText">
-                <div className="instructionTitle">INSTRUCCIONES DE IMPRESIÓN</div>
-                <div className="instructionLine"><span>✓</span> Papel: A4</div>
-                <div className="instructionLine"><span>✓</span> Escala: 100% (Tamaño real)</div>
-                <div className="instructionLine"><span>✓</span> Márgenes: Mínimos</div>
-                <div className="instructionLine"><span>✓</span> Se recomienda papel adhesivo A4 (cortar después de imprimir).</div>
+      <section className="sheet" aria-label="Hoja A4 etiquetas QR SITRAP">
+        <div className="labelsGrid">
+          {etiquetas.map((_, index) => (
+            <article className="label" key={index}>
+              <div className="qrWrap">
+                {qrImage && (
+                  <img
+                    src={qrImage}
+                    alt=""
+                    className="qr"
+                    onLoad={() => setQrOk(true)}
+                  />
+                )}
               </div>
+              <div className="line" />
+              <div className="brand">SITRAP</div>
+              <div className="lotId">{id}</div>
+              <div className="species">{especie}</div>
+              <div className="meta">{vivero} - {cantidad} pl.</div>
+              <div className="containerText">{contenedor}</div>
+            </article>
+          ))}
+        </div>
 
-              <div className="diagram">
-                <div className="diagramTop">60 mm</div>
-                <div className="diagramBox">
-                  <div>Etiqueta</div>
-                  <strong>60 x 40 mm</strong>
-                </div>
-                <div className="diagramSide">40 mm</div>
-              </div>
-            </section>
+        <footer className="instructions">
+          <div className="iconBox">▣</div>
+          <div className="instructionText">
+            <div className="title">INSTRUCCIONES DE IMPRESIÓN</div>
+            <div className="row">✓ Papel: A4</div>
+            <div className="row">✓ Escala: 100% / Tamaño real</div>
+            <div className="row">✓ Márgenes: mínimos</div>
+            <div className="row">✓ Se recomienda papel adhesivo A4 y cortar después de imprimir.</div>
           </div>
-        </section>
-      </main>
+          <div className="diagram">
+            <div className="measureTop">60 mm</div>
+            <div className="miniLabel">Etiqueta<br />60 x 40 mm</div>
+            <div className="measureSide">40 mm</div>
+          </div>
+        </footer>
+      </section>
 
-      <style jsx global>{`
-        @page {
-          size: A4 portrait;
-          margin: 0;
-        }
-
-        * {
-          box-sizing: border-box;
-          -webkit-print-color-adjust: exact;
-          print-color-adjust: exact;
-        }
-
-        html,
-        body {
-          margin: 0;
-          padding: 0;
+      <style jsx>{`
+        .printRoot {
+          min-height: 100vh;
           background: #e5e7eb;
-          font-family: Arial, Helvetica, sans-serif;
-        }
-
-        .loading {
           padding: 24px;
           font-family: Arial, Helvetica, sans-serif;
-          color: #111827;
+          color: #000;
         }
 
-        .screenToolbar {
-          width: 210mm;
-          margin: 16px auto 10px auto;
+        .toolbar {
+          max-width: 210mm;
+          margin: 0 auto 16px auto;
           display: flex;
           align-items: center;
-          gap: 12px;
-          font-family: Arial, Helvetica, sans-serif;
+          gap: 16px;
+          color: #475569;
+          font-size: 14px;
         }
 
-        .screenToolbar button {
+        .toolbar button {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
           border: 0;
-          border-radius: 8px;
+          border-radius: 10px;
           background: #14532d;
           color: white;
+          padding: 12px 18px;
+          font-size: 16px;
           font-weight: 800;
-          padding: 10px 14px;
           cursor: pointer;
         }
 
-        .screenToolbar span {
-          font-size: 12px;
-          color: #334155;
-        }
-
-        .pageWrap {
-          width: 210mm;
-          min-height: 297mm;
-          margin: 0 auto 24px auto;
+        .toolbar button:disabled {
+          opacity: 0.55;
+          cursor: wait;
         }
 
         .sheet {
           width: 210mm;
           height: 297mm;
-          background: white;
-          overflow: hidden;
-          padding: 5mm;
-        }
-
-        .sheetBorder {
-          width: 200mm;
-          height: 287mm;
-          border: 0.35mm solid #c9c9c9;
-          padding: 6mm 7mm 5mm 7mm;
-          overflow: hidden;
-          background: white;
-        }
-
-        .labelGrid {
-          display: grid;
-          grid-template-columns: 86mm 86mm;
-          grid-template-rows: 58mm 58mm 58mm;
-          column-gap: 12mm;
-          row-gap: 4mm;
-          width: 184mm;
           margin: 0 auto;
+          background: white;
+          box-sizing: border-box;
+          padding: 8mm 10mm 6mm 10mm;
+          border: 1px solid #cbd5e1;
+          overflow: hidden;
         }
 
-        .labelCard {
-          width: 86mm;
-          height: 58mm;
-          border: 0.35mm solid #111;
-          border-radius: 5mm;
+        .labelsGrid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          grid-template-rows: repeat(3, 68mm);
+          column-gap: 9mm;
+          row-gap: 4mm;
+        }
+
+        .label {
+          height: 68mm;
+          box-sizing: border-box;
+          border: 1.25px solid #111;
+          border-radius: 6mm;
+          padding: 4mm 4mm 3mm 4mm;
           overflow: hidden;
-          padding: 3mm 3mm 2.3mm 3mm;
           display: flex;
           flex-direction: column;
           align-items: center;
-          background: white;
-          color: #000;
+          justify-content: flex-start;
           break-inside: avoid;
           page-break-inside: avoid;
         }
 
-        .qrArea {
+        .qrWrap {
           width: 100%;
-          height: 33mm;
+          height: 38mm;
           display: flex;
           align-items: center;
           justify-content: center;
-          flex: 0 0 auto;
-        }
-
-        .qrArea img {
-          width: 33mm;
-          height: 33mm;
-          display: block;
-          image-rendering: pixelated;
-        }
-
-        .divider {
-          width: 100%;
-          border-top: 0.32mm solid #111;
-          margin: 1.6mm 0 1.3mm 0;
-          flex: 0 0 auto;
-        }
-
-        .labelText {
-          width: 100%;
-          text-align: center;
-          line-height: 1.08;
-          flex: 1 1 auto;
           overflow: hidden;
+        }
+
+        .qr {
+          width: 38mm;
+          height: 38mm;
+          display: block;
+          object-fit: contain;
+        }
+
+        .line {
+          width: 100%;
+          border-top: 1px solid #111;
+          margin: 2mm 0 2mm 0;
         }
 
         .brand {
-          font-size: 11pt;
-          font-weight: 900;
-          letter-spacing: 0.2px;
-        }
-
-        .id {
-          margin-top: 1mm;
-          font-size: 10.5pt;
-          font-weight: 900;
-          line-height: 1.05;
-          white-space: nowrap;
-        }
-
-        .species {
-          margin-top: 1mm;
-          font-size: 9.6pt;
-          font-weight: 700;
-          line-height: 1.05;
-        }
-
-        .meta {
-          margin-top: 0.8mm;
-          font-size: 9.6pt;
-          font-weight: 700;
-          line-height: 1.05;
-        }
-
-        .container {
-          margin-top: 0.8mm;
-          font-size: 9.3pt;
-          font-weight: 700;
-          line-height: 1.05;
-        }
-
-        .instructions {
-          width: 184mm;
-          height: 28mm;
-          margin: 5mm auto 0 auto;
-          border: 0.35mm solid #111;
-          border-radius: 5mm;
-          display: grid;
-          grid-template-columns: 12mm 1fr 56mm;
-          align-items: center;
-          padding: 3mm 5mm;
-          color: #000;
-          background: white;
-          overflow: hidden;
-        }
-
-        .leftIcon {
-          font-size: 18pt;
+          font-size: 15px;
           font-weight: 900;
           line-height: 1;
           text-align: center;
         }
 
-        .instructionTitle {
-          font-size: 11pt;
+        .lotId {
+          margin-top: 1.2mm;
+          font-size: 14px;
+          font-weight: 900;
+          line-height: 1.05;
+          text-align: center;
+          max-width: 100%;
+          word-break: break-word;
+        }
+
+        .species,
+        .meta,
+        .containerText {
+          margin-top: 1mm;
+          font-size: 12.5px;
+          font-weight: 700;
+          line-height: 1.05;
+          text-align: center;
+        }
+
+        .instructions {
+          height: 30mm;
+          margin-top: 5mm;
+          box-sizing: border-box;
+          border: 1.25px solid #111;
+          border-radius: 5mm;
+          padding: 4mm 6mm;
+          display: grid;
+          grid-template-columns: 11mm 1fr 58mm;
+          gap: 5mm;
+          align-items: center;
+          overflow: hidden;
+        }
+
+        .iconBox {
+          font-size: 22px;
+          font-weight: 900;
+          text-align: center;
+        }
+
+        .title {
+          font-size: 13px;
           font-weight: 900;
           margin-bottom: 2mm;
         }
 
-        .instructionLine {
-          font-size: 8.3pt;
+        .row {
+          font-size: 10.5px;
           font-weight: 700;
-          line-height: 1.25;
-          white-space: nowrap;
-        }
-
-        .instructionLine span {
-          color: #15803d;
-          font-weight: 900;
-          margin-right: 1.5mm;
+          line-height: 1.35;
         }
 
         .diagram {
           position: relative;
-          width: 52mm;
           height: 22mm;
         }
 
-        .diagramTop {
+        .measureTop {
           position: absolute;
           top: 0;
-          left: 8mm;
-          width: 31mm;
+          left: 12mm;
+          width: 33mm;
           text-align: center;
-          font-size: 9pt;
-          font-weight: 800;
-          border-bottom: 0.25mm solid #111;
-          padding-bottom: 1mm;
+          font-size: 10px;
+          font-weight: 700;
+          border-bottom: 1px solid #111;
         }
 
-        .diagramTop::before,
-        .diagramTop::after {
-          content: '';
+        .miniLabel {
           position: absolute;
-          bottom: -1.4mm;
-          width: 0;
-          height: 0;
-          border-top: 1.2mm solid transparent;
-          border-bottom: 1.2mm solid transparent;
-        }
-
-        .diagramTop::before {
-          left: -0.5mm;
-          border-right: 1.8mm solid #111;
-        }
-
-        .diagramTop::after {
-          right: -0.5mm;
-          border-left: 1.8mm solid #111;
-        }
-
-        .diagramBox {
-          position: absolute;
-          left: 8mm;
-          bottom: 0;
+          left: 13mm;
+          top: 6mm;
           width: 32mm;
           height: 15mm;
-          border: 0.35mm solid #111;
+          border: 1px solid #111;
           border-radius: 2mm;
           display: flex;
-          flex-direction: column;
           align-items: center;
           justify-content: center;
-          font-size: 8.5pt;
-          line-height: 1.15;
-        }
-
-        .diagramBox strong {
-          font-size: 10pt;
-        }
-
-        .diagramSide {
-          position: absolute;
-          right: 2mm;
-          bottom: 0;
-          height: 15mm;
-          display: flex;
-          align-items: center;
-          font-size: 9pt;
+          text-align: center;
+          font-size: 10px;
           font-weight: 800;
-          border-left: 0.25mm solid #111;
-          padding-left: 2mm;
+          line-height: 1.1;
         }
 
-        .diagramSide::before,
-        .diagramSide::after {
-          content: '';
+        .measureSide {
           position: absolute;
-          left: -1.25mm;
-          width: 0;
-          height: 0;
-          border-left: 1.2mm solid transparent;
-          border-right: 1.2mm solid transparent;
-        }
-
-        .diagramSide::before {
-          top: -0.3mm;
-          border-bottom: 1.8mm solid #111;
-        }
-
-        .diagramSide::after {
-          bottom: -0.3mm;
-          border-top: 1.8mm solid #111;
+          left: 48mm;
+          top: 10mm;
+          font-size: 10px;
+          font-weight: 700;
         }
 
         @media print {
+          @page {
+            size: A4 portrait;
+            margin: 0;
+          }
+
           html,
           body {
             width: 210mm;
             height: 297mm;
+            margin: 0 !important;
+            padding: 0 !important;
             background: white !important;
             overflow: hidden !important;
           }
 
-          .screenToolbar {
-            display: none !important;
-          }
-
-          .pageWrap {
+          .printRoot {
             width: 210mm !important;
             height: 297mm !important;
             min-height: 297mm !important;
             margin: 0 !important;
             padding: 0 !important;
+            background: white !important;
             overflow: hidden !important;
+          }
+
+          .toolbar {
+            display: none !important;
           }
 
           .sheet {
             width: 210mm !important;
             height: 297mm !important;
             margin: 0 !important;
-            padding: 5mm !important;
+            padding: 8mm 10mm 6mm 10mm !important;
+            border: none !important;
             overflow: hidden !important;
             page-break-after: avoid !important;
-            break-after: avoid !important;
+          }
+
+          .label,
+          .instructions {
+            print-color-adjust: exact;
+            -webkit-print-color-adjust: exact;
           }
         }
       `}</style>
-    </>
+    </main>
   );
-}
-
-function fmt(value: any) {
-  return Number(value || 0).toLocaleString('es-CL');
-}
-
-function shortVivero(value: any) {
-  const v = String(value || '').trim();
-
-  if (v.includes('Monte Aranda')) return 'VMA';
-  if (v.includes('Sagrada Familia')) return 'VSF';
-  if (v.includes('Quilimarí')) return 'VQ';
-
-  return v || '-';
 }
