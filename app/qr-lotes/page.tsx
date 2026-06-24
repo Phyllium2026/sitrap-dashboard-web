@@ -51,9 +51,9 @@ export default function QrLotesPage() {
   const esUltimoLote = lote?.ID_Lote_SITRAP === ultimoLoteId;
 
   const loteId = lote?.ID_Lote_SITRAP || '';
-  const qrUrl = loteId ? `${BASE_URL}/lote?id=${encodeURIComponent(loteId)}` : '';
-  const qrImage = loteId
-    ? `https://quickchart.io/qr?size=420&text=${encodeURIComponent(qrUrl)}`
+  const qrUrl = getQrTargetUrl(lote, loteId);
+  const qrImage = qrUrl
+    ? `https://quickchart.io/qr?size=420&margin=1&format=svg&text=${encodeURIComponent(qrUrl)}`
     : '';
 
   const especie = lote?.EspecieMaterial || lote?.Especie || 'Sin especie';
@@ -70,15 +70,15 @@ export default function QrLotesPage() {
     if (!loteId) return;
 
     const params = new URLSearchParams({
-      id: loteId,
+      id: String(loteId),
       especie: String(especie || ''),
       vivero: String(vivero || ''),
       cantidad: String(cantidad || ''),
       contenedor: String(contenedor || ''),
-      url: qrUrl,
+      url: String(qrUrl || ''),
     });
 
-    window.open(`/qr-lotes/print?${params.toString()}`, '_blank', 'noopener,noreferrer');
+    window.location.href = `/qr-lotes/print?${params.toString()}`;
   }
 
   return (
@@ -228,7 +228,10 @@ export default function QrLotesPage() {
       </div>
 
       <style jsx>{`
-        .screenPreview { display: block; }
+        .screenPreview {
+          display: block;
+        }
+
         .label {
           width: 60mm;
           height: 40mm;
@@ -241,16 +244,74 @@ export default function QrLotesPage() {
           color: #000;
           font-family: Arial, sans-serif;
         }
-        .qrBox { display: flex; align-items: center; justify-content: center; }
-        .qr { width: 24mm; height: 24mm; }
-        .labelInfo { display: flex; flex-direction: column; justify-content: center; overflow: hidden; }
-        .brand { font-size: 8px; font-weight: 900; letter-spacing: 0.5px; }
-        .id { margin-top: 2px; font-size: 9px; font-weight: 900; line-height: 1.05; word-break: break-word; }
-        .species { margin-top: 3px; font-size: 8px; font-weight: 700; line-height: 1.1; }
-        .meta { margin-top: 3px; font-size: 7px; font-weight: 700; }
+
+        .qrBox {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .qr {
+          width: 24mm;
+          height: 24mm;
+        }
+
+        .labelInfo {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          overflow: hidden;
+        }
+
+        .brand {
+          font-size: 8px;
+          font-weight: 900;
+          letter-spacing: 0.5px;
+        }
+
+        .id {
+          margin-top: 2px;
+          font-size: 9px;
+          font-weight: 900;
+          line-height: 1.05;
+          word-break: break-word;
+        }
+
+        .species {
+          margin-top: 3px;
+          font-size: 8px;
+          font-weight: 700;
+          line-height: 1.1;
+        }
+
+        .meta {
+          margin-top: 3px;
+          font-size: 7px;
+          font-weight: 700;
+        }
       `}</style>
     </main>
   );
+}
+
+function getQrTargetUrl(lote: any, loteId: string) {
+  const candidate =
+    lote?.URL_QR ||
+    lote?.UrlQR ||
+    lote?.QR_URL ||
+    lote?.URL_Lote ||
+    lote?.Url_Lote ||
+    lote?.Link_QR ||
+    lote?.LinkQR ||
+    lote?.QR ||
+    '';
+
+  const value = String(candidate || '').trim();
+
+  if (value.startsWith('http')) return value;
+  if (!loteId) return '';
+
+  return `${BASE_URL}/lote?id=${encodeURIComponent(loteId)}`;
 }
 
 function fmt(value: any) {
@@ -259,8 +320,10 @@ function fmt(value: any) {
 
 function shortVivero(value: any) {
   const v = String(value || '').trim();
+
   if (v.includes('Monte Aranda')) return 'VMA';
   if (v.includes('Sagrada Familia')) return 'VSF';
   if (v.includes('Quilimarí')) return 'VQ';
+
   return v || '-';
 }
