@@ -47,6 +47,9 @@ export default function QrLotesPage() {
 
   const lote = selected || filtrados[0];
 
+const ultimoLoteId = lotes[0]?.ID_Lote_SITRAP || '';
+const esUltimoLote = lote?.ID_Lote_SITRAP === ultimoLoteId;
+
   const loteId = lote?.ID_Lote_SITRAP || '';
   const qrUrl = loteId ? `${BASE_URL}/lote?id=${encodeURIComponent(loteId)}` : '';
   const qrImage = loteId
@@ -147,6 +150,11 @@ export default function QrLotesPage() {
                 <p className="text-xs text-slate-500">
                   Compatible con impresión térmica 58 mm.
                 </p>
+                {esUltimoLote && (
+  <p className="mt-1 text-xs font-semibold text-green-700">
+    Último lote creado seleccionado automáticamente
+  </p>
+)}
               </div>
 
               <button
