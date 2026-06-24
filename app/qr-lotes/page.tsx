@@ -68,8 +68,17 @@ export default function QrLotesPage() {
 
   function abrirHojaImpresion() {
     if (!loteId) return;
-    const url = `/qr-lotes/print?id=${encodeURIComponent(loteId)}`;
-    window.open(url, '_blank', 'noopener,noreferrer');
+
+    const params = new URLSearchParams({
+      id: loteId,
+      especie: String(especie || ''),
+      vivero: String(vivero || ''),
+      cantidad: String(cantidad || ''),
+      contenedor: String(contenedor || ''),
+      url: qrUrl,
+    });
+
+    window.open(`/qr-lotes/print?${params.toString()}`, '_blank', 'noopener,noreferrer');
   }
 
   return (
@@ -87,7 +96,7 @@ export default function QrLotesPage() {
 
           <Link
             href="/"
-            className="no-print flex items-center gap-2 rounded-lg border px-4 py-2 text-sm hover:bg-slate-100"
+            className="flex items-center gap-2 rounded-lg border px-4 py-2 text-sm hover:bg-slate-100"
           >
             <ArrowLeft size={16} />
             Volver
@@ -95,7 +104,7 @@ export default function QrLotesPage() {
         </div>
 
         <div className="grid gap-6 lg:grid-cols-[1fr_430px]">
-          <section className="no-print rounded-xl border bg-white p-4 shadow-sm">
+          <section className="rounded-xl border bg-white p-4 shadow-sm">
             <div className="mb-4 flex items-center gap-2 rounded-lg border px-3 py-2">
               <Search size={18} className="text-slate-400" />
               <input
@@ -158,7 +167,7 @@ export default function QrLotesPage() {
           </section>
 
           <section className="rounded-xl border bg-white p-5 shadow-sm">
-            <div className="no-print mb-4 flex items-center justify-between">
+            <div className="mb-4 flex items-center justify-between">
               <div>
                 <h2 className="font-bold text-[#14532d]">
                   Vista previa etiqueta
@@ -200,14 +209,11 @@ export default function QrLotesPage() {
                       <div className="meta">
                         {vivero} · {cantidad} pl.
                       </div>
-                      <div className="meta">
-                        {contenedor}
-                      </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="no-print mt-4 rounded-lg bg-slate-50 p-3 text-xs text-slate-600">
+                <div className="mt-4 rounded-lg bg-slate-50 p-3 text-xs text-slate-600">
                   <div><b>ID:</b> {loteId}</div>
                   <div><b>QR apunta a:</b> {qrUrl}</div>
                 </div>
@@ -222,10 +228,7 @@ export default function QrLotesPage() {
       </div>
 
       <style jsx>{`
-        .screenPreview {
-          display: block;
-        }
-
+        .screenPreview { display: block; }
         .label {
           width: 60mm;
           height: 40mm;
@@ -238,57 +241,13 @@ export default function QrLotesPage() {
           color: #000;
           font-family: Arial, sans-serif;
         }
-
-        .qrBox {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-
-        .qr {
-          width: 24mm;
-          height: 24mm;
-        }
-
-        .labelInfo {
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          overflow: hidden;
-        }
-
-        .brand {
-          font-size: 8px;
-          font-weight: 900;
-          letter-spacing: 0.5px;
-        }
-
-        .id {
-          margin-top: 2px;
-          font-size: 9px;
-          font-weight: 900;
-          line-height: 1.05;
-          word-break: break-word;
-        }
-
-        .species {
-          margin-top: 3px;
-          font-size: 8px;
-          font-weight: 700;
-          line-height: 1.1;
-        }
-
-        .meta {
-          margin-top: 3px;
-          font-size: 7px;
-          font-weight: 700;
-        }
-
-        @media print {
-          .no-print {
-            display: none !important;
-          }
-        }
+        .qrBox { display: flex; align-items: center; justify-content: center; }
+        .qr { width: 24mm; height: 24mm; }
+        .labelInfo { display: flex; flex-direction: column; justify-content: center; overflow: hidden; }
+        .brand { font-size: 8px; font-weight: 900; letter-spacing: 0.5px; }
+        .id { margin-top: 2px; font-size: 9px; font-weight: 900; line-height: 1.05; word-break: break-word; }
+        .species { margin-top: 3px; font-size: 8px; font-weight: 700; line-height: 1.1; }
+        .meta { margin-top: 3px; font-size: 7px; font-weight: 700; }
       `}</style>
     </main>
   );
@@ -300,10 +259,8 @@ function fmt(value: any) {
 
 function shortVivero(value: any) {
   const v = String(value || '').trim();
-
   if (v.includes('Monte Aranda')) return 'VMA';
   if (v.includes('Sagrada Familia')) return 'VSF';
   if (v.includes('Quilimarí')) return 'VQ';
-
   return v || '-';
 }
