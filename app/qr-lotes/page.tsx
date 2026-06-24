@@ -16,7 +16,7 @@ export default function QrLotesPage() {
   useEffect(() => {
     async function load() {
       try {
-        const r = await fetch(`${API}?view=lotes`, { cache: 'no-store' });
+        const r = await fetch(`${API}?view=altas`, { cache: 'no-store' });
         const data = await r.json();
         setLotes(Array.isArray(data) ? data : []);
       } catch {
