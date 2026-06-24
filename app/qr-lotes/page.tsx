@@ -220,11 +220,25 @@ export default function QrLotesPage() {
                   </div>
 
                   <div className="printInstructions">
-                    <div className="printTitle">INSTRUCCIONES DE IMPRESIÓN</div>
-                    <div>✓ Papel: A4</div>
-                    <div>✓ Escala: 100% / Tamaño real</div>
-                    <div>✓ Márgenes: mínimos</div>
-                    <div>✓ Se recomienda papel adhesivo A4 y cortar después de imprimir.</div>
+                    <div className="printInstrLeft">
+                      <div className="printInstrHeader">
+                        <Printer size={18} />
+                        <span>INSTRUCCIONES DE IMPRESIÓN</span>
+                      </div>
+                      <div>✓ Papel: A4</div>
+                      <div>✓ Escala: 100% (Tamaño real)</div>
+                      <div>✓ Márgenes: Mínimos</div>
+                      <div>✓ Se recomienda papel adhesivo A4 (cortar después de imprimir).</div>
+                    </div>
+
+                    <div className="printInstrDiagram">
+                      <div className="dimTop">60 mm</div>
+                      <div className="miniLabel">
+                        <div>Etiqueta</div>
+                        <strong>60 x 40 mm</strong>
+                      </div>
+                      <div className="dimSide">40 mm</div>
+                    </div>
                   </div>
                 </div>
 
@@ -311,15 +325,23 @@ export default function QrLotesPage() {
 
         @media print {
           @page {
-            size: A4;
-            margin: 8mm;
+            size: A4 portrait;
+            margin: 7mm;
           }
 
           html,
           body {
+            width: 210mm !important;
+            height: 297mm !important;
             margin: 0 !important;
             padding: 0 !important;
             background: white !important;
+            overflow: hidden !important;
+          }
+
+          * {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
           }
 
           .no-print,
@@ -328,51 +350,64 @@ export default function QrLotesPage() {
           }
 
           main {
+            width: 210mm !important;
+            height: 297mm !important;
+            min-height: 0 !important;
             padding: 0 !important;
             margin: 0 !important;
             background: white !important;
-            min-height: auto !important;
+            overflow: hidden !important;
           }
 
-          main > div {
-            width: auto !important;
-            max-width: none !important;
-            margin: 0 !important;
-          }
-
+          main > div,
+          main > div > div,
           section {
-            border: none !important;
-            box-shadow: none !important;
-            padding: 0 !important;
+            display: block !important;
+            width: 100% !important;
+            max-width: none !important;
+            height: auto !important;
             margin: 0 !important;
+            padding: 0 !important;
+            border: 0 !important;
+            box-shadow: none !important;
             background: white !important;
+          }
+
+          section:first-of-type {
+            display: none !important;
           }
 
           .printSheet {
             display: block !important;
-            width: 194mm;
-            min-height: 281mm;
-            margin: 0 auto;
-            background: white;
+            width: 190mm;
+            height: 283mm;
+            margin: 0 auto !important;
+            padding: 4mm 0 0 0;
+            box-sizing: border-box;
+            background: white !important;
+            overflow: hidden !important;
+            page-break-after: avoid;
+            page-break-before: avoid;
           }
 
           .printGrid {
-            display: grid;
-            grid-template-columns: repeat(2, 88mm);
-            grid-template-rows: repeat(3, 62mm);
-            gap: 5mm 10mm;
+            display: grid !important;
+            grid-template-columns: repeat(2, 82mm);
+            grid-template-rows: repeat(3, 52mm);
+            column-gap: 14mm;
+            row-gap: 4mm;
             justify-content: center;
             align-content: start;
           }
 
           .printLabel {
-            width: 88mm;
-            height: 62mm;
+            width: 82mm;
+            height: 52mm;
             box-sizing: border-box;
-            border: 1.4px solid #111;
-            border-radius: 8mm;
-            padding: 4mm;
-            display: flex;
+            border: 1.3px solid #111;
+            border-radius: 5mm;
+            padding: 3mm 2mm 2.2mm 2mm;
+            display: flex !important;
             flex-direction: column;
             align-items: center;
             justify-content: flex-start;
@@ -381,85 +416,159 @@ export default function QrLotesPage() {
             page-break-inside: avoid;
             font-family: Arial, sans-serif;
             color: #000;
+            background: white;
           }
 
           .printQrBox {
-            height: 32mm;
+            width: 100%;
+            height: 28mm;
             display: flex;
             align-items: center;
             justify-content: center;
+            flex: 0 0 auto;
           }
 
           .printQrBox img {
-            width: 32mm;
-            height: 32mm;
+            width: 28mm;
+            height: 28mm;
             display: block;
           }
 
           .printLine {
             width: 100%;
             border-top: 1px solid #555;
-            margin: 2mm 0 1.5mm 0;
+            margin: 1.4mm 0 1.1mm 0;
+            flex: 0 0 auto;
           }
 
           .printBrand {
-            font-size: 12px;
+            font-size: 10.5pt;
             font-weight: 900;
-            line-height: 1.1;
+            line-height: 1.05;
             text-align: center;
           }
 
           .printId {
-            margin-top: 1mm;
-            font-size: 12px;
+            margin-top: 0.6mm;
+            font-size: 10.5pt;
             font-weight: 900;
-            line-height: 1.1;
+            line-height: 1.05;
             text-align: center;
             word-break: break-word;
           }
 
           .printSpecies {
-            margin-top: 1mm;
-            font-size: 11px;
+            margin-top: 0.6mm;
+            font-size: 9.5pt;
             font-weight: 700;
-            line-height: 1.1;
+            line-height: 1.05;
             text-align: center;
           }
 
           .printMeta {
-            margin-top: 1mm;
-            font-size: 11px;
+            margin-top: 0.6mm;
+            font-size: 9.5pt;
             font-weight: 700;
-            line-height: 1.1;
+            line-height: 1.05;
             text-align: center;
           }
 
           .printContainer {
-            margin-top: 1mm;
-            font-size: 10.5px;
+            margin-top: 0.6mm;
+            font-size: 9.5pt;
             font-weight: 700;
-            line-height: 1.1;
+            line-height: 1.05;
             text-align: center;
           }
 
           .printInstructions {
-            margin: 7mm auto 0 auto;
-            width: 176mm;
-            min-height: 24mm;
-            border: 1.2px solid #111;
-            border-radius: 6mm;
-            padding: 4mm 8mm;
+            width: 164mm;
+            height: 29mm;
+            margin: 6mm auto 0 auto;
+            padding: 3.5mm 6mm;
             box-sizing: border-box;
+            border: 1.2px solid #111;
+            border-radius: 5mm;
+            display: flex !important;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8mm;
             font-family: Arial, sans-serif;
-            font-size: 11px;
+            color: #000;
+            background: white;
+            overflow: hidden;
+          }
+
+          .printInstrLeft {
+            font-size: 8.6pt;
             font-weight: 700;
+            line-height: 1.28;
+          }
+
+          .printInstrHeader {
+            display: flex;
+            align-items: center;
+            gap: 3mm;
+            margin-bottom: 1.8mm;
+            font-size: 10pt;
+            font-weight: 900;
+          }
+
+          .printInstrHeader svg {
+            width: 6mm;
+            height: 6mm;
+            stroke-width: 3;
+          }
+
+          .printInstrDiagram {
+            position: relative;
+            width: 47mm;
+            height: 22mm;
+            flex: 0 0 47mm;
+            font-family: Arial, sans-serif;
             color: #000;
           }
 
-          .printTitle {
-            font-size: 13px;
-            font-weight: 900;
-            margin-bottom: 2mm;
+          .miniLabel {
+            position: absolute;
+            left: 6mm;
+            top: 5mm;
+            width: 32mm;
+            height: 14mm;
+            border: 1px solid #111;
+            border-radius: 2mm;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 7.8pt;
+            line-height: 1.15;
+            text-align: center;
+          }
+
+          .dimTop {
+            position: absolute;
+            left: 6mm;
+            top: 0;
+            width: 32mm;
+            text-align: center;
+            font-size: 8pt;
+            font-weight: 700;
+            border-bottom: 1px solid #111;
+            padding-bottom: 0.5mm;
+          }
+
+          .dimSide {
+            position: absolute;
+            right: 0;
+            top: 8mm;
+            height: 10mm;
+            font-size: 8pt;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            border-left: 1px solid #111;
+            padding-left: 1.5mm;
           }
         }
       `}</style>
