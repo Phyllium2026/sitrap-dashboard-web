@@ -15,11 +15,15 @@ export default function QrLotesPage() {
 
   useEffect(() => {
     async function load() {
-      const r = await fetch(`${API}?view=lotes`, { cache: 'no-store' });
-      const data = await r.json();
-
-      setLotes(Array.isArray(data) ? data : []);
-      setLoading(false);
+      try {
+        const r = await fetch(`${API}?view=lotes`, { cache: 'no-store' });
+        const data = await r.json();
+        setLotes(Array.isArray(data) ? data : []);
+      } catch {
+        setLotes([]);
+      } finally {
+        setLoading(false);
+      }
     }
 
     load();
@@ -28,40 +32,37 @@ export default function QrLotesPage() {
   const filtrados = useMemo(() => {
     const q = query.toLowerCase().trim();
 
-    if (!q) return lotes.slice(0, 50);
+    if (!q) return lotes.slice(0, 80);
 
     return lotes
       .filter((l) => {
         const id = String(l.ID_Lote_SITRAP || '').toLowerCase();
-        const especie = String(l.EspecieMaterial || '').toLowerCase();
+        const especie = String(l.EspecieMaterial || l.Especie || '').toLowerCase();
         const vivero = String(l.Vivero || '').toLowerCase();
 
         return id.includes(q) || especie.includes(q) || vivero.includes(q);
       })
-      .slice(0, 50);
+      .slice(0, 80);
   }, [lotes, query]);
 
   const lote = selected || filtrados[0];
 
   const loteId = lote?.ID_Lote_SITRAP || '';
-  const qrUrl = `${BASE_URL}/lote?id=${encodeURIComponent(loteId)}`;
-
-  const qrImage =
-    loteId
-      ? `https://quickchart.io/qr?size=220&text=${encodeURIComponent(qrUrl)}`
-      : '';
+  const qrUrl = loteId ? `${BASE_URL}/lote?id=${encodeURIComponent(loteId)}` : '';
+  const qrImage = loteId
+    ? `https://quickchart.io/qr?size=220&text=${encodeURIComponent(qrUrl)}`
+    : '';
 
   return (
     <main className="min-h-screen bg-slate-50 p-6">
       <div className="mx-auto max-w-7xl">
-
         <div className="mb-6 flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-[#14532d]">
               QR de Lotes SITRAP
             </h1>
             <p className="text-sm text-slate-500">
-              Etiquetas adhesivas 60 x 40 mm para bandejas de plantas
+              Módulo paralelo seguro para buscar, visualizar e imprimir etiquetas 58 mm.
             </p>
           </div>
 
@@ -74,23 +75,29 @@ export default function QrLotesPage() {
           </Link>
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-[1fr_420px]">
-
+        <div className="grid gap-6 lg:grid-cols-[1fr_430px]">
           <section className="no-print rounded-xl border bg-white p-4 shadow-sm">
             <div className="mb-4 flex items-center gap-2 rounded-lg border px-3 py-2">
               <Search size={18} className="text-slate-400" />
               <input
                 className="w-full outline-none"
-                placeholder="Buscar por ID, especie o vivero..."
+                placeholder="Pegar o buscar ID_Lote_SITRAP, especie o vivero..."
                 value={query}
-                onChange={(e) => setQuery(e.target.value)}
+                onChange={(e) => {
+                  setQuery(e.target.value);
+                  setSelected(null);
+                }}
               />
             </div>
 
             {loading ? (
-              <p>Cargando lotes...</p>
+              <p className="text-sm text-slate-500">Cargando lotes...</p>
+            ) : filtrados.length === 0 ? (
+              <p className="text-sm text-red-600">
+                No se encontró ningún lote con ese criterio.
+              </p>
             ) : (
-              <div className="max-h-[70vh] overflow-auto">
+              <div className="max-h-[70vh] overflow-auto rounded-lg border">
                 <table className="min-w-full text-sm">
                   <thead className="sticky top-0 bg-slate-100">
                     <tr>
@@ -103,12 +110,13 @@ export default function QrLotesPage() {
                   <tbody>
                     {filtrados.map((l, i) => {
                       const id = l.ID_Lote_SITRAP || '-';
+                      const active = lote?.ID_Lote_SITRAP === id;
 
                       return (
                         <tr
-                          key={i}
+                          key={`${id}-${i}`}
                           className={`cursor-pointer border-t hover:bg-green-50 ${
-                            selected?.ID_Lote_SITRAP === id ? 'bg-green-50' : ''
+                            active ? 'bg-green-50' : ''
                           }`}
                           onClick={() => setSelected(l)}
                         >
@@ -116,7 +124,7 @@ export default function QrLotesPage() {
                             {id}
                           </td>
                           <td className="p-2">
-                            {l.EspecieMaterial || '-'}
+                            {l.EspecieMaterial || l.Especie || '-'}
                           </td>
                           <td className="p-2">
                             {l.Vivero || '-'}
@@ -137,13 +145,14 @@ export default function QrLotesPage() {
                   Vista previa etiqueta
                 </h2>
                 <p className="text-xs text-slate-500">
-                  Tamaño: 60 x 40 mm
+                  Compatible con impresión térmica 58 mm.
                 </p>
               </div>
 
               <button
+                disabled={!loteId}
                 onClick={() => window.print()}
-                className="flex items-center gap-2 rounded-lg bg-[#14532d] px-4 py-2 text-sm font-semibold text-white"
+                className="flex items-center gap-2 rounded-lg bg-[#14532d] px-4 py-2 text-sm font-semibold text-white disabled:opacity-40"
               >
                 <Printer size={16} />
                 Imprimir
@@ -151,29 +160,42 @@ export default function QrLotesPage() {
             </div>
 
             {lote ? (
-              <div className="label">
-                <div className="qrBox">
-                  {qrImage && (
-                    <img src={qrImage} alt="QR Lote SITRAP" className="qr" />
-                  )}
+              <>
+                <div className="label">
+                  <div className="qrBox">
+                    {qrImage && (
+                      <img src={qrImage} alt="QR Lote SITRAP" className="qr" />
+                    )}
+                  </div>
+
+                  <div className="labelInfo">
+                    <div className="brand">SITRAP</div>
+                    <div className="id">{loteId}</div>
+                    <div className="species">
+                      {lote.EspecieMaterial || lote.Especie || 'Sin especie'}
+                    </div>
+                    <div className="meta">
+                      {shortVivero(lote.Vivero)} · {fmt(
+                        lote.CantidadInicialP_Corregida ||
+                        lote.CantidadInicialP ||
+                        lote.StockActual ||
+                        0
+                      )} pl.
+                    </div>
+                  </div>
                 </div>
 
-                <div className="labelInfo">
-                  <div className="brand">SITRAP</div>
-                  <div className="id">{loteId}</div>
-                  <div className="species">
-                    {lote.EspecieMaterial || 'Sin especie'}
-                  </div>
-                  <div className="meta">
-                    {shortVivero(lote.Vivero)} · {fmt(lote.CantidadInicialP_Corregida || lote.CantidadInicialP)} pl.
-                  </div>
+                <div className="no-print mt-4 rounded-lg bg-slate-50 p-3 text-xs text-slate-600">
+                  <div><b>ID:</b> {loteId}</div>
+                  <div><b>QR apunta a:</b> {qrUrl}</div>
                 </div>
-              </div>
+              </>
             ) : (
-              <p>No hay lote seleccionado.</p>
+              <p className="text-sm text-slate-500">
+                Selecciona un lote para generar la etiqueta.
+              </p>
             )}
           </section>
-
         </div>
       </div>
 
