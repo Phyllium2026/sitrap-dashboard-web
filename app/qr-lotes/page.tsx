@@ -53,7 +53,7 @@ export default function QrLotesPage() {
   const loteId = lote?.ID_Lote_SITRAP || '';
   const qrUrl = loteId ? `${BASE_URL}/lote?id=${encodeURIComponent(loteId)}` : '';
   const qrImage = loteId
-    ? `https://quickchart.io/qr?size=420&text=${encodeURIComponent(qrUrl)}`
+    ? `https://quickchart.io/qr?size=500&text=${encodeURIComponent(qrUrl)}`
     : '';
 
   const cantidad =
@@ -62,12 +62,12 @@ export default function QrLotesPage() {
     lote?.StockActual ||
     0;
 
-  const etiquetas = Array.from({ length: 12 });
+  const etiquetas = Array.from({ length: 6 });
 
   return (
     <main className="min-h-screen bg-slate-50 p-6">
       <div className="mx-auto max-w-7xl">
-        <div className="mb-6 flex items-center justify-between no-print">
+        <div className="no-print mb-6 flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-[#14532d]">
               QR de Lotes SITRAP
@@ -82,11 +82,11 @@ export default function QrLotesPage() {
             className="flex items-center gap-2 rounded-lg border px-4 py-2 text-sm hover:bg-slate-100"
           >
             <ArrowLeft size={16} />
-            Volver
+            Volver al menú
           </Link>
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-[1fr_500px]">
+        <div className="grid gap-6 lg:grid-cols-[1fr_680px]">
           <section className="no-print rounded-xl border bg-white p-4 shadow-sm">
             <div className="mb-4 flex items-center gap-2 rounded-lg border px-3 py-2">
               <Search size={18} className="text-slate-400" />
@@ -150,16 +150,17 @@ export default function QrLotesPage() {
           </section>
 
           <section className="rounded-xl border bg-white p-5 shadow-sm">
-            <div className="no-print mb-4 flex items-center justify-between">
+            <div className="no-print mb-4 flex items-center justify-between gap-4">
               <div>
                 <h2 className="font-bold text-[#14532d]">
-                  Vista previa etiqueta A4
+                  Vista previa etiquetas A4
                 </h2>
                 <p className="text-xs text-slate-500">
-                  Imprime 12 etiquetas iguales en hoja A4 adhesiva.
+                  Se imprimirán 6 etiquetas iguales en una hoja A4.
                 </p>
+
                 {esUltimoLote && (
-                  <p className="mt-1 text-xs font-semibold text-green-700">
+                  <p className="mt-2 inline-block rounded-lg bg-green-50 px-3 py-2 text-xs font-semibold text-green-700">
                     Último lote creado seleccionado automáticamente
                   </p>
                 )}
@@ -168,25 +169,16 @@ export default function QrLotesPage() {
               <button
                 disabled={!loteId}
                 onClick={() => window.print()}
-                className="flex items-center gap-2 rounded-lg bg-[#14532d] px-4 py-2 text-sm font-semibold text-white disabled:opacity-40"
+                className="flex items-center gap-2 rounded-lg bg-[#14532d] px-5 py-3 text-sm font-semibold text-white disabled:opacity-40"
               >
-                <Printer size={16} />
+                <Printer size={17} />
                 Imprimir etiqueta A4
               </button>
             </div>
 
             {lote ? (
               <>
-                <div className="previewWrap">
-                  <EtiquetaLote
-                    lote={lote}
-                    loteId={loteId}
-                    qrImage={qrImage}
-                    cantidad={cantidad}
-                  />
-                </div>
-
-                <div className="printSheet">
+                <div className="sheetPreview">
                   {etiquetas.map((_, i) => (
                     <EtiquetaLote
                       key={i}
@@ -198,11 +190,23 @@ export default function QrLotesPage() {
                   ))}
                 </div>
 
-                <div className="no-print mt-4 rounded-lg bg-slate-50 p-3 text-xs text-slate-600">
-                  <div><b>ID:</b> {loteId}</div>
-                  <div><b>QR apunta a:</b> {qrUrl}</div>
-                  <div className="mt-2">
-                    <b>Impresión recomendada:</b> hoja A4, escala 100%, márgenes mínimos.
+                <div className="no-print mt-4 rounded-lg border bg-slate-50 p-3 text-xs text-slate-600">
+                  <div>
+                    <b>QR apunta a:</b> {qrUrl}
+                  </div>
+                </div>
+
+                <div className="no-print mt-3 rounded-xl border bg-white p-4">
+                  <div className="mb-2 flex items-center gap-2 font-bold text-slate-800">
+                    <Printer size={18} />
+                    INSTRUCCIONES DE IMPRESIÓN
+                  </div>
+                  <div className="grid gap-1 text-sm text-slate-700">
+                    <div>✅ Papel: A4</div>
+                    <div>✅ Escala: 100% / tamaño real</div>
+                    <div>✅ Márgenes: mínimos</div>
+                    <div>✅ Papel recomendado: adhesivo A4 mate o vinilo adhesivo A4</div>
+                    <div>✅ Cortar después de imprimir</div>
                   </div>
                 </div>
               </>
@@ -216,125 +220,155 @@ export default function QrLotesPage() {
       </div>
 
       <style jsx>{`
-        .previewWrap {
-          display: flex;
+        .sheetPreview {
+          width: 100%;
+          display: grid;
+          grid-template-columns: repeat(2, 90mm);
+          grid-auto-rows: 80mm;
+          gap: 6mm;
           justify-content: center;
-          padding: 18px;
-          background: #f8fafc;
-          border-radius: 12px;
-          border: 1px dashed #cbd5e1;
-        }
-
-        .printSheet {
-          display: none;
+          padding: 10mm 4mm;
+          background: white;
+          border: 1px solid #e5e7eb;
+          border-radius: 10px;
         }
 
         .label {
-          width: 60mm;
-          height: 40mm;
-          display: grid;
-          grid-template-columns: 24mm 1fr;
-          gap: 2mm;
-          padding: 2mm;
+          width: 90mm;
+          height: 80mm;
+          padding: 5mm;
           background: white;
-          border: 1px solid #111;
+          border: 1.5px solid #111;
+          border-radius: 12px;
           color: #000;
           font-family: Arial, sans-serif;
           box-sizing: border-box;
           overflow: hidden;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: flex-start;
         }
 
         .qrBox {
+          height: 42mm;
           display: flex;
           align-items: center;
           justify-content: center;
         }
 
         .qr {
-          width: 23mm;
-          height: 23mm;
+          width: 42mm;
+          height: 42mm;
+          display: block;
         }
 
-        .labelInfo {
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          overflow: hidden;
+        .divider {
+          width: 100%;
+          border-top: 1px solid #555;
+          margin: 3mm 0 2.5mm 0;
         }
 
         .brand {
-          font-size: 9px;
+          font-size: 14px;
           font-weight: 900;
-          letter-spacing: 0.8px;
+          color: #14532d;
+          line-height: 1.1;
+          text-align: center;
         }
 
         .id {
-          margin-top: 2px;
-          font-size: 9px;
+          margin-top: 1.5mm;
+          font-size: 14px;
           font-weight: 900;
-          line-height: 1.05;
+          line-height: 1.15;
+          text-align: center;
           word-break: break-word;
         }
 
         .species {
-          margin-top: 3px;
-          font-size: 8.5px;
-          font-weight: 800;
-          line-height: 1.1;
+          margin-top: 1.5mm;
+          font-size: 13px;
+          font-weight: 700;
+          line-height: 1.15;
+          text-align: center;
         }
 
         .meta {
-          margin-top: 3px;
-          font-size: 8px;
-          font-weight: 700;
+          margin-top: 1.5mm;
+          font-size: 12.5px;
+          font-weight: 800;
+          line-height: 1.15;
+          text-align: center;
         }
 
-        .smallMeta {
-          margin-top: 2px;
-          font-size: 7px;
+        .containerText {
+          margin-top: 1.5mm;
+          font-size: 12px;
           font-weight: 700;
+          line-height: 1.15;
+          text-align: center;
         }
 
         @media print {
           @page {
             size: A4;
-            margin: 10mm;
+            margin: 8mm;
           }
 
+          html,
           body {
             margin: 0 !important;
+            padding: 0 !important;
             background: white !important;
           }
 
-          .no-print,
-          .previewWrap {
+          .no-print {
             display: none !important;
           }
 
           main {
             padding: 0 !important;
+            margin: 0 !important;
+            background: white !important;
+            min-height: auto !important;
+          }
+
+          main > div {
+            max-width: none !important;
+            width: auto !important;
+            margin: 0 !important;
+          }
+
+          section {
+            border: none !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
             background: white !important;
           }
 
-          .printSheet {
+          .sheetPreview {
+            width: 194mm !important;
+            height: 281mm !important;
             display: grid !important;
-            grid-template-columns: repeat(3, 60mm);
-            grid-auto-rows: 40mm;
-            gap: 5mm 5mm;
-            justify-content: center;
-            align-content: start;
-            width: 190mm;
-            min-height: 277mm;
-            margin: 0 auto;
-            background: white;
+            grid-template-columns: repeat(2, 90mm) !important;
+            grid-template-rows: repeat(3, 80mm) !important;
+            gap: 6mm 8mm !important;
+            justify-content: center !important;
+            align-content: start !important;
+            padding: 0 !important;
+            margin: 0 auto !important;
+            border: none !important;
+            border-radius: 0 !important;
+            background: white !important;
           }
 
           .label {
-            width: 60mm !important;
-            height: 40mm !important;
-            border: 1px solid #111 !important;
-            page-break-inside: avoid;
-            break-inside: avoid;
+            width: 90mm !important;
+            height: 80mm !important;
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
           }
         }
       `}</style>
@@ -361,18 +395,22 @@ function EtiquetaLote({
         )}
       </div>
 
-      <div className="labelInfo">
-        <div className="brand">SITRAP</div>
-        <div className="id">{loteId}</div>
-        <div className="species">
-          {lote.EspecieMaterial || lote.Especie || 'Sin especie'}
-        </div>
-        <div className="meta">
-          {shortVivero(lote.Vivero)} · {fmt(cantidad)} pl.
-        </div>
-        <div className="smallMeta">
-          {lote.Contenedor || lote.TipoContenedor || 'Contenedor s/i'}
-        </div>
+      <div className="divider" />
+
+      <div className="brand">SITRAP</div>
+
+      <div className="id">{loteId}</div>
+
+      <div className="species">
+        {lote.EspecieMaterial || lote.Especie || 'Sin especie'}
+      </div>
+
+      <div className="meta">
+        {shortVivero(lote.Vivero)} • {fmt(cantidad)} plantas
+      </div>
+
+      <div className="containerText">
+        {lote.Contenedor || lote.TipoContenedor || 'Contenedor s/i'}
       </div>
     </div>
   );
