@@ -220,25 +220,11 @@ export default function QrLotesPage() {
                   </div>
 
                   <div className="printInstructions">
-                    <div className="printInstrLeft">
-                      <div className="printInstrHeader">
-                        <Printer size={18} />
-                        <span>INSTRUCCIONES DE IMPRESIÓN</span>
-                      </div>
-                      <div>✓ Papel: A4</div>
-                      <div>✓ Escala: 100% (Tamaño real)</div>
-                      <div>✓ Márgenes: Mínimos</div>
-                      <div>✓ Se recomienda papel adhesivo A4 (cortar después de imprimir).</div>
-                    </div>
-
-                    <div className="printInstrDiagram">
-                      <div className="dimTop">60 mm</div>
-                      <div className="miniLabel">
-                        <div>Etiqueta</div>
-                        <strong>60 x 40 mm</strong>
-                      </div>
-                      <div className="dimSide">40 mm</div>
-                    </div>
+                    <div className="printTitle">INSTRUCCIONES DE IMPRESIÓN</div>
+                    <div>✓ Papel: A4</div>
+                    <div>✓ Escala: 100% / Tamaño real</div>
+                    <div>✓ Márgenes: mínimos</div>
+                    <div>✓ Se recomienda papel adhesivo A4 y cortar después de imprimir.</div>
                   </div>
                 </div>
 
@@ -256,7 +242,7 @@ export default function QrLotesPage() {
         </div>
       </div>
 
-      <style jsx>{`
+      <style jsx global>{`
         .screenPreview {
           display: block;
         }
@@ -335,13 +321,35 @@ export default function QrLotesPage() {
             height: 297mm !important;
             margin: 0 !important;
             padding: 0 !important;
-            background: white !important;
+            background: #fff !important;
             overflow: hidden !important;
-          }
-
-          * {
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
+          }
+
+          body * {
+            visibility: hidden !important;
+          }
+
+          .printSheet,
+          .printSheet * {
+            visibility: visible !important;
+          }
+
+          .printSheet {
+            display: block !important;
+            position: fixed !important;
+            left: 7mm !important;
+            top: 7mm !important;
+            width: 196mm !important;
+            height: 283mm !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            box-sizing: border-box !important;
+            background: #fff !important;
+            overflow: hidden !important;
+            font-family: Arial, sans-serif !important;
+            color: #000 !important;
           }
 
           .no-print,
@@ -349,226 +357,112 @@ export default function QrLotesPage() {
             display: none !important;
           }
 
-          main {
-            width: 210mm !important;
-            height: 297mm !important;
-            min-height: 0 !important;
-            padding: 0 !important;
-            margin: 0 !important;
-            background: white !important;
-            overflow: hidden !important;
-          }
-
-          main > div,
-          main > div > div,
-          section {
-            display: block !important;
-            width: 100% !important;
-            max-width: none !important;
+          .printGrid {
+            display: grid !important;
+            grid-template-columns: 88mm 88mm !important;
+            grid-template-rows: 58mm 58mm 58mm !important;
+            column-gap: 14mm !important;
+            row-gap: 5mm !important;
+            justify-content: center !important;
+            align-content: start !important;
+            width: 196mm !important;
             height: auto !important;
             margin: 0 !important;
             padding: 0 !important;
-            border: 0 !important;
-            box-shadow: none !important;
-            background: white !important;
-          }
-
-          section:first-of-type {
-            display: none !important;
-          }
-
-          .printSheet {
-            display: block !important;
-            width: 190mm;
-            height: 283mm;
-            margin: 0 auto !important;
-            padding: 4mm 0 0 0;
-            box-sizing: border-box;
-            background: white !important;
-            overflow: hidden !important;
-            page-break-after: avoid;
-            page-break-before: avoid;
-          }
-
-          .printGrid {
-            display: grid !important;
-            grid-template-columns: repeat(2, 82mm);
-            grid-template-rows: repeat(3, 52mm);
-            column-gap: 14mm;
-            row-gap: 4mm;
-            justify-content: center;
-            align-content: start;
+            box-sizing: border-box !important;
           }
 
           .printLabel {
-            width: 82mm;
-            height: 52mm;
-            box-sizing: border-box;
-            border: 1.3px solid #111;
-            border-radius: 5mm;
-            padding: 3mm 2mm 2.2mm 2mm;
+            width: 88mm !important;
+            height: 58mm !important;
+            box-sizing: border-box !important;
+            border: 1.2px solid #111 !important;
+            border-radius: 6mm !important;
+            padding: 3mm 3.5mm 2.5mm 3.5mm !important;
             display: flex !important;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            overflow: hidden;
-            break-inside: avoid;
-            page-break-inside: avoid;
-            font-family: Arial, sans-serif;
-            color: #000;
-            background: white;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: flex-start !important;
+            overflow: hidden !important;
+            break-inside: avoid !important;
+            page-break-inside: avoid !important;
+            background: #fff !important;
+            color: #000 !important;
           }
 
           .printQrBox {
-            width: 100%;
-            height: 28mm;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex: 0 0 auto;
+            width: 100% !important;
+            height: 34mm !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            flex: 0 0 auto !important;
           }
 
           .printQrBox img {
-            width: 28mm;
-            height: 28mm;
-            display: block;
+            width: 34mm !important;
+            height: 34mm !important;
+            display: block !important;
           }
 
           .printLine {
-            width: 100%;
-            border-top: 1px solid #555;
-            margin: 1.4mm 0 1.1mm 0;
-            flex: 0 0 auto;
+            width: 100% !important;
+            border-top: 1px solid #555 !important;
+            margin: 1.5mm 0 1.2mm 0 !important;
+            height: 0 !important;
+            flex: 0 0 auto !important;
           }
 
           .printBrand {
-            font-size: 10.5pt;
-            font-weight: 900;
-            line-height: 1.05;
-            text-align: center;
+            font-size: 11px !important;
+            font-weight: 900 !important;
+            line-height: 1.05 !important;
+            text-align: center !important;
+            margin: 0 !important;
           }
 
           .printId {
-            margin-top: 0.6mm;
-            font-size: 10.5pt;
-            font-weight: 900;
-            line-height: 1.05;
-            text-align: center;
-            word-break: break-word;
+            margin: 0.6mm 0 0 0 !important;
+            font-size: 11px !important;
+            font-weight: 900 !important;
+            line-height: 1.05 !important;
+            text-align: center !important;
+            word-break: break-word !important;
           }
 
-          .printSpecies {
-            margin-top: 0.6mm;
-            font-size: 9.5pt;
-            font-weight: 700;
-            line-height: 1.05;
-            text-align: center;
-          }
-
-          .printMeta {
-            margin-top: 0.6mm;
-            font-size: 9.5pt;
-            font-weight: 700;
-            line-height: 1.05;
-            text-align: center;
-          }
-
+          .printSpecies,
+          .printMeta,
           .printContainer {
-            margin-top: 0.6mm;
-            font-size: 9.5pt;
-            font-weight: 700;
-            line-height: 1.05;
-            text-align: center;
+            margin: 0.6mm 0 0 0 !important;
+            font-size: 10px !important;
+            font-weight: 700 !important;
+            line-height: 1.05 !important;
+            text-align: center !important;
           }
 
           .printInstructions {
-            width: 164mm;
-            height: 29mm;
-            margin: 6mm auto 0 auto;
-            padding: 3.5mm 6mm;
-            box-sizing: border-box;
-            border: 1.2px solid #111;
-            border-radius: 5mm;
-            display: flex !important;
-            align-items: center;
-            justify-content: space-between;
-            gap: 8mm;
-            font-family: Arial, sans-serif;
-            color: #000;
-            background: white;
-            overflow: hidden;
+            width: 176mm !important;
+            min-height: 25mm !important;
+            margin: 7mm auto 0 auto !important;
+            border: 1.2px solid #111 !important;
+            border-radius: 5mm !important;
+            padding: 3.5mm 8mm !important;
+            box-sizing: border-box !important;
+            background: #fff !important;
+            color: #000 !important;
+            font-family: Arial, sans-serif !important;
+            font-size: 10.5px !important;
+            font-weight: 700 !important;
+            line-height: 1.35 !important;
+            break-inside: avoid !important;
+            page-break-inside: avoid !important;
           }
 
-          .printInstrLeft {
-            font-size: 8.6pt;
-            font-weight: 700;
-            line-height: 1.28;
-          }
-
-          .printInstrHeader {
-            display: flex;
-            align-items: center;
-            gap: 3mm;
-            margin-bottom: 1.8mm;
-            font-size: 10pt;
-            font-weight: 900;
-          }
-
-          .printInstrHeader svg {
-            width: 6mm;
-            height: 6mm;
-            stroke-width: 3;
-          }
-
-          .printInstrDiagram {
-            position: relative;
-            width: 47mm;
-            height: 22mm;
-            flex: 0 0 47mm;
-            font-family: Arial, sans-serif;
-            color: #000;
-          }
-
-          .miniLabel {
-            position: absolute;
-            left: 6mm;
-            top: 5mm;
-            width: 32mm;
-            height: 14mm;
-            border: 1px solid #111;
-            border-radius: 2mm;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            font-size: 7.8pt;
-            line-height: 1.15;
-            text-align: center;
-          }
-
-          .dimTop {
-            position: absolute;
-            left: 6mm;
-            top: 0;
-            width: 32mm;
-            text-align: center;
-            font-size: 8pt;
-            font-weight: 700;
-            border-bottom: 1px solid #111;
-            padding-bottom: 0.5mm;
-          }
-
-          .dimSide {
-            position: absolute;
-            right: 0;
-            top: 8mm;
-            height: 10mm;
-            font-size: 8pt;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            border-left: 1px solid #111;
-            padding-left: 1.5mm;
+          .printTitle {
+            font-size: 12px !important;
+            font-weight: 900 !important;
+            margin: 0 0 1.5mm 0 !important;
+            line-height: 1.2 !important;
           }
         }
       `}</style>
