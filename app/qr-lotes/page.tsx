@@ -66,8 +66,6 @@ export default function QrLotesPage() {
       0
   );
 
-  const contenedor = normalizaContenedor(lote, loteId);
-
   function abrirImpresion() {
     if (!loteId) return;
 
@@ -76,7 +74,6 @@ export default function QrLotesPage() {
       especie: String(especie || ''),
       vivero: String(vivero || ''),
       cantidad: String(cantidad || ''),
-      contenedor: String(contenedor || ''),
       url: qrUrl,
     });
 
@@ -211,7 +208,6 @@ export default function QrLotesPage() {
                       <div className="meta">
                         {vivero} · {cantidad} pl.
                       </div>
-                      <div className="containerText">{contenedor}</div>
                     </div>
                   </div>
                 </div>
@@ -219,7 +215,6 @@ export default function QrLotesPage() {
                 <div className="mt-4 rounded-lg bg-slate-50 p-3 text-xs text-slate-600">
                   <div><b>ID:</b> {loteId}</div>
                   <div><b>QR apunta a:</b> {qrUrl}</div>
-                  <div><b>Contenedor:</b> {contenedor}</div>
                 </div>
               </>
             ) : (
@@ -293,12 +288,6 @@ export default function QrLotesPage() {
           font-size: 7px;
           font-weight: 700;
         }
-
-        .containerText {
-          margin-top: 3px;
-          font-size: 7px;
-          font-weight: 700;
-        }
       `}</style>
     </main>
   );
@@ -316,27 +305,4 @@ function shortVivero(value: any) {
   if (v.includes('Quilimarí')) return 'VQ';
 
   return v || '-';
-}
-
-function normalizaContenedor(lote: any, loteId: string) {
-  const directo =
-    lote?.Contenedor ||
-    lote?.TipoContenedor ||
-    lote?.Tipo_Contenedor ||
-    lote?.Tipo_de_Contenedor ||
-    lote?.TipoContenedorActual ||
-    lote?.ContenedorActual ||
-    lote?.Envase ||
-    '';
-
-  const limpio = String(directo || '').trim();
-
-  if (limpio && limpio.toLowerCase() !== 'contenedor s/i' && limpio.toLowerCase() !== 's/i') {
-    return limpio;
-  }
-
-  const partes = String(loteId || '').split('-').filter(Boolean);
-  const desdeId = partes.length >= 2 ? partes[partes.length - 2] : '';
-
-  return desdeId || 'Contenedor s/i';
 }
