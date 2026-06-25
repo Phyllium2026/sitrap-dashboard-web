@@ -11,7 +11,6 @@ type PrintData = {
   especie: string;
   vivero: string;
   cantidad: string;
-  contenedor: string;
   url: string;
 };
 
@@ -21,7 +20,6 @@ export default function PrintQrLotesPage() {
     especie: '',
     vivero: '',
     cantidad: '',
-    contenedor: '',
     url: '',
   });
 
@@ -32,8 +30,6 @@ export default function PrintQrLotesPage() {
     const especie = params.get('especie') || 'Sin especie';
     const vivero = params.get('vivero') || '-';
     const cantidad = params.get('cantidad') || '0';
-    const contenedorParam = params.get('contenedor') || '';
-    const contenedor = normalizaContenedorPrint(contenedorParam, id);
     const urlFromParams = params.get('url') || '';
 
     setData({
@@ -41,7 +37,6 @@ export default function PrintQrLotesPage() {
       especie,
       vivero,
       cantidad,
-      contenedor,
       url: urlFromParams || (id ? `${BASE_URL}/lote?id=${encodeURIComponent(id)}` : ''),
     });
   }, []);
@@ -87,51 +82,29 @@ export default function PrintQrLotesPage() {
         <div className="grid">
           {labels.map((_, index) => (
             <article className="label" key={index}>
-              <div className="qrBox">
-                {qrImage ? (
-                  <img src={qrImage} alt="QR Lote SITRAP" className="qr" />
-                ) : (
-                  <div className="qrEmpty">QR</div>
-                )}
-              </div>
-
-              <div className="line" />
-
-              <div className="textBlock">
-                <div className="brand">SITRAP</div>
-                <div className="id">{data.id || 'ID_Lote_SITRAP'}</div>
-                <div className="species">{data.especie}</div>
-                <div className="meta">
-                  {data.vivero} - {data.cantidad} pl.
+              <div className="labelInner">
+                <div className="qrBox">
+                  {qrImage ? (
+                    <img src={qrImage} alt="QR Lote SITRAP" className="qr" />
+                  ) : (
+                    <div className="qrEmpty">QR</div>
+                  )}
                 </div>
-                <div className="container">{data.contenedor}</div>
+
+                <div className="line" />
+
+                <div className="textBlock">
+                  <div className="brand">SITRAP</div>
+                  <div className="id">{data.id || 'ID_Lote_SITRAP'}</div>
+                  <div className="species">{data.especie}</div>
+                  <div className="meta">
+                    {data.vivero} - {data.cantidad} pl.
+                  </div>
+                </div>
               </div>
             </article>
           ))}
         </div>
-
-        <footer className="instructions">
-          <div className="info">
-            <div className="icon">▣</div>
-
-            <div>
-              <div className="title">INSTRUCCIONES DE IMPRESIÓN</div>
-              <div className="item"><span>✓</span> Papel: A4</div>
-              <div className="item"><span>✓</span> Escala: 100% / Tamaño real</div>
-              <div className="item"><span>✓</span> Márgenes: mínimos</div>
-              <div className="item"><span>✓</span> Papel adhesivo A4. Cortar cada etiqueta después de imprimir.</div>
-            </div>
-          </div>
-
-          <div className="diagram">
-            <div className="topMeasure">82 mm</div>
-            <div className="diagramBox">
-              <div>Etiqueta</div>
-              <strong>82 x 58 mm</strong>
-            </div>
-            <div className="sideMeasure">58 mm</div>
-          </div>
-        </footer>
       </section>
 
       <style jsx>{`
@@ -202,7 +175,7 @@ export default function PrintQrLotesPage() {
           box-sizing: border-box;
           background: white;
           border: 1px solid #d0d0d0;
-          padding: 7mm 8mm;
+          padding: 9mm 8mm;
           overflow: hidden;
         }
 
@@ -211,7 +184,7 @@ export default function PrintQrLotesPage() {
           grid-template-columns: repeat(2, 82mm);
           grid-template-rows: repeat(3, 58mm);
           column-gap: 10mm;
-          row-gap: 4mm;
+          row-gap: 10mm;
           justify-content: center;
         }
 
@@ -221,18 +194,27 @@ export default function PrintQrLotesPage() {
           box-sizing: border-box;
           border: 1.5px solid #111;
           border-radius: 6mm;
-          padding: 3.2mm 4mm 4mm 4mm;
+          padding: 3.2mm 4mm;
           display: flex;
           flex-direction: column;
           align-items: center;
+          justify-content: center;
           overflow: hidden;
           break-inside: avoid;
           page-break-inside: avoid;
         }
 
+        .labelInner {
+          width: 100%;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+        }
+
         .qrBox {
-          width: 33mm;
-          height: 29mm;
+          width: 37mm;
+          height: 35mm;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -240,15 +222,15 @@ export default function PrintQrLotesPage() {
         }
 
         .qr {
-          width: 29mm;
-          height: 29mm;
+          width: 35mm;
+          height: 35mm;
           object-fit: contain;
           display: block;
         }
 
         .qrEmpty {
-          width: 29mm;
-          height: 29mm;
+          width: 35mm;
+          height: 35mm;
           border: 1px solid #ddd;
           color: #999;
           display: flex;
@@ -260,13 +242,12 @@ export default function PrintQrLotesPage() {
         .line {
           width: 100%;
           border-top: 1.25px solid #111;
-          margin: 1.5mm 0 1.4mm 0;
+          margin: 1.6mm 0 1.5mm 0;
         }
 
         .textBlock {
           width: 100%;
           text-align: center;
-          padding-bottom: 1.5mm;
         }
 
         .brand {
@@ -288,8 +269,7 @@ export default function PrintQrLotesPage() {
         }
 
         .species,
-        .meta,
-        .container {
+        .meta {
           font-size: 9.5px;
           font-weight: 800;
           line-height: 1.08;
@@ -298,104 +278,6 @@ export default function PrintQrLotesPage() {
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
-        }
-
-        .instructions {
-          height: 29mm;
-          margin-top: 5mm;
-          border: 1.5px solid #111;
-          border-radius: 5mm;
-          box-sizing: border-box;
-          padding: 3.2mm 6mm;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: 7mm;
-          overflow: hidden;
-        }
-
-        .info {
-          display: flex;
-          gap: 4mm;
-          align-items: flex-start;
-        }
-
-        .icon {
-          width: 9mm;
-          height: 9mm;
-          border: 1.3px solid #111;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 14px;
-          font-weight: 900;
-          margin-top: 2mm;
-        }
-
-        .title {
-          font-size: 12.5px;
-          font-weight: 900;
-          margin-bottom: 1.8mm;
-        }
-
-        .item {
-          font-size: 9.6px;
-          font-weight: 800;
-          line-height: 1.28;
-        }
-
-        .item span {
-          display: inline-flex;
-          width: 12px;
-          height: 12px;
-          align-items: center;
-          justify-content: center;
-          border-radius: 50%;
-          background: #14803c;
-          color: white;
-          font-size: 8px;
-          margin-right: 4px;
-        }
-
-        .diagram {
-          width: 45mm;
-          height: 21mm;
-          position: relative;
-          flex: 0 0 auto;
-        }
-
-        .topMeasure {
-          text-align: center;
-          font-size: 9px;
-          font-weight: 900;
-          border-bottom: 1.2px solid #111;
-          margin-bottom: 1.4mm;
-        }
-
-        .diagramBox {
-          width: 32mm;
-          height: 14mm;
-          border: 1.2px solid #111;
-          border-radius: 2mm;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          font-size: 9px;
-          font-weight: 800;
-          margin-left: 4mm;
-        }
-
-        .diagramBox strong {
-          font-size: 9.5px;
-        }
-
-        .sideMeasure {
-          position: absolute;
-          right: 0;
-          top: 9mm;
-          font-size: 9px;
-          font-weight: 900;
         }
 
         @media print {
@@ -427,7 +309,7 @@ export default function PrintQrLotesPage() {
             width: 190mm !important;
             height: 267mm !important;
             margin: 0 auto !important;
-            padding: 7mm 8mm !important;
+            padding: 9mm 8mm !important;
             border: none !important;
             box-shadow: none !important;
             overflow: hidden !important;
@@ -438,21 +320,4 @@ export default function PrintQrLotesPage() {
       `}</style>
     </main>
   );
-}
-
-function normalizaContenedorPrint(value: string, loteId: string) {
-  const limpio = String(value || '').trim();
-
-  if (
-    limpio &&
-    limpio.toLowerCase() !== 'contenedor s/i' &&
-    limpio.toLowerCase() !== 's/i'
-  ) {
-    return limpio;
-  }
-
-  const partes = String(loteId || '').split('-').filter(Boolean);
-  const desdeId = partes.length >= 2 ? partes[partes.length - 2] : '';
-
-  return desdeId || 'Contenedor s/i';
 }
