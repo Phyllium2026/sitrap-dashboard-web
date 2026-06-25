@@ -51,34 +51,36 @@ export default function QrLotesPage() {
   const esUltimoLote = lote?.ID_Lote_SITRAP === ultimoLoteId;
 
   const loteId = lote?.ID_Lote_SITRAP || '';
-  const qrUrl = getQrTargetUrl(lote, loteId);
-  const qrImage = qrUrl
-    ? `https://quickchart.io/qr?size=420&margin=1&format=svg&text=${encodeURIComponent(qrUrl)}`
+  const qrUrl = loteId ? `${BASE_URL}/lote?id=${encodeURIComponent(loteId)}` : '';
+
+  const qrImage = loteId
+    ? `https://quickchart.io/qr?size=420&text=${encodeURIComponent(qrUrl)}`
     : '';
 
   const especie = lote?.EspecieMaterial || lote?.Especie || 'Sin especie';
   const vivero = shortVivero(lote?.Vivero);
   const cantidad = fmt(
     lote?.CantidadInicialP_Corregida ||
-    lote?.CantidadInicialP ||
-    lote?.StockActual ||
-    0
+      lote?.CantidadInicialP ||
+      lote?.StockActual ||
+      0
   );
-  const contenedor = lote?.Contenedor || lote?.TipoContenedor || 'Contenedor s/i';
 
-  function abrirHojaImpresion() {
+  const contenedor = normalizaContenedor(lote, loteId);
+
+  function abrirImpresion() {
     if (!loteId) return;
 
     const params = new URLSearchParams({
-      id: String(loteId),
+      id: loteId,
       especie: String(especie || ''),
       vivero: String(vivero || ''),
       cantidad: String(cantidad || ''),
       contenedor: String(contenedor || ''),
-      url: String(qrUrl || ''),
+      url: qrUrl,
     });
 
-    window.location.href = `/qr-lotes/print?${params.toString()}`;
+    window.open(`/qr-lotes/print?${params.toString()}`, '_blank');
   }
 
   return (
@@ -184,7 +186,7 @@ export default function QrLotesPage() {
 
               <button
                 disabled={!loteId}
-                onClick={abrirHojaImpresion}
+                onClick={abrirImpresion}
                 className="flex items-center gap-2 rounded-lg bg-[#14532d] px-4 py-2 text-sm font-semibold text-white disabled:opacity-40"
               >
                 <Printer size={16} />
@@ -209,6 +211,7 @@ export default function QrLotesPage() {
                       <div className="meta">
                         {vivero} · {cantidad} pl.
                       </div>
+                      <div className="containerText">{contenedor}</div>
                     </div>
                   </div>
                 </div>
@@ -216,6 +219,7 @@ export default function QrLotesPage() {
                 <div className="mt-4 rounded-lg bg-slate-50 p-3 text-xs text-slate-600">
                   <div><b>ID:</b> {loteId}</div>
                   <div><b>QR apunta a:</b> {qrUrl}</div>
+                  <div><b>Contenedor:</b> {contenedor}</div>
                 </div>
               </>
             ) : (
@@ -289,29 +293,15 @@ export default function QrLotesPage() {
           font-size: 7px;
           font-weight: 700;
         }
+
+        .containerText {
+          margin-top: 3px;
+          font-size: 7px;
+          font-weight: 700;
+        }
       `}</style>
     </main>
   );
-}
-
-function getQrTargetUrl(lote: any, loteId: string) {
-  const candidate =
-    lote?.URL_QR ||
-    lote?.UrlQR ||
-    lote?.QR_URL ||
-    lote?.URL_Lote ||
-    lote?.Url_Lote ||
-    lote?.Link_QR ||
-    lote?.LinkQR ||
-    lote?.QR ||
-    '';
-
-  const value = String(candidate || '').trim();
-
-  if (value.startsWith('http')) return value;
-  if (!loteId) return '';
-
-  return `${BASE_URL}/lote?id=${encodeURIComponent(loteId)}`;
 }
 
 function fmt(value: any) {
@@ -326,4 +316,27 @@ function shortVivero(value: any) {
   if (v.includes('Quilimarí')) return 'VQ';
 
   return v || '-';
+}
+
+function normalizaContenedor(lote: any, loteId: string) {
+  const directo =
+    lote?.Contenedor ||
+    lote?.TipoContenedor ||
+    lote?.Tipo_Contenedor ||
+    lote?.Tipo_de_Contenedor ||
+    lote?.TipoContenedorActual ||
+    lote?.ContenedorActual ||
+    lote?.Envase ||
+    '';
+
+  const limpio = String(directo || '').trim();
+
+  if (limpio && limpio.toLowerCase() !== 'contenedor s/i' && limpio.toLowerCase() !== 's/i') {
+    return limpio;
+  }
+
+  const partes = String(loteId || '').split('-').filter(Boolean);
+  const desdeId = partes.length >= 2 ? partes[partes.length - 2] : '';
+
+  return desdeId || 'Contenedor s/i';
 }
