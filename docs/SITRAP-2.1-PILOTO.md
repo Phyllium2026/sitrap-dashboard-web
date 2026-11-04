@@ -47,3 +47,12 @@ Prueba de navegador Chromium: navegación de módulos, carga de ejemplo, reapert
 - E1 contiene códigos repetidos: se mantienen los valores originales, se valida la identidad al agrupar y queda pendiente depurar esos catálogos con el responsable. No se publican registros productivos ni datos personales del Excel.
 - No se migran códigos antiguos ni se inventan fechas de colecta para los ensayos anteriores. El nuevo formato aplica a nuevos registros; cambios de calidad de esos registros conservan CLS.
 - Se agregan cuatro pruebas: catálogos/agrupación, validaciones, reclasificación con CLS y colisiones.
+
+## Corrección 2.1.2 (sustituye la regla de fechas de 2.1.1)
+Colecta y siembra se ingresan por mes/año; ambas fechas se codifican MMYY. Se elimina la referencia opcional de colecta. Las incorporaciones con la misma combinación mensual CLS+CLP se agrupan; meses de colecta distintos permanecen separados. Los registros previos mantienen códigos e historial, sin recodificación automática.
+
+La ubicación interna del registro inicial se exige solo en VMA. En VQ/VSF se registra la existencia en el vivero (ubicación general), ignorando cualquier ubicación interna enviada. La recepción de traslados a VMA asigna ubicación en destino. Se mantiene la validación de Supervisor por vivero.
+
+El módulo DIM Ubicación permite agregar sectores y ubicaciones reales. Los archivos E1 (4) y E2 (7) entregados no contienen la hoja DIM Ubicación: el listado completo de VMA sigue pendiente de entrega. Se conservan las ubicaciones existentes del ensayo sin presentarlas como un catálogo completo.
+
+Validación: 15 pruebas del modelo y prueba móvil del formulario, ocultamiento de ubicación en VSF, guardado de código mensual y catálogo offline.
