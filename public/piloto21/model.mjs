@@ -1,5 +1,6 @@
+import {CATALOGS} from './catalogs.mjs';
 // SITRAP 2.1: deterministic command model, no network or production writes.
-export const VERSION = '2.1.0';
+export const VERSION = '2.1.1';
 export const ROLES = ['Supervisor de Vivero','Supervisor ITO','AdC MLP'];
 export const NURSERIES = {VMA:'Monte Aranda',VQ:'Quillota',VSF:'Sagrada Familia'};
 export const uid = () => globalThis.crypto.randomUUID();
@@ -8,8 +9,23 @@ const requireThat=(ok,msg)=>{if(!ok)throw new Error(msg)};
 const qty=x=>{const n=Number(x);requireThat(Number.isSafeInteger(n)&&n>0,'La cantidad debe ser un entero mayor que cero.');return n};
 const text=x=>String(x||'').trim();
 export function emptyState(){return {schema:1,version:VERSION,revision:0,lots:[],positions:[],orders:[],transfers:[],returns:[],events:[],dispatches:[],locations:[{id:'VMA-SOMB-M01',nursery:'VMA',sector:'Sombreadero',kind:'Mesón',name:'M01',active:true},{id:'VMA-EVAL-P01',nursery:'VMA',sector:'Evaluación',kind:'Platabanda',name:'P01',active:true},{id:'VQ-CREC-P01',nursery:'VQ',sector:'Crecimiento',kind:'Platabanda',name:'P01',active:true},{id:'VSF-PROP-I01',nursery:'VSF',sector:'Propagación',kind:'Invernadero',name:'I01',active:true}],feedback:[]}}
-export function code(l){return [l.speciesCode,l.provenance,l.sowing.slice(5,7)+l.sowing.slice(2,4),l.container,l.quality,l.origin].join('-')}
-function lot(s,info){requireThat(['C1','C2','C3'].includes(info.quality),'Calidad inválida.');const c=code(info);let l=s.lots.find(x=>x.code===c);if(!l){l={...info,id:uid(),code:c};s.lots.push(l)}else requireThat(l.species===info.species,'Ese código de especie ya corresponde a otro nombre.');return l}
+const monthCode=d=>d.slice(5,7)+d.slice(2,4);
+export function clp(l){return [l.speciesCode,l.provenance,monthCode(l.sowing),l.container,l.quality].join('-')}
+export function code(l){return l.cls?l.cls+'--'+clp(l):[l.speciesCode,l.provenance,monthCode(l.sowing),l.container,l.quality,l.origin].join('-')}
+export function registrationInfo(d){
+ const pick=(key,id)=>{const row=CATALOGS[key].find(r=>r.id===id);requireThat(row,'Seleccione una opción válida del catálogo E1.');return row};
+ const sp=pick('species',d.speciesId),pr=pick('origins',d.provenanceId),ct=pick('containers',d.containerId);
+ requireThat(['new','existing'].includes(d.registrationKind),'Seleccione el tipo de registro.');
+ requireThat(['C1','C2','C3'].includes(d.quality),'Seleccione la calidad.');
+ requireThat(d.registrationKind!=='new'||d.quality==='C3','Las plantas recién establecidas se registran en C3.');
+ requireThat(/^\d{4}-(0[1-9]|1[0-2])$/.test(d.sowing)&&d.sowing<=now().slice(0,7),'Mes de siembra inválido o futuro.');
+ const dt=new Date(d.collectionDate+'T00:00:00Z');
+ requireThat(/^\d{4}-\d{2}-\d{2}$/.test(d.collectionDate)&&!isNaN(dt)&&dt.toISOString().slice(0,10)===d.collectionDate&&d.collectionDate.slice(0,7)<=d.sowing,'La fecha de colecta debe ser válida y anterior o del mismo mes que la siembra.');
+ const ref=text(d.collectionRef);requireThat(!ref||/^[A-Za-z0-9_]{1,24}$/.test(ref),'La referencia de colecta admite hasta 24 letras, números o guion bajo.');
+ const cls=sp.code+'-'+pr.code+'-'+d.collectionDate.replaceAll('-','')+(ref?'-'+ref:'');
+ return {species:sp.name,speciesCode:sp.code,provenance:pr.code,provenanceName:pr.name,speciesId:sp.id,provenanceId:pr.id,containerId:ct.id,container:ct.code,containerName:ct.name,sowing:d.sowing,collectionDate:d.collectionDate,collectionRef:ref,cls,quality:d.quality,origin:d.origin,registrationKind:d.registrationKind};
+}
+function lot(s,info){requireThat(['C1','C2','C3'].includes(info.quality),'Calidad inválida.');const c=code(info);let l=s.lots.find(x=>x.code===c);if(!l){l={...info,id:uid(),code:c};s.lots.push(l)}else {requireThat(l.species===info.species&&l.provenanceName===info.provenanceName&&l.origin===info.origin,'Código coincidente con otra especie, procedencia o vivero de origen. Revise los catálogos antes de registrar; no se han mezclado plantas.');}return l}
 export const lotBy=(s,id)=>s.lots.find(l=>l.id===id);
 export const locBy=(s,id)=>s.locations.find(l=>l.id===id);
 export const total=s=>s.positions.filter(p=>p.status!=='custody').reduce((n,p)=>n+p.qty,0);
@@ -36,6 +52,7 @@ export function execute(input,command,actor){
  const s=structuredClone(input),d=command.data||{},t=command.type;const start=s.events.length;
  if(t==='location'){supervisor(actor);requireThat(actor.nursery===d.nursery,'Solo puede crear ubicaciones de su vivero.');requireThat(text(d.sector)&&text(d.name),'Complete sector e identificación.');requireThat(['Mesón','Platabanda','Invernadero','Cuarentena','Tratamiento','Custodia'].includes(d.kind),'Tipo inválido.');const id=[d.nursery,d.sector,d.name].join('-').toUpperCase();requireThat(!s.locations.some(x=>x.id===id),'La ubicación ya existe.');s.locations.push({...d,id,active:true,enabled:d.kind!=='Cuarentena'});event(s,'Ubicación creada',actor,{id,...d});}
  else if(t==='enableQuarantine'){ito(actor);const loc=locBy(s,d.location);requireThat(loc?.kind==='Cuarentena','Seleccione un sector de cuarentena.');requireThat(text(d.reason),'Registre el respaldo de habilitación.');loc.enabled=true;event(s,'Cuarentena habilitada',actor,d);}
+ else if(t==='registerLot'){supervisor(actor);const info=registrationInfo(d);requireThat(NURSERIES[d.origin]&&d.origin===actor.nursery,'El vivero de origen debe corresponder al Supervisor.');const loc=locBy(s,d.location);requireThat(loc?.nursery===actor.nursery&&!['Cuarentena','Custodia'].includes(loc.kind),'Seleccione una ubicación de producción de su vivero.');const n=qty(d.qty),l=lot(s,info),p=pos(s,l.id,d.location);p.qty=n;event(s,'Registro de lote · '+l.quality,actor,{...info,lot:l.id,code:l.code,location:d.location,qty:n},[{position:p.id,delta:n}]);}
  else if(t==='high'){supervisor(actor);requireThat(NURSERIES[d.origin]&&/^\d{4}-(0[1-9]|1[0-2])$/.test(d.sowing)&&d.sowing<=(new Date().toISOString().slice(0,7)),'Revise origen y mes de siembra (no puede ser futuro).');for(const key of ['species','speciesCode','provenance','container'])requireThat(text(d[key]),'Complete especie, código, procedencia y contenedor.');requireThat([d.speciesCode,d.provenance,d.container].every(v=>/^[A-Z0-9_]+$/i.test(v)),'Use letras, números o guion bajo en componentes del código.');const loc=locBy(s,d.location);requireThat(loc?.nursery===actor.nursery&&d.origin===actor.nursery,'El alta debe corresponder al vivero del Supervisor.');requireThat(!['Cuarentena','Custodia'].includes(loc.kind),'El alta requiere una ubicación de producción.');const n=qty(d.qty),l=lot(s,{species:text(d.species),speciesCode:d.speciesCode.toUpperCase(),provenance:d.provenance.toUpperCase(),sowing:d.sowing,container:d.container.toUpperCase(),origin:d.origin,quality:'C3'}),p=pos(s,l.id,d.location);p.qty=n;event(s,'Alta C3 · recién establecida',actor,{lot:l.id,location:d.location,qty:n},[{position:p.id,delta:n}]);}
  else if(['move','quality','container','loss','adjust','block','unblock'].includes(t)){
  const p=source(s,d.position);scope(actor,p);const l=lotBy(s,p.lot);requireThat(!['transit','custody'].includes(p.status),'Resuelva primero el traslado o la devolución.');

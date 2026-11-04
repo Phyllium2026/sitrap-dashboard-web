@@ -36,3 +36,14 @@ El control sanitario se aplica a la partida completa recibida que se evalúa; la
 `node --test tests/pilot-model.test.mjs`: diez casos sobre conservación de inventario, reserva, despacho idempotente, firma obligatoria, límites de stock, recepción parcial, devoluciones, donaciones y cuarentena.
 
 Prueba de navegador Chromium: navegación de módulos, carga de ejemplo, reapertura offline y diseño desktop/móvil. La impresión física y la cámara del iPhone requieren prueba en equipo real.
+
+## Mejora 2.1.1 — Registro y codificación
+- «Registrar lote» reemplaza «Registrar alta» en los accesos.
+- Catálogos estáticos de E1 (4): DIM_Especie, DIM_Origen y DIM_Contenedor, columnas A/B; se conserva mayúsculas/minúsculas y correspondencia de códigos.
+- Nuevo registro por catálogos: CLS = especie-origen-AAAAMMDD de colecta, con referencia opcional para distinguir colectas del mismo día; CLP = especie-origen-MMYY de siembra-contenedor-calidad; código final = CLS--CLP.
+- La fecha completa de colecta amplía la precisión mensual del CLS original de E1 para evitar fusionar colectas de días distintos. CLP conserva mes/año de siembra.
+- Calidad desplegable C1/C2/C3 para producción existente; plantas recién establecidas requieren C3.
+- Distintos CLS permanecen separados. Una misma combinación CLS+CLP incorpora cantidad con un nuevo movimiento. Si coincide el código pero difiere especie, localidad o vivero original, se bloquea la incorporación en vez de fusionarla.
+- E1 contiene códigos repetidos: se mantienen los valores originales, se valida la identidad al agrupar y queda pendiente depurar esos catálogos con el responsable. No se publican registros productivos ni datos personales del Excel.
+- No se migran códigos antiguos ni se inventan fechas de colecta para los ensayos anteriores. El nuevo formato aplica a nuevos registros; cambios de calidad de esos registros conservan CLS.
+- Se agregan cuatro pruebas: catálogos/agrupación, validaciones, reclasificación con CLS y colisiones.
