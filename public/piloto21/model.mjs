@@ -1,6 +1,6 @@
 import {CATALOGS} from './catalogs.mjs';
 // SITRAP 2.1: deterministic command model, no network or production writes.
-export const VERSION = '2.1.2';
+export const VERSION = '2.1.3';
 export const ROLES = ['Supervisor de Vivero','Supervisor ITO','AdC MLP'];
 export const NURSERIES = {VMA:'Monte Aranda',VQ:'Quillota',VSF:'Sagrada Familia'};
 export const uid = () => globalThis.crypto.randomUUID();
@@ -39,7 +39,7 @@ function pos(s,lid,location,status='available',extra={}){const loc=locBy(s,locat
 function event(s,type,actor,payload,entries=[]){s.events.push({id:uid(),at:now(),type,actor:actor.name,role:actor.role,payload,entries});}
 function source(s,id){const p=s.positions.find(x=>x.id===id);requireThat(p,'Seleccione una existencia válida.');return p}
 function scope(actor,p){requireThat(actor.role!=='Supervisor de Vivero'||actor.nursery===p.nursery,'El Supervisor solo opera su vivero.');}
-function auth(actor,roles){requireThat(roles.includes(actor.role),'Esta acción corresponde a '+roles.join(' o ')+'.');requireThat(text(actor.name),'Indique el nombre del responsable de prueba.');}
+function auth(actor,roles){requireThat(roles.includes(actor.role),'Perfil activo: '+actor.role+'. Esta acción requiere '+roles.join(' o ')+'.');requireThat(text(actor.name),'Indique el nombre del responsable de prueba.');}
 const supervisor=a=>auth(a,['Supervisor de Vivero']);
 const ito=a=>auth(a,['Supervisor ITO']);
 function evidence(d){requireThat(text(d.reason),'Ingrese una justificación.');requireThat(Array.isArray(d.photos)&&d.photos.length>0,'Adjunte al menos una fotografía de prueba.');}

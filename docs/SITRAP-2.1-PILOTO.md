@@ -56,3 +56,8 @@ La ubicación interna del registro inicial se exige solo en VMA. En VQ/VSF se re
 El módulo DIM Ubicación permite agregar sectores y ubicaciones reales. Los archivos E1 (4) y E2 (7) entregados no contienen la hoja DIM Ubicación: el listado completo de VMA sigue pendiente de entrega. Se conservan las ubicaciones existentes del ensayo sin presentarlas como un catálogo completo.
 
 Validación: 15 pruebas del modelo y prueba móvil del formulario, ocultamiento de ubicación en VSF, guardado de código mensual y catálogo offline.
+
+## Corrección 2.1.3 — Perfil en movimientos
+El formulario muestra responsable y rol requerido. El selector explícito de perfil del piloto habilita la confirmación solo con el rol correspondiente, sin reconstruir el formulario ni eliminar cantidad, observación o archivos seleccionados. La evaluación del Supervisor ITO se confirma directamente, sin una segunda aprobación ITO. Se mantienen las validaciones del modelo y el rol en la auditoría.
+
+Este selector solo simula roles en el entorno de pruebas; no constituye autenticación ni autorización de producción. No modifica existencias anteriores. Validación: 15 pruebas del modelo aprobadas y comprobación de sintaxis. La prueba automatizada de navegador local está bloqueada por restricciones del entorno.
